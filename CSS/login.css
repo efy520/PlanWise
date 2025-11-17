@@ -1,0 +1,136 @@
+/* --- Global Styles --- */
+/* This sets up our font and background color for the whole page */
+body {
+    font-family: 'Inter', sans-serif;
+    /* This light gray comes from your Figma input fields */
+    background-color: #F3F4F6; 
+    color: #2E2E2E; /* Charcoal text */
+}
+
+/* --- Bootstrap Card Override --- */
+/* We're making the card rounder to match your design */
+.card {
+    border-radius: 16px !important;
+}
+
+/* --- Logo Styling --- */
+.logo {
+    display: block; 
+    /* CHANGE: I removed the fixed "margin-bottom: 24px;"
+      This now lets our Bootstrap class (mb-2) in the HTML file control the spacing.
+    */
+    margin: 0 auto; 
+    
+    /* We let Bootstrap's column handle the width, 
+       but set a max-width so it doesn't get too big */
+    max-width: 250px;
+    height: auto; 
+}
+
+/* --- "Sign Up" Box --- */
+.signup-box {
+    background-color: #171A1F; /* Dark background from Figma */
+}
+
+.signup-button {
+    background-color: #3a3a3a; /* Darker gray */
+    color: #ffffff;
+    text-decoration: none;
+    padding: 10px 16px;
+    border-radius: 12px; /* Slightly rounder than default */
+    font-weight: 500;
+    font-size: 14px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px; /* Space between icon and text */
+    transition: background-color 0.2s ease;
+    border: none;
+}
+
+.signup-button:hover {
+    background-color: #D4AF37;
+}
+
+/* --- Divider "OR LOG IN WITH" --- */
+.divider {
+    display: flex;
+    align-items: center;
+    text-align: center;
+    color: #565D6D; /* From Figma */
+    margin: 24px 0;
+    font-size: 14px;
+    font-weight: 400;
+}
+
+.divider hr {
+    flex: 1;
+    border: none;
+    border-top: 1px solid #eee;
+}
+
+.divider span {
+    padding: 0 16px;
+}
+
+/* --- Login Form Overrides --- */
+.form-label {
+    color: #424856;
+    font-size: 14px;
+    font-weight: 400;
+}
+
+/* This is how we override Bootstrap's default form style
+  to match your Figma design.
+*/
+.form-control {
+    background-color: #F3F4F6 !important; /* Light gray from Figma */
+    border: 1px solid #F3F4F6 !important;
+    padding-top: 12px; /* Make it a bit taller */
+    padding-bottom: 12px;
+    font-size: 16px;
+    border-radius: 12px !important; /* Rounded corners */
+}
+
+.form-control::placeholder {
+    color: #BDC1CA; /* Placeholder color from Figma */
+    font-weight: 400;
+}
+
+/* This styles the icon containers */
+.input-group-text {
+    background-color: #F3F4F6; /* Match the input */
+    border: 1px solid #F3F4F6;
+    border-radius: 12px !important;
+}
+
+/* This makes the right-side "eye" icon have a transparent background */
+.input-icon-right {
+    cursor: pointer;
+    background-color: transparent;
+    border: none;
+}
+
+/* Customizing the :focus ring to our brand color */
+.form-control:focus {
+    background-color: #ffffff !important;
+    border-color: #4E56C0 !important; /* Our new Blue */
+    box-shadow: 0 0 0 3px rgba(78, 86, 192, 0.1) !important;
+}
+
+/* --- Custom Gold Button --- */
+/* This is our custom button class */
+.btn-gold {
+    background-color: #D4AF37; /* Gold */
+    color: #FFF; /* White text from Figma */
+    border: none;
+    border-radius: 16px !important; /* From Figma */
+    font-size: 18px;
+    font-weight: 500;
+    padding-top: 12px;
+    padding-bottom: 12px;
+}
+
+.btn-gold:hover {
+    background-color: #020202; /* Slightly darker gold */
+    color: #FFF;
+}
