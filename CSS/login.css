@@ -16,20 +16,30 @@ body {
 /* --- Logo Styling --- */
 .logo {
     display: block; 
-    /* CHANGE: I removed the fixed "margin-bottom: 24px;"
-      This now lets our Bootstrap class (mb-2) in the HTML file control the spacing.
-    */
     margin: 0 auto; 
     
-    /* We let Bootstrap's column handle the width, 
-       but set a max-width so it doesn't get too big */
+    /* This negative margin pulls the content up (the crop fix) */
+    margin-bottom: -20px; 
+
     max-width: 250px;
     height: auto; 
 }
 
+/* NEW: Style for the "First Time?" text */
+.signup-prompt {
+    color: #171A1F;
+    text-align: center;
+    font-size: 20px; /* Slightly smaller than Figma's 24px to look balanced */
+    font-weight: 500;
+    line-height: 1.5;
+    margin-bottom: 8px; /* Adds a small space above the black box */
+}
+
 /* --- "Sign Up" Box --- */
+/* The padding is smaller now since the text is outside */
 .signup-box {
     background-color: #171A1F; /* Dark background from Figma */
+    padding: 8px !important; 
 }
 
 .signup-button {
@@ -42,7 +52,6 @@ body {
     font-size: 14px;
     display: inline-flex;
     align-items: center;
-    gap: 8px; /* Space between icon and text */
     transition: background-color 0.2s ease;
     border: none;
 }
@@ -131,6 +140,6 @@ body {
 }
 
 .btn-gold:hover {
-    background-color: #020202; /* Slightly darker gold */
+    background-color: #c7a034; /* Slightly darker gold */
     color: #FFF;
 }

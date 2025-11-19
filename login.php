@@ -45,6 +45,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
       2. This links to your CUSTOM CSS file (for matching your Figma design)
     -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- This is linking to the correct "login.css" file -->
     <link rel="stylesheet" href="css/login.css">
     
     <!-- This links to the "Inter" font from Google Fonts -->
@@ -64,37 +65,37 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <div class="row justify-content-center align-items-center min-vh-100">
             <!-- 
               HERE IS THE RESPONSIVE PART:
-              "col-lg-6" = On Large screens (laptops), make this box 6/12 columns wide (half the screen).
+              "col-lg-6" = On Large screens (laptops), make this box 6/12 columns wide.
               "col-md-8" = On Medium screens (tablets), make this box 8/12 columns wide.
               "col-11"   = On Small screens (phones), make this box 11/12 columns wide.
             -->
             <div class="col-lg-6 col-md-8 col-11">
                 
                 <!-- 
-                  This is the main white box.
-                  CHANGE 1: I changed 'pt-4' (padding-top 1.5rem) to 'pt-3' (padding-top 1rem).
-                  This will move everything up.
+                  This is the main white box. We use Bootstrap's "card" component.
+                  We are using "pt-3" for less padding on top.
                 -->
-                <main class="card shadow-sm border-0 pt-0 pb-5 px-4 px-md-3">
+                <main class="card shadow-sm border-0 pt-3 pb-5 px-4 px-md-5">
                     <div class="card-body">
 
                         <!-- 
                           1. The Logo
-                          CHANGE 2: I changed 'mb-3' (margin-bottom 1rem) to 'mb-2' (margin-bottom 0.5rem).
-                          This will shrink the space between the logo and the black box.
+                          We are using "mb-2" for less margin-bottom (less space below).
                         -->
-                        <img src="images/logo.png" alt="PlanWise Logo" class="logo mb-0">
+                        <img src="images/logo.png" alt="PlanWise Logo" class="logo mb-2">
 
-                        <!-- 2. The "Sign Up" Box -->
+                        <!-- 
+                          2. The "Sign Up" Box 
+                          The "First Time?" text is now OUTSIDE this box.
+                        -->
+                        
+                        <!-- This text is from your Figma file, now with its own class -->
+                        <p class="signup-prompt">First Time?</p>
+                        
                         <div class="signup-box text-white rounded-4 p-3 text-center mb-4">
-                            <!-- This text is from your Figma file -->
-                            <p class="mb-2" style="font-weight: 500; font-size: 20px;">First Time?</p>
-                            
                             <!-- This will link to your registration page. '#' is a placeholder -->
                             <a href="#" class="signup-button">
-                                <!-- This is the small "play" icon -->
-                                <svg width="12" height="12" viewBox="0 0 12 12" fill="currentColor" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M2.768 1.336A1 1 0 0 1 4 2.164v7.672a1 1 0 0 1-1.555.832L.93 9.42a1 1 0 0 1 0-1.664l1.515-1.246a1 1 0 0 1 .323-.174Z M10.555 2.998a1 1 0 0 1 .832 1.554l-1.246 1.515a1 1 0 0 1-1.664 0L7.23 4.82a1 1 0 0 1 .832-1.554c.73-.099 1.46-.099 2.19 0Z" clip-rule="evenodd"/></svg>
-                                Sign Up
+                            Sign Up
                             </a>
                         </div>
 
@@ -142,6 +143,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
                                             <path d="M2.86078 13.0174C2.43345 12.4064 2.43345 11.5936 2.86078 10.9826C4.21356 9.0674 7.54434 5.12 12 5.12C16.4557 5.12 19.7864 9.0674 21.1392 10.9826C21.5665 11.5936 21.5665 12.4064 21.1392 13.0174C19.7864 14.9326 16.4557 18.88 12 18.88C7.54434 18.88 4.21356 14.9326 2.86078 13.0174Z" stroke="#BDC1CA" stroke-width="2.064" stroke-miterlimit="10" stroke-linecap="round"/>
                                             <path d="M12.0001 15.4401C13.8999 15.4401 15.4401 13.8999 15.4401 12.0001C15.4401 10.1002 13.8999 8.56006 12.0001 8.56006C10.1002 8.56006 8.56006 10.1002 8.56006 12.0001C8.56006 13.8999 10.1002 15.4401 12.0001 15.4401Z" stroke="#BDC1CA" stroke-width="2.064" stroke-miterlimit="10" stroke-linecap="square"/>
+                                            <path d="M3.3999 20.6L20.5999 3.40002" stroke="#BDC1CA" stroke-width="2.064" stroke-miterlimit="10" stroke-linecap="square"/>
                                         </svg>
                                     </button>
                                 </div>
