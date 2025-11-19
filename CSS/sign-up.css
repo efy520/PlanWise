@@ -1,0 +1,116 @@
+/* --- Global Styles --- */
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: #F3F4F6; /* Light gray background */
+    color: #171A1F; /* Dark text from Figma */
+}
+
+/* --- Card Override --- */
+.card {
+    border-radius: 16px !important; /* Matches your Figma general style */
+    background-color: #ffffff;
+}
+
+/* --- Title --- */
+.signup-title {
+    color: #171A1F;
+    font-family: 'Inter', sans-serif;
+    font-size: 32px; /* From Figma */
+    font-weight: 400;
+    line-height: 48px; /* 150% */
+}
+
+/* --- Form Labels --- */
+.form-label {
+    color: #424856; 
+    font-size: 14px; /* Default label size */
+    font-weight: 400;
+    line-height: 20px;
+    margin-bottom: 8px;
+}
+
+/* --- Form Inputs (Username, Phone, Email, Password) --- */
+.form-control {
+    background-color: #F3F4F6 !important; /* Light gray background */
+    border: 1px solid transparent !important; 
+    border-radius: 6px !important; /* From Figma */
+    padding: 7px 12px; /* Tighter vertical padding from Figma (7px/6px) */
+    height: 35px; /* Tighter height from Figma */
+    font-size: 14px; /* Default input text size */
+    color: #171A1F;
+}
+
+.form-control::placeholder {
+    color: #BDC1CA; /* Light placeholder text */
+}
+
+.form-control:focus {
+    background-color: #ffffff !important;
+    border-color: #D4AF37 !important; /* Gold border on focus */
+    box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.1) !important;
+}
+
+/* --- Input Group (Password Field adjustments) --- */
+.input-group-text {
+    background-color: #F3F4F6 !important;
+    border: 1px solid transparent !important;
+    border-radius: 0 6px 6px 0 !important; /* Round only right corners */
+}
+
+/* Fix left border radius for password input inside group */
+.input-group .form-control {
+    border-radius: 6px 0 0 6px !important;
+}
+
+/* --- Radio Buttons (Gender Label) --- */
+.form-check-label {
+    color: #171A1F;
+    font-size: 14px; /* From Figma */
+    font-weight: 400;
+}
+
+.form-check-input:checked {
+    background-color: #D4AF37; /* Gold checked color */
+    border-color: #D4AF37;
+}
+
+/* --- Gold Sign Up Button --- */
+.btn-gold {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    padding: 9px 0; /* Direct padding from Figma */
+    border-radius: 6px !important; /* From Figma */
+    background-color: #D4AF37; /* Gold */
+    border: 1px solid transparent;
+    
+    /* Text Style */
+    color: #ffffff;
+    font-size: 18px; /* Adjusted slightly for visibility */
+    font-weight: 500;
+    transition: background-color 0.2s ease;
+}
+
+.btn-gold:hover {
+    background-color: #c7a034; /* Darker gold on hover */
+    color: #ffffff;
+}
+
+/* --- Bottom Link ("Already have an account?") --- */
+.login-link {
+    color: #171A1F;
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 22px;
+}
+
+.login-link a {
+    color: #D4AF37; /* Gold link color */
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.login-link a:hover {
+    text-decoration: underline;
+}
