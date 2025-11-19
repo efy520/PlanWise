@@ -1,0 +1,230 @@
+/* Importing Inter font, though it's also in PHP file */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: #F3F4F6; /* Light gray background */
+    color: #2E2E2E; /* Charcoal text for general info */
+    min-height: 100vh;
+}
+
+/* --- 1. Top Navigation Bar (Header) --- */
+
+.app-nav {
+    background-color: #ffffff !important;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.nav-logo {
+    /* NEW: Logo dimensions from Figma */
+    width: 180px; 
+    height: auto;
+    margin-right: 40px; /* Space between logo and menu links */
+}
+
+/* Container for logo and links to align them centrally */
+.logo-section {
+    width: auto;
+}
+
+.nav-links .nav-link-item {
+    /* NEW: Font size and color for menu links */
+    color: #726F54; /* Muted Green/Brown from Figma */
+    font-size: 32px; /* Large font size from Figma */
+    font-weight: 700;
+    line-height: 48px; /* 150% */
+    
+    text-decoration: none;
+    padding: 0 10px;
+    border-radius: 0;
+    transition: color 0.2s, border-color 0.2s;
+}
+
+.nav-links .nav-link-item.active {
+    color: #171A1F; /* Darker charcoal when active */
+    border-bottom: 4px solid #171A1F; 
+}
+
+.nav-links .nav-link-item:hover {
+    color: #4E56C0; /* Trustworthy Blue on hover */
+}
+
+.user-info {
+    /* Ensures the Logout link text remains legible */
+    font-size: 14px; 
+}
+
+/* --- 2. Quote Box --- */
+.quote-box {
+    background-color: #ffffff !important;
+    border: 1px solid #e0e0e0;
+    padding: 16px;
+}
+
+.quote-text {
+    /* NEW: Quote text styles from Figma */
+    color: #171A1F;
+    text-align: right; /* Aligns the quote text to the right */
+    font-size: 24px;
+    font-style: italic;
+    font-weight: 400;
+    line-height: 36px;
+    margin-bottom: 0;
+}
+
+
+/* --- 3. Task/Calendar Tabs --- */
+.tab-controls {
+    /* NEW: Tighter border-radius for the outer container */
+    border-radius: 6px !important;
+    background-color: #ffffff;
+    width: fit-content; /* Make the container fit the tabs */
+    margin-bottom: 24px !important;
+}
+
+.tab-button {
+    /* Main styling for both tabs */
+    flex-grow: 1;
+    text-align: center;
+    padding: 12px 30px;
+    text-decoration: none;
+    color: #424856; 
+    font-size: 16px;
+    font-weight: 600;
+    min-width: 150px;
+}
+
+.tab-button.active {
+    /* Style for the active (Task) tab */
+    background-color: #ffffff; 
+    color: #4E56C0; /* Trustworthy Blue */
+    border-radius: 6px;
+}
+
+/* We need to style the INACTIVE calendar tab darker */
+.tab-button:not(.active) {
+    background-color: #4E56C0; /* Trustworthy Blue */
+    color: #ffffff;
+}
+
+/* --- 4. Search and Controls --- */
+
+.search-icon {
+    /* Tighter padding to match Figma input field */
+    padding: 8px 12px !important; 
+    border-right: none !important;
+    border-radius: 10px 0 0 10px !important; /* Rounded search left */
+}
+
+.input-group .form-control {
+    border-radius: 0 10px 10px 0 !important; /* Rounded search right */
+    background-color: #F3F4F6 !important; /* Light gray from Figma */
+    height: 48px; /* Taller input field */
+    padding: 9px 16px; /* From Figma */
+}
+
+.status-dropdown {
+    /* NEW: Dropdown style from Figma */
+    border-radius: 10px !important;
+    background-color: #F3F4F6 !important;
+    height: 48px;
+    font-size: 14px;
+    color: #565D6D;
+}
+
+.add-task-btn {
+    /* NEW: Button style from Figma */
+    background-color: #4E56C0; /* Trustworthy Blue */
+    color: #FFF;
+    border-radius: 6px !important;
+    font-weight: 700;
+    font-size: 20px; /* Adjusted to fit better than 24px */
+    height: 48px;
+    padding: 8px 20px;
+    transition: background-color 0.2s;
+}
+
+.add-task-btn:hover {
+    background-color: #3b4290; /* Darker blue on hover */
+}
+
+/* --- 5. Task List Table --- */
+
+.task-table-wrapper {
+    border-radius: 8px !important;
+    overflow: hidden; 
+}
+
+.task-table thead th {
+    /* NEW: Column Headers styling */
+    color: #565D6D;
+    font-weight: 400;
+    font-size: 14px; /* From Figma */
+    line-height: 22px; /* 157.143% */
+    text-transform: uppercase;
+    padding-top: 12px;
+    padding-bottom: 12px;
+}
+
+.task-name-col {
+    /* NEW: Task name color and font */
+    color: #171A1F;
+    font-weight: 500;
+    font-size: 14px;
+    /* Ensure content inside this column is vertically centered */
+    display: flex;
+    align-items: center;
+}
+
+/* Styling the link that contains the pencil icon */
+.edit-link {
+    display: inline-flex; /* Allows icon and link text to align */
+    color: #171A1F; /* Dark color */
+    text-decoration: none; /* Removes underline */
+    margin-right: 5px; /* Adds a bit of space between icon and text */
+}
+
+.edit-link:hover {
+    color: #4E56C0; /* Trustworthy Blue on hover */
+}
+
+.edit-icon {
+    /* NEW: Pen icon color */
+    color: #171A1F !important;
+    margin-top: 2px; /* Slight adjustment to align with text */
+}
+
+/* --- Status Badges (The Colored Text) --- */
+
+.status-badge {
+    /* General badge style */
+    padding: 3px 8px;
+    border-radius: 12px;
+    font-size: 12px; /* NEW: Tighter font size */
+    font-weight: 600;
+    text-transform: capitalize; /* Use capitalize for 'In progress' */
+}
+
+.status-incomplete {
+    /* NEW: Red color from Figma */
+    background-color: #FBEAEA; 
+    color: #AF2020; /* Dark Red/Brown */
+}
+
+.status-in-progress {
+    /* Blue color for In Progress */
+    background-color: #cce5ff;
+    color: #004085;
+}
+
+.status-pending {
+    /* NEW: Orange color from Figma */
+    background-color: #FFF0E6;
+    color: #D4AF37; 
+}
+
+.status-completed {
+    /* Green color for Completed */
+    background-color: #d4edda;
+    color: #155724;
+}

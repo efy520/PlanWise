@@ -94,7 +94,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         
                         <div class="signup-box text-white rounded-4 p-3 text-center mb-4">
                             <!-- This will link to your registration page. '#' is a placeholder -->
-                            <a href="#" class="signup-button">
+                            <a href="sign-in.php" class="signup-button">
                             Sign Up
                             </a>
                         </div>
