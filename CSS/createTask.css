@@ -1,32 +1,37 @@
 body {
     font-family: 'Inter', sans-serif;
     background: #F9E7B2;
-    margin: 0;
-    padding: 0;
+    padding: 30px;
 }
 
-.container {
+/* Container */
+.create-container {
     max-width: 900px;
-    margin: 40px auto;
+    margin: auto;
     background: #FFF9E6;
+    border-radius: 6px;
     padding: 40px 50px;
-    border-radius: 10px;
+    box-shadow: 0 0 4px rgba(0,0,0,0.1);
 }
 
-/* Back button */
+/* Back Button */
 .back-btn {
     display: inline-flex;
-    padding: 8px 31px;
+    padding: 8px 30px;
     border-radius: 29px;
     background: #F77F00;
     color: white;
     text-decoration: none;
-    font-weight: 600;
+    font-weight: 500;
     margin-bottom: 20px;
 }
 
+.back-btn:hover {
+    background: #d96f00;
+}
+
 /* Title */
-.create-title {
+.title-text {
     font-size: 48px;
     font-weight: 700;
     color: #323743;
@@ -34,74 +39,63 @@ body {
 }
 
 /* Labels */
-.label {
+.label-text {
     font-size: 16px;
-    margin-bottom: 5px;
+    font-weight: 500;
+    margin-bottom: 8px;
     display: block;
-    color: #323743;
 }
 
-/* Input field */
-.input-field,
-.textarea-field {
-    width: 100%;
+/* Inputs */
+.input-box,
+.date-box {
     background: #F3F4F6;
-    border: none;
-    padding: 12px;
     border-radius: 6px;
-    font-size: 16px;
-    margin-bottom: 20px;
-}
-
-.textarea-field {
-    height: 120px;
-    resize: none;
-}
-
-
-.date-field {
+    padding: 15px;
+    border: none;
     width: 100%;
-    background: #F3F4F6;
-    border: none;
-    padding: 12px;
-    border-radius: 6px;
+    margin-bottom: 25px;
     font-size: 16px;
-    margin-bottom: 30px;
 }
 
+.input-box:focus,
+.date-box:focus {
+    outline: 2px solid #7B542F;
+}
 
-/* Buttons row */
+/* Buttons */
 .button-row {
+    margin-top: 25px;
     display: flex;
     gap: 20px;
 }
 
-.cancel-btn,
-.create-btn {
-    width: 200px;
-    padding: 18px 0;
-    border: none;
+.btn-cancel {
+    padding: 15px 80px;
     border-radius: 43px;
-    font-size: 16px;
-    cursor: pointer;
-}
-
-.cancel-btn {
     background: #F3F4F6;
+    border: none;
+    font-weight: 600;
+    font-size: 16px;
+    text-decoration: none;
+    text-align: center;
     color: #323743;
 }
 
-.create-btn {
+.btn-create {
+    padding: 15px 80px;
+    border-radius: 43px;
     background: #7B542F;
-    color: white;
+    border: none;
     font-weight: 600;
+    font-size: 16px;
+    color: white;
 }
 
-/* Error message */
-.error-msg {
-    background: #ffdddd;
-    color: #a10000;
-    padding: 10px;
-    margin-bottom: 20px;
-    border-radius: 6px;
+.btn-create:hover {
+    background: #6A4728;
+}
+
+.btn-cancel:hover {
+    background: #E0E0E0;
 }

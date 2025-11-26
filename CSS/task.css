@@ -315,11 +315,6 @@ body {
     background: #E6EFFA; /* Light blue background */
 }
 
-/* Pending status - gray color */
-.status-pending {
-    color: #565D6D; /* Gray text */
-    background: #F3F4F6; /* Light gray background */
-}
 
 /* --- Responsive Design --- */
 /* Adjustments for smaller screens (tablets and phones) */
