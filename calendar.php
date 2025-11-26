@@ -71,6 +71,17 @@ $nextDT->modify('+1 month');
 $prevM = (int)$prevDT->format('n'); $prevY = (int)$prevDT->format('Y');
 $nextM = (int)$nextDT->format('n'); $nextY = (int)$nextDT->format('Y');
 
+// -------------------------------------------
+// FETCH RANDOM ACTIVE QUOTE
+// -------------------------------------------
+$sql_quote = "SELECT quote_text FROM quote WHERE is_active = 1 ORDER BY RAND() LIMIT 1";
+$result_quote = $conn->query($sql_quote);
+
+$quote_text = "No quote available";
+if ($result_quote && $result_quote->num_rows > 0) {
+    $row = $result_quote->fetch_assoc();
+    $quote_text = $row['quote_text'];
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -107,11 +118,16 @@ $nextM = (int)$nextDT->format('n'); $nextY = (int)$nextDT->format('Y');
         </div>
     </div>
 
-    <!-- Quote box -->
-    <div class="quote-box mb-3">
-        <p class="quote-text">"Hustle in silence and let your success make the noise"</p>
+   <!-- QUOTE BOX -->
+    <div class="row mb-3">
+        <div class="col-12">
+            <div class="quote-box">
+                <p class="quote-text">
+                    "<?php echo htmlspecialchars($quote_text); ?>"
+                </p>
+            </div>
+        </div>
     </div>
-
     <!-- calendar header: month & navigation -->
     <div class="calendar-header d-flex justify-content-between align-items-center mb-2">
         <div class="d-flex align-items-center gap-2">
