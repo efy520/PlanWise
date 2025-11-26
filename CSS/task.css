@@ -1,230 +1,355 @@
-/* Importing Inter font, though it's also in PHP file */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+/* ==========================================
+   TASK PAGE STYLES
+   ==========================================
+   This CSS file styles the task management page
+   with warm color scheme from Figma design
+   ========================================== */
 
+/* --- Global Styles --- */
 body {
-    font-family: 'Inter', sans-serif;
-    background-color: #F3F4F6; /* Light gray background */
-    color: #2E2E2E; /* Charcoal text for general info */
-    min-height: 100vh;
+    font-family: 'Inter', sans-serif; /* Modern, clean font from Google Fonts */
+    background-color: #F9E7B2; /* Warm beige background color */
+    color: #171A1F; /* Dark text color for good readability */
+    margin: 0;
+    padding: 0;
 }
 
-/* --- 1. Top Navigation Bar (Header) --- */
-
-.app-nav {
-    background-color: #ffffff !important;
-    border-bottom: 1px solid #e0e0e0;
+/* --- Top Navigation Bar --- */
+/* Container for logo and navigation menu */
+.navbar-custom {
+    display: flex; /* Arranges items horizontally */
+    justify-content: space-between; /* Space between logo and menu */
+    align-items: center; /* Vertically center items */
+    padding: 20px 0; /* Vertical padding */
 }
 
-.nav-logo {
-    /* NEW: Logo dimensions from Figma */
-    width: 180px; 
-    height: auto;
-    margin-right: 40px; /* Space between logo and menu links */
+/* --- Logo Styling --- */
+.logo-container {
+    flex-shrink: 0; /* Logo doesn't shrink */
 }
 
-/* Container for logo and links to align them centrally */
-.logo-section {
-    width: auto;
+.logo {
+    width: 180px; /* Width from Figma */
+    height: auto; /* Maintains aspect ratio */
+    display: block;
 }
 
-.nav-links .nav-link-item {
-    /* NEW: Font size and color for menu links */
-    color: #726F54; /* Muted Green/Brown from Figma */
-    font-size: 32px; /* Large font size from Figma */
-    font-weight: 700;
-    line-height: 48px; /* 150% */
-    
-    text-decoration: none;
-    padding: 0 10px;
-    border-radius: 0;
-    transition: color 0.2s, border-color 0.2s;
+/* --- Navigation Menu --- */
+/* Container for navigation links (To-Do, Finance, Dashboard, Profile) */
+.nav-menu {
+    display: flex; /* Arranges links horizontally */
+    gap: 40px; /* Space between menu items from Figma */
+    align-items: center; /* Vertically center items */
 }
 
-.nav-links .nav-link-item.active {
-    color: #171A1F; /* Darker charcoal when active */
-    border-bottom: 4px solid #171A1F; 
+/* Individual navigation links */
+.nav-item {
+    color: #171A1F; /* Dark text color */
+    text-decoration: none; /* Remove underline */
+    font-size: 18px; /* Font size */
+    font-weight: 400; /* Normal weight */
+    padding-bottom: 8px; /* Space for underline effect */
+    border-bottom: 2px solid transparent; /* Invisible border by default */
+    transition: all 0.3s ease; /* Smooth transition */
 }
 
-.nav-links .nav-link-item:hover {
-    color: #4E56C0; /* Trustworthy Blue on hover */
+/* Active/current page styling */
+.nav-item.active {
+    border-bottom: 2px solid #171A1F; /* Underline for active page */
+    font-weight: 500; /* Slightly bolder text */
 }
 
-.user-info {
-    /* Ensures the Logout link text remains legible */
-    font-size: 14px; 
+/* Hover effect for navigation links */
+.nav-item:hover {
+    color: #7B542F; /* Brown color on hover */
+    border-bottom: 2px solid #7B542F; /* Brown underline on hover */
 }
 
-/* --- 2. Quote Box --- */
+/* --- Motivational Quote Box --- */
+/* The orange box with the motivational quote */
 .quote-box {
-    background-color: #ffffff !important;
-    border: 1px solid #e0e0e0;
-    padding: 16px;
+    width: 100%; /* Full width */
+    padding: 24px 32px; /* Space inside the box */
+    border-radius: 6px; /* Rounded corners from Figma */
+    border: 0 solid #BDC1CA; /* Border from Figma */
+    background: #FFCF71; /* Orange background from Figma */
+    box-shadow: 0 0 2px 0 rgba(23, 26, 31, 0.08), 0 0 1px 0 rgba(23, 26, 31, 0.05); /* Subtle shadow from Figma */
 }
 
+/* The quote text styling */
 .quote-text {
-    /* NEW: Quote text styles from Figma */
-    color: #171A1F;
-    text-align: right; /* Aligns the quote text to the right */
-    font-size: 24px;
-    font-style: italic;
-    font-weight: 400;
-    line-height: 36px;
-    margin-bottom: 0;
+    color: #171A1F; /* Dark text */
+    font-size: 18px; /* Text size */
+    font-style: italic; /* Italic for quote style */
+    font-weight: 400; /* Normal weight */
+    margin: 0; /* Remove default margin */
+    text-align: center; /* Center the quote */
 }
 
-
-/* --- 3. Task/Calendar Tabs --- */
-.tab-controls {
-    /* NEW: Tighter border-radius for the outer container */
-    border-radius: 6px !important;
-    background-color: #ffffff;
-    width: fit-content; /* Make the container fit the tabs */
-    margin-bottom: 24px !important;
+/* --- Task and Calendar Tabs --- */
+/* Container for the tab buttons */
+.tabs-container {
+    display: flex; /* Arranges tabs horizontally */
+    gap: 0; /* No gap - tabs are connected */
+    width: 100%; /* Full width */
 }
 
+/* Individual tab button */
 .tab-button {
-    /* Main styling for both tabs */
-    flex-grow: 1;
-    text-align: center;
-    padding: 12px 30px;
-    text-decoration: none;
-    color: #424856; 
-    font-size: 16px;
-    font-weight: 600;
-    min-width: 150px;
+    flex: 1; /* Both tabs take equal width */
+    padding: 12px 24px; /* Space inside button */
+    border: 0 solid #BDC1CA; /* Border from Figma */
+    background: #FFF; /* White background by default */
+    color: #171A1F; /* Dark text */
+    font-size: 18px; /* Text size */
+    font-weight: 500; /* Medium weight */
+    cursor: pointer; /* Hand cursor on hover */
+    transition: all 0.3s ease; /* Smooth transition */
 }
 
+/* First tab (Task) - left rounded corners */
+.tab-button:first-child {
+    border-radius: 6px 0 0 0; /* Rounded top-left corner only */
+}
+
+/* Second tab (Calendar) - right rounded corners */
+.tab-button:last-child {
+    border-radius: 0 6px 0 0; /* Rounded top-right corner only */
+}
+
+/* Active tab styling */
 .tab-button.active {
-    /* Style for the active (Task) tab */
-    background-color: #ffffff; 
-    color: #4E56C0; /* Trustworthy Blue */
-    border-radius: 6px;
+    background: #7B542F; /* Brown background from Figma */
+    color: #FFF; /* White text */
 }
 
-/* We need to style the INACTIVE calendar tab darker */
-.tab-button:not(.active) {
-    background-color: #4E56C0; /* Trustworthy Blue */
-    color: #ffffff;
+/* Hover effect for non-active tabs */
+.tab-button:not(.active):hover {
+    background: #F3F4F6; /* Light gray on hover */
 }
 
-/* --- 4. Search and Controls --- */
-
-.search-icon {
-    /* Tighter padding to match Figma input field */
-    padding: 8px 12px !important; 
-    border-right: none !important;
-    border-radius: 10px 0 0 10px !important; /* Rounded search left */
+/* --- Main Content Box (Brown Container) --- */
+/* The large brown box containing the task list */
+.content-box {
+    width: 100%; /* Full width */
+    padding: 32px; /* Space inside the box */
+    border-radius: 0 0 6px 6px; /* Rounded bottom corners */
+    background: #C19A6B; /* Light brown/tan background */
+    box-shadow: 0 0 2px 0 rgba(23, 26, 31, 0.08), 0 0 1px 0 rgba(23, 26, 31, 0.05); /* Subtle shadow */
+    min-height: 500px; /* Minimum height from Figma */
 }
 
-.input-group .form-control {
-    border-radius: 0 10px 10px 0 !important; /* Rounded search right */
-    background-color: #F3F4F6 !important; /* Light gray from Figma */
-    height: 48px; /* Taller input field */
-    padding: 9px 16px; /* From Figma */
+/* --- Search Input --- */
+/* Search box for filtering tasks */
+.search-input {
+    background-color: #FFFFFF !important; /* White background */
+    border: 1px solid #DEE1E6 !important; /* Light gray border */
+    border-radius: 6px !important; /* Rounded corners */
+    padding: 10px 14px; /* Space inside input */
+    font-size: 14px; /* Text size */
+    color: #171A1F; /* Dark text */
 }
 
-.status-dropdown {
-    /* NEW: Dropdown style from Figma */
-    border-radius: 10px !important;
-    background-color: #F3F4F6 !important;
-    height: 48px;
-    font-size: 14px;
-    color: #565D6D;
+.search-input::placeholder {
+    color: #9095A0; /* Light gray placeholder */
 }
 
-.add-task-btn {
-    /* NEW: Button style from Figma */
-    background-color: #4E56C0; /* Trustworthy Blue */
-    color: #FFF;
-    border-radius: 6px !important;
-    font-weight: 700;
-    font-size: 20px; /* Adjusted to fit better than 24px */
-    height: 48px;
-    padding: 8px 20px;
-    transition: background-color 0.2s;
+.search-input:focus {
+    border-color: #7B542F !important; /* Brown border on focus */
+    box-shadow: 0 0 0 3px rgba(123, 84, 47, 0.1) !important; /* Brown glow */
+    outline: none; /* Remove default outline */
 }
 
-.add-task-btn:hover {
-    background-color: #3b4290; /* Darker blue on hover */
+/* --- Filter Dropdown --- */
+/* Dropdown for filtering by status */
+.filter-select {
+    background-color: #FFFFFF !important; /* White background */
+    border: 1px solid #DEE1E6 !important; /* Light gray border */
+    border-radius: 6px !important; /* Rounded corners */
+    padding: 10px 14px; /* Space inside select */
+    font-size: 14px; /* Text size */
+    color: #171A1F; /* Dark text */
+    cursor: pointer; /* Hand cursor */
 }
 
-/* --- 5. Task List Table --- */
-
-.task-table-wrapper {
-    border-radius: 8px !important;
-    overflow: hidden; 
+.filter-select:focus {
+    border-color: #7B542F !important; /* Brown border on focus */
+    box-shadow: 0 0 0 3px rgba(123, 84, 47, 0.1) !important; /* Brown glow */
+    outline: none; /* Remove default outline */
 }
 
+/* --- Add New Task Button --- */
+/* The brown "Add New Task" button from Figma */
+.btn-add-task {
+    display: inline-flex; /* Inline flex for centering text */
+    padding: 8px 21px 8px 20px; /* Padding from Figma */
+    justify-content: center; /* Center text horizontally */
+    align-items: center; /* Center text vertically */
+    border-radius: 6px; /* Rounded corners from Figma */
+    border: 1px solid rgba(0, 0, 0, 0.00); /* Transparent border from Figma */
+    background: #7B542F; /* Brown background from Figma */
+    color: #FFF; /* White text from Figma */
+    text-align: center; /* Center text */
+    font-family: 'Inter', sans-serif; /* Font from Figma */
+    font-size: 16px; /* Text size (adjusted from 24px for better fit) */
+    font-weight: 700; /* Bold weight from Figma */
+    line-height: 24px; /* Line height */
+    cursor: pointer; /* Hand cursor */
+    transition: background-color 0.3s ease; /* Smooth transition */
+}
+
+/* Hover effect for Add New Task button */
+.btn-add-task:hover {
+    background: #6A4728; /* Darker brown on hover */
+}
+
+/* --- Task Table --- */
+/* Container for the task table */
+.task-table-container {
+    background: #FFFFFF; /* White background */
+    border-radius: 6px; /* Rounded corners */
+    padding: 20px; /* Space inside container */
+    overflow-x: auto; /* Horizontal scroll on small screens */
+}
+
+/* The actual table element */
+.task-table {
+    width: 100%; /* Full width */
+    border-collapse: collapse; /* Remove space between cells */
+}
+
+/* Table header styling */
 .task-table thead th {
-    /* NEW: Column Headers styling */
-    color: #565D6D;
-    font-weight: 400;
-    font-size: 14px; /* From Figma */
-    line-height: 22px; /* 157.143% */
-    text-transform: uppercase;
-    padding-top: 12px;
-    padding-bottom: 12px;
+    background: #F3F4F6; /* Light gray background for header */
+    color: #565D6D; /* Medium gray text */
+    font-size: 12px; /* Small text */
+    font-weight: 600; /* Semi-bold */
+    text-transform: uppercase; /* Uppercase text */
+    padding: 12px; /* Space inside header cells */
+    text-align: left; /* Left-align text */
+    border-bottom: 2px solid #DEE1E6; /* Bottom border */
 }
 
-.task-name-col {
-    /* NEW: Task name color and font */
-    color: #171A1F;
-    font-weight: 500;
-    font-size: 14px;
-    /* Ensure content inside this column is vertically centered */
-    display: flex;
-    align-items: center;
+/* Table body row styling */
+.task-table tbody tr {
+    border-bottom: 1px solid #F3F4F6; /* Light border between rows */
+    transition: background-color 0.2s ease; /* Smooth transition */
 }
 
-/* Styling the link that contains the pencil icon */
-.edit-link {
-    display: inline-flex; /* Allows icon and link text to align */
-    color: #171A1F; /* Dark color */
-    text-decoration: none; /* Removes underline */
-    margin-right: 5px; /* Adds a bit of space between icon and text */
+/* Hover effect for table rows */
+.task-table tbody tr:hover {
+    background-color: #F9FAFB; /* Very light gray on hover */
 }
 
-.edit-link:hover {
-    color: #4E56C0; /* Trustworthy Blue on hover */
+/* Table cell styling */
+.task-table tbody td {
+    padding: 16px 12px; /* Space inside cells */
+    color: #171A1F; /* Dark text */
+    font-size: 14px; /* Text size */
+    vertical-align: middle; /* Vertically center content */
 }
 
-.edit-icon {
-    /* NEW: Pen icon color */
-    color: #171A1F !important;
-    margin-top: 2px; /* Slight adjustment to align with text */
+/* Task name cell - bold text */
+.task-name {
+    font-weight: 500; /* Medium weight */
+    color: #171A1F; /* Dark text */
 }
 
-/* --- Status Badges (The Colored Text) --- */
+/* Due date cell styling */
+.due-date {
+    color: #565D6D; /* Medium gray text */
+}
 
+/* Description cell styling */
+.description {
+    color: #565D6D; /* Medium gray text */
+    font-size: 13px; /* Slightly smaller text */
+}
+
+/* --- Edit Button (Pencil Icon) --- */
+/* The gold/yellow edit button next to each task */
+.btn-edit {
+    display: inline-flex; /* Inline flex for icon */
+    padding: 6px 8px; /* Space around icon */
+    justify-content: center; /* Center icon */
+    align-items: center; /* Center icon */
+    border-radius: 6px; /* Rounded corners from Figma */
+    border: 1px solid rgba(0, 0, 0, 0.00); /* Transparent border from Figma */
+    background: #D4AF37; /* Gold background from Figma */
+    color: #FFF; /* White icon color */
+    cursor: pointer; /* Hand cursor */
+    transition: background-color 0.3s ease; /* Smooth transition */
+}
+
+/* Hover effect for edit button */
+.btn-edit:hover {
+    background: #C69F30; /* Darker gold on hover */
+}
+
+/* --- Status Badges --- */
+/* Base styling for all status badges */
 .status-badge {
-    /* General badge style */
-    padding: 3px 8px;
-    border-radius: 12px;
-    font-size: 12px; /* NEW: Tighter font size */
-    font-weight: 600;
-    text-transform: capitalize; /* Use capitalize for 'In progress' */
+    display: inline-block; /* Inline block for badge */
+    padding: 4px 12px; /* Space inside badge */
+    border-radius: 12px; /* Rounded pill shape */
+    font-size: 12px; /* Small text from Figma */
+    font-weight: 400; /* Normal weight from Figma */
+    line-height: 20px; /* Line height from Figma */
 }
 
+/* Incomplete status - orange color from Figma */
 .status-incomplete {
-    /* NEW: Red color from Figma */
-    background-color: #FBEAEA; 
-    color: #AF2020; /* Dark Red/Brown */
+    color: #F77F00; /* Orange text from Figma */
+    background: #FFF4E6; /* Light orange background */
 }
 
-.status-in-progress {
-    /* Blue color for In Progress */
-    background-color: #cce5ff;
-    color: #004085;
-}
-
-.status-pending {
-    /* NEW: Orange color from Figma */
-    background-color: #FFF0E6;
-    color: #D4AF37; 
-}
-
+/* Completed status - green color from Figma */
 .status-completed {
-    /* Green color for Completed */
-    background-color: #d4edda;
-    color: #155724;
+    color: #3A914D; /* Green text from Figma */
+    background: #E6F7E9; /* Light green background */
+}
+
+/* In Progress status - blue color */
+.status-in-progress {
+    color: #2E5AAC; /* Blue text */
+    background: #E6EFFA; /* Light blue background */
+}
+
+/* Pending status - gray color */
+.status-pending {
+    color: #565D6D; /* Gray text */
+    background: #F3F4F6; /* Light gray background */
+}
+
+/* --- Responsive Design --- */
+/* Adjustments for smaller screens (tablets and phones) */
+@media (max-width: 768px) {
+    /* Stack logo and menu vertically on mobile */
+    .navbar-custom {
+        flex-direction: column;
+        gap: 20px;
+    }
+    
+    /* Reduce gap between menu items on mobile */
+    .nav-menu {
+        gap: 20px;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+    
+    /* Smaller logo on mobile */
+    .logo {
+        width: 140px;
+    }
+    
+    /* Less padding in content box on mobile */
+    .content-box {
+        padding: 20px;
+    }
+    
+    /* Smaller button text on mobile */
+    .btn-add-task {
+        font-size: 14px;
+        padding: 8px 16px;
+    }
 }
