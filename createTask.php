@@ -10,6 +10,9 @@ if (!isset($_SESSION['user_id'])) {
 
 $user_id = $_SESSION['user_id'];
 
+// Read autofill due_date from URL (if coming from calendar)
+$autoDue = isset($_GET['due_date']) ? $_GET['due_date'] : "";
+
 // Insert task
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
@@ -26,6 +29,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $stmt->bind_param("isssss", $user_id, $title, $description, $due_date, $created_date, $status);
 
     if ($stmt->execute()) {
+        // redirect back to task list
         header("Location: task.php?created=1");
         exit();
     } else {
@@ -60,22 +64,29 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
             <!-- Title -->
             <label class="label-text">Task name</label>
-            <input type="text" class="form-control input-field" name="title" placeholder="Type name" required>
+            <input type="text" class="form-control input-field"
+                   name="title" placeholder="Type name" required>
 
             <!-- Description -->
             <label class="label-text">Description</label>
-            <textarea class="form-control input-field" name="description" placeholder="Give some examples" required></textarea>
+            <textarea class="form-control input-field"
+                      name="description"
+                      placeholder="Give some examples" required></textarea>
 
-            <!-- Start + Due date side-by-side -->
+            <!-- Start + Due date -->
             <div class="row mt-3">
                 <div class="col-md-6">
                     <label class="label-text">Start date</label>
-                    <input type="text" class="form-control input-field" value="<?= date('Y-m-d'); ?>" readonly>
+                    <input type="text" class="form-control input-field"
+                           value="<?= date('Y-m-d'); ?>" readonly>
                 </div>
 
                 <div class="col-md-6">
                     <label class="label-text">Due date</label>
-                    <input type="date" class="form-control input-field" name="due_date" required>
+                    <input type="date" class="form-control input-field"
+                           name="due_date"
+                           value="<?= $autoDue ?>"   <!-- Autofill here -->
+                           required>
                 </div>
             </div>
 

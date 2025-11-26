@@ -1,0 +1,431 @@
+/* ==========================================
+   CALENDAR PAGE STYLES
+   ==========================================
+   Calendar page with Figma-based modal design
+   ========================================== */
+
+/* --- Page Background --- */
+body {
+    background: #FFF7E0; /* Light cream background */
+    font-family: 'Inter', sans-serif;
+    color: #171A1F;
+}
+
+/* --- Button Styles --- */
+/* Back button - orange */
+.btn-back {
+    background: #F77F00;
+    color: #fff;
+    border-radius: 20px;
+    padding: 6px 16px;
+    border: none;
+}
+
+.btn-back:hover {
+    background: #E06E00;
+    color: #fff;
+}
+
+/* New Task button - brown */
+.btn-new-task {
+    padding: 8px 18px;
+    border-radius: 10px;
+    background: #7B542F;
+    color: #fff;
+    border: none;
+}
+
+.btn-new-task:hover {
+    background: #6A4728;
+    color: #fff;
+}
+
+/* Go to Tasks button - brown */
+.btn-go-tasks {
+    background: #7B542F;
+    color: #fff;
+    border-radius: 8px;
+    padding: 6px 16px;
+    border: none;
+}
+
+.btn-go-tasks:hover {
+    background: #6A4728;
+    color: #fff;
+}
+
+/* --- Quote Box --- */
+.quote-box {
+    background: #FFCF71; /* Orange background from Figma */
+    border-radius: 6px;
+    padding: 16px 24px;
+    margin-bottom: 16px;
+    box-shadow: 0 0 2px 0 rgba(23, 26, 31, 0.08), 0 0 1px 0 rgba(23, 26, 31, 0.05);
+}
+
+.quote-text { 
+    margin: 0; 
+    color: #171A1F; 
+    font-style: italic;
+    font-size: 16px;
+    text-align: center;
+}
+
+/* --- Calendar Header --- */
+.calendar-header .month-name {
+    font-size: 20px;
+    color: #171A1F;
+    font-weight: 600;
+}
+
+/* --- Calendar Container --- */
+.calendar-wrap {
+    max-width: 1344px;
+    margin: 0 auto;
+    background: #FFF7E0;
+    border-radius: 16px;
+    padding: 22px;
+    box-shadow: 0 3px 6px rgba(18, 15, 40, 0.12);
+}
+
+/* --- Weekdays Row --- */
+.weekdays {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+.weekday {
+    flex: 1;
+    text-align: center;
+    font-size: 14px;
+    font-weight: 500;
+    color: #565D6D;
+    text-transform: uppercase;
+    font-family: 'Inter', sans-serif;
+}
+
+/* --- Calendar Grid --- */
+.calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 10px;
+    user-select: none;
+}
+
+/* --- Day Cell --- */
+.day {
+    background: #ffffff;
+    min-height: 72px;
+    border-radius: 10px;
+    padding: 10px;
+    cursor: pointer;
+    box-shadow: 0 0 2px rgba(23, 26, 31, 0.08), 0 0 1px rgba(23, 26, 31, 0.05);
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.day:hover:not(.empty) {
+    box-shadow: 0 2px 8px rgba(23, 26, 31, 0.15);
+    transform: translateY(-2px);
+}
+
+.day.empty {
+    background: transparent;
+    box-shadow: none;
+    cursor: default;
+}
+
+/* --- Date Row Inside Cell --- */
+.date-row { 
+    width: 100%; 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
+    gap: 8px; 
+}
+
+.date-number { 
+    font-size: 16px; 
+    color: #171A1F;
+    font-family: 'Inter', sans-serif;
+}
+
+/* --- Today Highlight --- */
+.day.today {
+    background: #FF9D00; /* Orange highlight for today */
+    color: #ffffff;
+    box-shadow: 0 0 6px rgba(255, 157, 0, 0.3);
+}
+
+.day.today .date-number { 
+    color: #fff;
+    font-weight: 600;
+}
+
+/* --- Weekend Styling (Saturday and Sunday) --- */
+.calendar-grid .day:nth-child(7n+1) .date-number,
+.calendar-grid .day:nth-child(7n) .date-number {
+    color: #D62828; /* Red color for weekends */
+    font-weight: 500;
+}
+
+/* --- Task Dot (Gold Circle Indicator) --- */
+.task-dot {
+    display: flex;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: #D4AF37; /* Gold dot */
+    align-items: center;
+    justify-content: center;
+    margin-left: 6px;
+}
+
+.day.has-task .date-row { 
+    align-items: center; 
+}
+
+/* ==========================================
+   MODAL STYLES - FIGMA DESIGN
+   ========================================== */
+
+/* --- Modal Container --- */
+.task-modal {
+    border-radius: 12px;
+    border: 1px solid #E0E0E0;
+    overflow: hidden;
+}
+
+/* --- Modal Header --- */
+.task-modal-header {
+    background: #FFFFFF;
+    border-bottom: 1px solid #E0E0E0;
+    padding: 20px 24px;
+}
+
+/* Orange circle icon next to "Task" title */
+.task-icon-circle {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #FF9D00; /* Orange circle from Figma */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.task-modal-header .modal-title {
+    font-size: 20px;
+    font-weight: 600;
+    color: #171A1F;
+}
+
+/* --- Modal Body --- */
+.task-modal-body {
+    background: #FFFFFF;
+    padding: 24px;
+}
+
+/* Date section in modal */
+.task-date-label {
+    font-size: 12px;
+    color: #565D6D;
+    font-weight: 400;
+    margin-bottom: 4px;
+}
+
+.task-date-value {
+    font-size: 14px;
+    color: #171A1F;
+    font-weight: 500;
+}
+
+/* Task Name section header */
+.task-section-header {
+    font-size: 14px;
+    color: #565D6D;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 12px;
+}
+
+/* --- Task List Container --- */
+.tasks-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+/* --- Individual Task Item --- */
+.task-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px;
+    background: #F9FAFB;
+    border: 1px solid #E0E0E0;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+}
+
+.task-item:hover {
+    background: #F3F4F6;
+    border-color: #D4AF37;
+}
+
+/* Task content (title and description) */
+.task-item-content {
+    flex: 1;
+}
+
+.task-title {
+    font-size: 15px;
+    font-weight: 500;
+    color: #171A1F;
+    margin-bottom: 4px;
+}
+
+.task-description {
+    font-size: 13px;
+    color: #565D6D;
+    font-weight: 400;
+}
+
+/* --- Task Action Buttons --- */
+.task-actions {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+/* Base style for all action buttons */
+.btn-task-action {
+    width: 36px;
+    height: 36px;
+    border-radius: 6px;
+    border: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-task-action:hover {
+    transform: scale(1.05);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+/* Yellow/Gold Edit Button */
+.btn-edit-yellow {
+    background: #D4AF37; /* Gold from Figma */
+}
+
+.btn-edit-yellow:hover {
+    background: #C69F30;
+}
+
+/* Green Complete Button */
+.btn-complete-green {
+    background: #3A914D; /* Green from Figma */
+}
+
+.btn-complete-green:hover {
+    background: #2E7A3E;
+}
+
+/* Red Delete Button */
+.btn-delete-red {
+    background: #DC3545; /* Red */
+}
+
+.btn-delete-red:hover {
+    background: #BB2D3B;
+}
+
+/* --- Modal Footer --- */
+.task-modal-footer {
+    background: #FFFFFF;
+    border-top: 1px solid #E0E0E0;
+    padding: 16px 24px;
+    display: flex;
+    justify-content: space-between;
+}
+
+/* Add Task button in modal footer - brown */
+.btn-add-task-modal {
+    background: #7B542F;
+    color: #fff;
+    border-radius: 8px;
+    padding: 10px 24px;
+    border: none;
+    font-weight: 500;
+    text-decoration: none;
+    display: inline-block;
+    transition: background-color 0.3s ease;
+}
+
+.btn-add-task-modal:hover {
+    background: #6A4728;
+    color: #fff;
+}
+
+/* Close button in modal footer */
+.btn-close-modal {
+    background: #F3F4F6;
+    color: #171A1F;
+    border-radius: 8px;
+    padding: 10px 24px;
+    border: 1px solid #E0E0E0;
+    font-weight: 500;
+}
+
+.btn-close-modal:hover {
+    background: #E5E7EB;
+}
+
+/* --- Responsive Design --- */
+@media (max-width: 992px) {
+    .calendar-grid { 
+        gap: 8px; 
+    }
+    
+    .day { 
+        min-height: 62px; 
+        padding: 8px; 
+    }
+    
+    .task-modal-body {
+        padding: 16px;
+    }
+    
+    .task-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+    }
+    
+    .task-actions {
+        width: 100%;
+        justify-content: flex-end;
+    }
+}
+
+@media (max-width: 768px) {
+    .calendar-wrap {
+        padding: 16px;
+    }
+    
+    .date-number {
+        font-size: 14px;
+    }
+    
+    .task-dot {
+        width: 10px;
+        height: 10px;
+    }
+}

@@ -98,10 +98,14 @@ while ($row = $result_task->fetch_assoc()) {
         <div class="col-12">
             <div class="tabs-container">
                 <button class="tab-button active">Task</button>
-                <button class="tab-button" onclick="alert('Calendar view coming soon!')">Calendar</button>
+                <button class="tab-button" onclick="window.location='calendar.php'">Calendar</button>
             </div>
         </div>
     </div>
+    <div class="tabs-container">
+    <button class="tab-button active">Task</button>
+</div>
+
 
     <!-- MAIN CONTENT BOX -->
     <div class="row">
