@@ -5,10 +5,10 @@ include 'db_connection.php';
 // -------------------------------------------
 // CHECK LOGIN SESSION
 // -------------------------------------------
-if (!isset($_SESSION['user_id'])) {
-    header("Location: login.php");
-    exit();
-}
+// if (!isset($_SESSION['user_id'])) {
+//     header("Location: login.php");
+//     exit();
+// }
 
 $user_id = $_SESSION['user_id'];
 

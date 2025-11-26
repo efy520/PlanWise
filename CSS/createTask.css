@@ -1,0 +1,107 @@
+body {
+    font-family: 'Inter', sans-serif;
+    background: #F9E7B2;
+    margin: 0;
+    padding: 0;
+}
+
+.container {
+    max-width: 900px;
+    margin: 40px auto;
+    background: #FFF9E6;
+    padding: 40px 50px;
+    border-radius: 10px;
+}
+
+/* Back button */
+.back-btn {
+    display: inline-flex;
+    padding: 8px 31px;
+    border-radius: 29px;
+    background: #F77F00;
+    color: white;
+    text-decoration: none;
+    font-weight: 600;
+    margin-bottom: 20px;
+}
+
+/* Title */
+.create-title {
+    font-size: 48px;
+    font-weight: 700;
+    color: #323743;
+    margin-bottom: 30px;
+}
+
+/* Labels */
+.label {
+    font-size: 16px;
+    margin-bottom: 5px;
+    display: block;
+    color: #323743;
+}
+
+/* Input field */
+.input-field,
+.textarea-field {
+    width: 100%;
+    background: #F3F4F6;
+    border: none;
+    padding: 12px;
+    border-radius: 6px;
+    font-size: 16px;
+    margin-bottom: 20px;
+}
+
+.textarea-field {
+    height: 120px;
+    resize: none;
+}
+
+
+.date-field {
+    width: 100%;
+    background: #F3F4F6;
+    border: none;
+    padding: 12px;
+    border-radius: 6px;
+    font-size: 16px;
+    margin-bottom: 30px;
+}
+
+
+/* Buttons row */
+.button-row {
+    display: flex;
+    gap: 20px;
+}
+
+.cancel-btn,
+.create-btn {
+    width: 200px;
+    padding: 18px 0;
+    border: none;
+    border-radius: 43px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.cancel-btn {
+    background: #F3F4F6;
+    color: #323743;
+}
+
+.create-btn {
+    background: #7B542F;
+    color: white;
+    font-weight: 600;
+}
+
+/* Error message */
+.error-msg {
+    background: #ffdddd;
+    color: #a10000;
+    padding: 10px;
+    margin-bottom: 20px;
+    border-radius: 6px;
+}
