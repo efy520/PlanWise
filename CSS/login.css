@@ -1,145 +1,186 @@
+/* ==========================================
+   LOGIN PAGE STYLES
+   ==========================================
+   This CSS file styles the login page with
+   a warm beige color scheme matching the design
+   ========================================== */
+
 /* --- Global Styles --- */
-/* This sets up our font and background color for the whole page */
 body {
-    font-family: 'Inter', sans-serif;
-    /* This light gray comes from your Figma input fields */
-    background-color: #F3F4F6; 
-    color: #2E2E2E; /* Charcoal text */
+    font-family: 'Inter', sans-serif; /* Modern, clean font from Google Fonts */
+    background-color: #F9E7B2; /* Warm beige background color matching sign-up page */
+    color: #171A1F; /* Dark text color for good readability */
+    margin: 0;
+    padding: 0;
 }
 
-/* --- Bootstrap Card Override --- */
-/* We're making the card rounder to match your design */
-.card {
-    border-radius: 16px !important;
+/* --- Login Card Container --- */
+/* This is the cream box that contains the form */
+.login-card {
+    background-color: #FFF9E6; /* Light cream background to stand out from page background */
+    border-radius: 6px; /* Rounded corners */
+    border: 0 solid #FFF; /* No visible border */
+    padding: 40px 50px; /* Space inside the card (top/bottom: 40px, left/right: 50px) */
+    box-shadow: 0 0 2px 0 rgba(23, 26, 31, 0.08), 0 0 1px 0 rgba(23, 26, 31, 0.05); /* Subtle shadow for depth */
+    max-width: 999px; /* Maximum width from design */
+    margin: 0 auto; /* Center the card horizontally */
 }
 
 /* --- Logo Styling --- */
 .logo {
-    display: block; 
-    margin: 0 auto; 
-    
-    /* This negative margin pulls the content up (the crop fix) */
-    margin-bottom: -20px; 
-
-    max-width: 250px;
-    height: auto; 
+    display: block; /* Makes image a block element */
+    margin: 0 auto; /* Centers the logo horizontally */
+    max-width: 200px; /* Limits logo size */
+    height: auto; /* Maintains aspect ratio */
 }
 
-/* NEW: Style for the "First Time?" text */
+/* --- "First Time?" Text --- */
 .signup-prompt {
-    color: #171A1F;
-    text-align: center;
-    font-size: 20px; /* Slightly smaller than Figma's 24px to look balanced */
-    font-weight: 500;
-    line-height: 1.5;
-    margin-bottom: 8px; /* Adds a small space above the black box */
+    color: #171A1F; /* Dark text color */
+    text-align: center; /* Center the text */
+    font-size: 18px; /* Medium text size */
+    font-weight: 500; /* Medium weight */
+    line-height: 1.5; /* Line height for readability */
+    margin-bottom: 12px; /* Space below the text */
 }
 
-/* --- "Sign Up" Box --- */
-/* The padding is smaller now since the text is outside */
-.signup-box {
-    background-color: #171A1F; /* Dark background from Figma */
-    padding: 8px !important; 
-}
-
+/* --- Sign Up Button --- */
+/* The rounded button that links to sign-up page */
 .signup-button {
-    background-color: #3a3a3a; /* Darker gray */
-    color: #ffffff;
-    text-decoration: none;
-    padding: 10px 16px;
-    border-radius: 12px; /* Slightly rounder than default */
-    font-weight: 500;
-    font-size: 14px;
-    display: inline-flex;
-    align-items: center;
-    transition: background-color 0.2s ease;
-    border: none;
+    display: inline-block; /* Makes link behave like a button */
+    background-color: #D4AF37; /* Gold/tan background */
+    color: #171A1F; /* Dark text */
+    padding: 10px 80px; /* Horizontal padding makes button wider */
+    border-radius: 20px; /* Very rounded corners (pill shape) */
+    text-decoration: none; /* Remove underline from link */
+    font-size: 16px; /* Button text size */
+    font-weight: 500; /* Medium weight */
+    transition: all 0.3s ease; /* Smooth transition for hover effects */
 }
 
+/* When hovering over Sign Up button */
 .signup-button:hover {
-    background-color: #D4AF37;
+    background-color: #C69F30; /* Slightly darker gold */
+    color: #171A1F; /* Keep dark text */
+    transform: translateY(-2px); /* Slight lift effect */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Add shadow on hover */
 }
 
-/* --- Divider "OR LOG IN WITH" --- */
-.divider {
-    display: flex;
-    align-items: center;
-    text-align: center;
-    color: #565D6D; /* From Figma */
-    margin: 24px 0;
-    font-size: 14px;
-    font-weight: 400;
+/* --- Divider Text --- */
+/* The "OR LOG IN WITH" text */
+.divider-text {
+    color: #9095A0; /* Light gray text */
+    font-size: 12px; /* Small text */
+    font-weight: 400; /* Normal weight */
+    letter-spacing: 0.5px; /* Slight spacing between letters */
+    margin: 24px 0; /* Space above and below */
 }
 
-.divider hr {
-    flex: 1;
-    border: none;
-    border-top: 1px solid #eee;
-}
-
-.divider span {
-    padding: 0 16px;
-}
-
-/* --- Login Form Overrides --- */
+/* --- Form Labels --- */
+/* Labels like "Email" and "Password" */
 .form-label {
-    color: #424856;
-    font-size: 14px;
-    font-weight: 400;
+    color: #565D6D; /* Medium gray color */
+    font-size: 14px; /* Small text size */
+    font-weight: 400; /* Normal weight */
+    line-height: 20px; /* Line height for readability */
+    margin-bottom: 6px; /* Small space between label and input */
+    display: block; /* Makes label take full width */
 }
 
-/* This is how we override Bootstrap's default form style
-  to match your Figma design.
-*/
+/* --- Form Inputs --- */
+/* Text input fields (email and password) */
 .form-control {
-    background-color: #F3F4F6 !important; /* Light gray from Figma */
-    border: 1px solid #F3F4F6 !important;
-    padding-top: 12px; /* Make it a bit taller */
-    padding-bottom: 12px;
-    font-size: 16px;
-    border-radius: 12px !important; /* Rounded corners */
+    background-color: #FFFFFF !important; /* White background for inputs */
+    border: 1px solid #DEE1E6 !important; /* Light gray border */
+    border-radius: 6px !important; /* Rounded corners */
+    padding: 10px 14px; /* Space inside the input field */
+    height: auto; /* Height adjusts to content */
+    font-size: 14px; /* Text size inside input */
+    color: #171A1F; /* Dark text color */
+    transition: all 0.2s ease; /* Smooth transition for hover/focus effects */
 }
 
+/* Placeholder text styling (like "Enter email") */
 .form-control::placeholder {
-    color: #BDC1CA; /* Placeholder color from Figma */
-    font-weight: 400;
+    color: #9095A0; /* Light gray placeholder text */
 }
 
-/* This styles the icon containers */
-.input-group-text {
-    background-color: #F3F4F6; /* Match the input */
-    border: 1px solid #F3F4F6;
-    border-radius: 12px !important;
-}
-
-/* This makes the right-side "eye" icon have a transparent background */
-.input-icon-right {
-    cursor: pointer;
-    background-color: transparent;
-    border: none;
-}
-
-/* Customizing the :focus ring to our brand color */
+/* When user clicks/focuses on an input field */
 .form-control:focus {
-    background-color: #ffffff !important;
-    border-color: #4E56C0 !important; /* Our new Blue */
-    box-shadow: 0 0 0 3px rgba(78, 86, 192, 0.1) !important;
+    background-color: #FFFFFF !important; /* Keep white background */
+    border-color: #7B542F !important; /* Brown border to match theme */
+    box-shadow: 0 0 0 3px rgba(123, 84, 47, 0.1) !important; /* Subtle brown glow around input */
+    outline: none; /* Remove default browser outline */
 }
 
-/* --- Custom Gold Button --- */
-/* This is our custom button class */
-.btn-gold {
-    background-color: #D4AF37; /* Gold */
-    color: #FFF; /* White text from Figma */
-    border: none;
-    border-radius: 16px !important; /* From Figma */
-    font-size: 18px;
-    font-weight: 500;
-    padding-top: 12px;
-    padding-bottom: 12px;
+/* --- Input Group (Password Field) --- */
+/* The password field has a special structure with the eye icon attached */
+
+/* The container holding the eye icon */
+.input-group-text {
+    background-color: #FFFFFF !important; /* White background to match input */
+    border: 1px solid #DEE1E6 !important; /* Same border as input */
+    border-radius: 0 6px 6px 0 !important; /* Rounded only on the right side */
+    padding: 10px 14px; /* Same padding as input */
+    cursor: pointer; /* Shows hand cursor when hovering */
 }
 
-.btn-gold:hover {
-    background-color: #c7a034; /* Slightly darker gold */
-    color: #FFF;
+/* The password input inside the input-group */
+.input-group .form-control {
+    border-radius: 6px 0 0 6px !important; /* Rounded only on the left side */
+    border-right: none !important; /* Remove right border (connects to eye icon) */
+}
+
+/* When password input is focused, also style the eye icon container */
+.input-group:focus-within .input-group-text {
+    border-color: #7B542F !important; /* Brown border */
+}
+
+.input-group:focus-within .form-control {
+    border-color: #7B542F !important; /* Brown border */
+}
+
+/* --- Continue/Login Button --- */
+/* The brown "Continue" submit button */
+.btn-login {
+    display: flex; /* Flexbox for centering text */
+    width: 100%; /* Full width of container */
+    padding: 12px 0; /* Vertical padding */
+    justify-content: center; /* Center text horizontally */
+    align-items: center; /* Center text vertically */
+    border-radius: 6px; /* Rounded corners */
+    border: 1px solid rgba(0, 0, 0, 0.00); /* Transparent border */
+    background: #7B542F; /* Brown background color matching sign-up button */
+    color: #FFFFFF; /* White text */
+    font-size: 16px; /* Button text size */
+    font-weight: 500; /* Medium weight */
+    transition: background-color 0.3s ease; /* Smooth color change on hover */
+    cursor: pointer; /* Shows hand cursor */
+}
+
+/* When hovering over the button */
+.btn-login:hover {
+    background-color: #6A4728; /* Darker brown */
+    color: #FFFFFF; /* Keep white text */
+}
+
+/* When button is clicked/pressed */
+.btn-login:active {
+    background-color: #5A3C21; /* Even darker brown */
+}
+
+/* --- Responsive Design --- */
+/* Adjustments for smaller screens (tablets and phones) */
+@media (max-width: 768px) {
+    .login-card {
+        padding: 30px 25px; /* Less padding on small screens */
+    }
+    
+    .logo {
+        max-width: 180px; /* Smaller logo on mobile */
+    }
+    
+    .signup-button {
+        padding: 10px 60px; /* Less horizontal padding on mobile */
+    }
 }
