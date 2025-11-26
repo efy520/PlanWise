@@ -156,12 +156,13 @@ while ($row = $result_task->fetch_assoc()) {
 
                                 <!-- EDIT BUTTON -->
                                 <td>
-                                    <button class="btn-edit" onclick="alert('Edit Task <?php echo $task['task_id']; ?> coming soon')">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <a href="edit-task.php?task_id=<?php echo $task['task_id']; ?>" class="btn-edit">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                                             viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                             <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
                                             <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
                                         </svg>
-                                    </button>
+                                    </a>
                                 </td>
 
                                 <!-- TITLE -->
