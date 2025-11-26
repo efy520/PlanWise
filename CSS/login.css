@@ -125,16 +125,7 @@ body {
     cursor: pointer; /* Shows hand cursor when hovering */
 }
 
-/* The password input inside the input-group */
-.input-group .form-control {
-    border-radius: 6px 0 0 6px !important; /* Rounded only on the left side */
-    border-right: none !important; /* Remove right border (connects to eye icon) */
-}
 
-/* When password input is focused, also style the eye icon container */
-.input-group:focus-within .input-group-text {
-    border-color: #7B542F !important; /* Brown border */
-}
 
 .input-group:focus-within .form-control {
     border-color: #7B542F !important; /* Brown border */

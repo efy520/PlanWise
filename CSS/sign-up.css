@@ -1,116 +1,209 @@
+/* ==========================================
+   SIGN UP PAGE STYLES
+   ==========================================
+   This CSS file styles the sign-up page with
+   a warm beige color scheme matching Figma design
+   ========================================== */
+
 /* --- Global Styles --- */
 body {
-    font-family: 'Inter', sans-serif;
-    background-color: #F3F4F6; /* Light gray background */
-    color: #171A1F; /* Dark text from Figma */
+    font-family: 'Inter', sans-serif; /* Modern, clean font from Google Fonts */
+    background-color: #F9E7B2; /* Warm beige background color from Figma */
+    color: #171A1F; /* Dark text color for good readability */
+    margin: 0;
+    padding: 0;
 }
 
-/* --- Card Override --- */
-.card {
-    border-radius: 16px !important; /* Matches your Figma general style */
-    background-color: #ffffff;
+/* --- Signup Card Container --- */
+/* This is the white/cream box that contains the form */
+.signup-card {
+    background-color: #FFF9E6; /* Light cream background to stand out from page background */
+    border-radius: 6px; /* Rounded corners */
+    border: 0 solid #FFF; /* No visible border */
+    padding: 40px 50px; /* Space inside the card (top/bottom: 40px, left/right: 50px) */
+    box-shadow: 0 0 2px 0 rgba(23, 26, 31, 0.08), 0 0 1px 0 rgba(23, 26, 31, 0.05); /* Subtle shadow for depth */
+    max-width: 999px; /* Maximum width from Figma design */
+    margin: 0 auto; /* Center the card horizontally */
 }
 
 /* --- Title --- */
+/* The "Sign up" heading at the top */
 .signup-title {
-    color: #171A1F;
+    color: #171A1F; /* Dark text color */
     font-family: 'Inter', sans-serif;
-    font-size: 32px; /* From Figma */
-    font-weight: 400;
-    line-height: 48px; /* 150% */
+    font-size: 32px; /* Large text for emphasis */
+    font-weight: 400; /* Normal weight (not bold) */
+    line-height: 48px; /* Spacing between lines */
+    margin-bottom: 32px; /* Space below the title */
 }
 
 /* --- Form Labels --- */
+/* Labels like "Username", "Phone", "Email", etc. */
 .form-label {
-    color: #424856; 
-    font-size: 14px; /* Default label size */
-    font-weight: 400;
-    line-height: 20px;
-    margin-bottom: 8px;
+    color: #565D6D; /* Medium gray color */
+    font-size: 14px; /* Small text size */
+    font-weight: 400; /* Normal weight */
+    line-height: 20px; /* Line height for readability */
+    margin-bottom: 6px; /* Small space between label and input */
+    display: block; /* Makes label take full width */
 }
 
-/* --- Form Inputs (Username, Phone, Email, Password) --- */
+/* --- Form Inputs --- */
+/* Text input fields (username, phone, email, password) */
 .form-control {
-    background-color: #F3F4F6 !important; /* Light gray background */
-    border: 1px solid transparent !important; 
-    border-radius: 6px !important; /* From Figma */
-    padding: 7px 12px; /* Tighter vertical padding from Figma (7px/6px) */
-    height: 35px; /* Tighter height from Figma */
-    font-size: 14px; /* Default input text size */
-    color: #171A1F;
+    background-color: #FFFFFF !important; /* White background for inputs */
+    border: 1px solid #DEE1E6 !important; /* Light gray border */
+    border-radius: 6px !important; /* Rounded corners */
+    padding: 10px 14px; /* Space inside the input field */
+    height: auto; /* Height adjusts to content */
+    font-size: 14px; /* Text size inside input */
+    color: #171A1F; /* Dark text color */
+    transition: all 0.2s ease; /* Smooth transition for hover/focus effects */
 }
 
+/* Placeholder text styling (like "Enter username") */
 .form-control::placeholder {
-    color: #BDC1CA; /* Light placeholder text */
+    color: #9095A0; /* Light gray placeholder text */
 }
 
+/* When user clicks/focuses on an input field */
 .form-control:focus {
-    background-color: #ffffff !important;
-    border-color: #D4AF37 !important; /* Gold border on focus */
-    box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.1) !important;
+    background-color: #FFFFFF !important; /* Keep white background */
+    border-color: #7B542F !important; /* Brown border to match button */
+    box-shadow: 0 0 0 3px rgba(123, 84, 47, 0.1) !important; /* Subtle brown glow around input */
+    outline: none; /* Remove default browser outline */
 }
 
-/* --- Input Group (Password Field adjustments) --- */
+/* --- Input Group (Password Field) --- */
+/* The password field has a special structure with the eye icon attached */
+
+/* The container holding the eye icon */
 .input-group-text {
-    background-color: #F3F4F6 !important;
-    border: 1px solid transparent !important;
-    border-radius: 0 6px 6px 0 !important; /* Round only right corners */
+    background-color: #FFFFFF !important; /* White background to match input */
+    border: 1px solid #DEE1E6 !important; /* Same border as input */
+    border-radius: 0 6px 6px 0 !important; /* Rounded only on the right side */
+    padding: 10px 14px; /* Same padding as input */
+    cursor: pointer; /* Shows hand cursor when hovering */
 }
 
-/* Fix left border radius for password input inside group */
+/* The password input inside the input-group */
 .input-group .form-control {
-    border-radius: 6px 0 0 6px !important;
+    border-radius: 6px 0 0 6px !important; /* Rounded only on the left side */
+    border-right: none !important; /* Remove right border (connects to eye icon) */
 }
 
-/* --- Radio Buttons (Gender Label) --- */
-.form-check-label {
-    color: #171A1F;
-    font-size: 14px; /* From Figma */
-    font-weight: 400;
+/* When password input is focused, also style the eye icon container */
+.input-group:focus-within .input-group-text {
+    border-color: #7B542F !important; /* Brown border */
 }
 
+.input-group:focus-within .form-control {
+    border-color: #7B542F !important; /* Brown border */
+}
+
+/* --- Radio Buttons (Gender) --- */
+/* Styling for the Male/Female radio button section */
+
+/* Container for each radio button option */
+.form-check {
+    display: flex; /* Arranges radio button and label horizontally */
+    align-items: center; /* Vertically centers radio button with label */
+    padding-left: 0; /* Remove default padding */
+    /* Note: Spacing between Male and Female is controlled by gap-5 in HTML */
+}
+
+/* The actual radio button circle */
+.form-check-input {
+    width: 18px; /* Circle size */
+    height: 18px; /* Circle size */
+    margin-top: 0; /* No top margin */
+    margin-right: 10px; /* Space between radio button and label text */
+    border: 2px solid #9095A0; /* Gray border when not selected */
+    cursor: pointer; /* Shows hand cursor when hovering */
+}
+
+/* When radio button is selected/checked */
 .form-check-input:checked {
-    background-color: #D4AF37; /* Gold checked color */
-    border-color: #D4AF37;
+    background-color: #7B542F; /* Brown fill color */
+    border-color: #7B542F; /* Brown border */
 }
 
-/* --- Gold Sign Up Button --- */
-.btn-gold {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 100%;
-    padding: 9px 0; /* Direct padding from Figma */
-    border-radius: 6px !important; /* From Figma */
-    background-color: #D4AF37; /* Gold */
-    border: 1px solid transparent;
-    
-    /* Text Style */
-    color: #ffffff;
-    font-size: 18px; /* Adjusted slightly for visibility */
-    font-weight: 500;
-    transition: background-color 0.2s ease;
+/* When radio button is focused (keyboard navigation) */
+.form-check-input:focus {
+    box-shadow: 0 0 0 3px rgba(123, 84, 47, 0.1); /* Brown glow */
+    border-color: #7B542F; /* Brown border */
 }
 
-.btn-gold:hover {
-    background-color: #c7a034; /* Darker gold on hover */
-    color: #ffffff;
+/* The label text next to radio button (Male/Female) */
+.form-check-label {
+    color: #171A1F; /* Dark text */
+    font-size: 14px; /* Small text */
+    font-weight: 400; /* Normal weight */
+    cursor: pointer; /* Shows hand cursor (clicking label also selects radio) */
+    margin-bottom: 0; /* No bottom margin */
 }
 
-/* --- Bottom Link ("Already have an account?") --- */
+/* --- Sign Up Button --- */
+/* The brown "Sign up" submit button */
+.btn-signup {
+    display: flex; /* Flexbox for centering text */
+    width: 100%; /* Full width of container */
+    padding: 9px 0; /* Vertical padding from Figma */
+    justify-content: center; /* Center text horizontally */
+    align-items: center; /* Center text vertically */
+    border-radius: 6px; /* Rounded corners */
+    border: 1px solid rgba(0, 0, 0, 0.00); /* Transparent border */
+    background: #7B542F; /* Brown background color from Figma */
+    color: #FFFFFF; /* White text */
+    font-size: 16px; /* Button text size */
+    font-weight: 500; /* Medium weight */
+    transition: background-color 0.3s ease; /* Smooth color change on hover */
+    cursor: pointer; /* Shows hand cursor */
+}
+
+/* When hovering over the button */
+.btn-signup:hover {
+    background-color: #6A4728; /* Darker brown */
+    color: #FFFFFF; /* Keep white text */
+}
+
+/* When button is clicked/pressed */
+.btn-signup:active {
+    background-color: #5A3C21; /* Even darker brown */
+}
+
+/* --- Bottom Link --- */
+/* The "Already have an account? Log in" text at the bottom */
 .login-link {
-    color: #171A1F;
-    font-size: 14px;
-    font-weight: 400;
-    line-height: 22px;
+    color: #171A1F; /* Dark text for main sentence */
+    font-size: 14px; /* Small text */
+    font-weight: 400; /* Normal weight */
+    line-height: 22px; /* Line height */
+    margin-bottom: 0; /* No bottom margin */
 }
 
+/* The "Log in" link specifically */
 .login-link a {
-    color: #D4AF37; /* Gold link color */
-    text-decoration: none;
-    font-weight: 500;
+    color: #D4A574; /* Gold/tan color for the link */
+    text-decoration: none; /* Remove underline by default */
+    font-weight: 500; /* Medium weight to stand out */
 }
 
+/* When hovering over the "Log in" link */
 .login-link a:hover {
-    text-decoration: underline;
+    text-decoration: underline; /* Add underline on hover */
+    color: #C69563; /* Slightly darker gold */
+}
+
+/* --- Responsive Design --- */
+/* Adjustments for smaller screens (tablets and phones) */
+@media (max-width: 768px) {
+    .signup-card {
+        padding: 30px 25px; /* Less padding on small screens */
+    }
+    
+    .signup-title {
+        font-size: 28px; /* Smaller title on small screens */
+        line-height: 40px; /* Adjusted line height */
+    }
 }
