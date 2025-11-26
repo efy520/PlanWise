@@ -1,108 +1,83 @@
-/* --- Global Styles --- */
 body {
     font-family: 'Inter', sans-serif;
-    background-color: #F3F4F6; /* Light gray background */
-    color: #323743; /* Dark gray text */
+    background: #F9E7B2;
 }
 
-.card {
-    border-radius: 16px !important;
-    background-color: #ffffff;
+.edit-box {
+    max-width: 900px;
+    margin: auto;
+    background: #FFF9E6;
+    padding: 40px 50px;
+    border-radius: 6px;
 }
 
-/* --- Header Section --- */
 .back-btn {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 40px; /* From Figma */
-    height: 40px;
-    background-color: #4E56C0; /* Using your blue for the back button circle */
-    border-radius: 50%; /* Makes it a perfect circle */
+    display: inline-flex;
+    padding: 8px 25px;
+    background: #F77F00;
+    border-radius: 29px;
+    color: white;
     text-decoration: none;
-    transition: background-color 0.2s;
+    font-weight: 600;
 }
 
 .back-btn:hover {
-    background-color: #3b4290;
+    background: #d96f00;
 }
 
-.page-title {
-    color: #323743;
-    font-family: 'Inter', sans-serif;
-    font-size: 48px; /* Adjusted slightly for better web fit, Figma had 64px which is huge */
+.title-text {
+    font-size: 42px;
     font-weight: 700;
-    line-height: 1.2;
+    margin-bottom: 25px;
 }
 
-/* --- Form Elements --- */
-.form-label {
-    color: #171A1F; /* Dark text for labels */
-    font-size: 14px;
-    font-weight: 500; /* Slightly bolder labels */
-    margin-bottom: 8px;
-}
-
-/* Inputs and Textareas */
-.form-control, .form-select {
-    background-color: #F3F4F6 !important; /* Light gray from Figma */
-    border: 1px solid transparent !important;
-    border-radius: 6px !important;
-    padding: 10px 20px; /* "padding: 0 20px" from Figma, adapted for vertical centering */
-    height: 45px; /* Fixed height to match design */
-    font-size: 14px;
-    color: #424856;
-}
-
-/* Textarea specific */
-.description-box {
-    height: 100px; /* Taller for description */
-    padding-top: 12px;
-}
-
-.form-control::placeholder {
-    color: #BDC1CA;
-}
-
-.form-control:focus, .form-select:focus {
-    background-color: #ffffff !important;
-    border-color: #4E56C0 !important;
-    box-shadow: 0 0 0 3px rgba(78, 86, 192, 0.1) !important;
-}
-
-/* --- Action Buttons --- */
-.btn {
-    display: inline-flex;
-    justify-content: center;
-    align-items: center;
-    border-radius: 26px !important; /* From Figma "border-radius: 26px" */
-    font-weight: 500;
+.label-text {
     font-size: 16px;
-    padding: 10px 40px; /* Generous padding */
+    margin-bottom: 8px;
+    display: block;
+}
+
+.input-field {
+    background: #F3F4F6;
+    border-radius: 6px;
+    padding: 15px;
     border: none;
-    transition: filter 0.2s;
+    margin-bottom: 20px;
+    font-size: 16px;
 }
 
-.btn:hover {
-    filter: brightness(0.9); /* Simple hover effect */
+.button-row {
+    display: flex;
+    gap: 20px;
 }
 
-/* Cancel Button */
+/* Buttons */
+.btn-cancel,
+.btn-delete,
+.btn-update {
+    padding: 15px 60px;
+    border-radius: 43px;
+    font-weight: 600;
+}
+
 .btn-cancel {
-    background-color: #F3F4F6; /* Light Gray */
-    color: #565D6D; /* Dark Gray Text */
-    padding: 10px 30px;
+    background: #F3F4F6;
+    text-decoration: none;
+    color: #323743;
 }
 
-/* Delete Button */
 .btn-delete {
-    background-color: #D62828; /* Red from Figma */
-    color: #ffffff;
+    background: #E63946;
+    color: white;
+    border: none;
 }
 
-/* Edit/Save Button */
-.btn-edit {
-    background-color: #4E56C0; /* Blue/Purple from Figma */
-    color: #ffffff;
-    padding: 10px 50px; /* Wider for the primary action */
+.btn-update {
+    background: #7B542F;
+    color: white;
+    border: none;
 }
+
+.btn-delete:hover { background:#c82333; }
+.btn-update:hover { background:#6A4728; }
+.btn-cancel:hover { background:#E0E0E0; }

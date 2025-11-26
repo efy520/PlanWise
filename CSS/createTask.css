@@ -1,28 +1,26 @@
 body {
     font-family: 'Inter', sans-serif;
     background: #F9E7B2;
-    padding: 30px;
 }
 
-/* Container */
-.create-container {
+/* Main box */
+.create-box {
     max-width: 900px;
     margin: auto;
     background: #FFF9E6;
-    border-radius: 6px;
     padding: 40px 50px;
-    box-shadow: 0 0 4px rgba(0,0,0,0.1);
+    border-radius: 6px;
 }
 
-/* Back Button */
+/* Back button */
 .back-btn {
     display: inline-flex;
-    padding: 8px 30px;
-    border-radius: 29px;
+    padding: 8px 25px;
     background: #F77F00;
+    border-radius: 29px;
     color: white;
     text-decoration: none;
-    font-weight: 500;
+    font-weight: 600;
     margin-bottom: 20px;
 }
 
@@ -32,70 +30,54 @@ body {
 
 /* Title */
 .title-text {
-    font-size: 48px;
+    font-size: 42px;
     font-weight: 700;
-    color: #323743;
-    margin-bottom: 30px;
+    margin-bottom: 25px;
 }
 
 /* Labels */
 .label-text {
     font-size: 16px;
-    font-weight: 500;
     margin-bottom: 8px;
     display: block;
 }
 
-/* Inputs */
-.input-box,
-.date-box {
+/* Fields */
+.input-field {
     background: #F3F4F6;
     border-radius: 6px;
     padding: 15px;
     border: none;
-    width: 100%;
-    margin-bottom: 25px;
+    margin-bottom: 20px;
     font-size: 16px;
 }
 
-.input-box:focus,
-.date-box:focus {
-    outline: 2px solid #7B542F;
-}
-
-/* Buttons */
+/* Buttons row */
 .button-row {
-    margin-top: 25px;
     display: flex;
     gap: 20px;
 }
 
+/* Cancel */
 .btn-cancel {
-    padding: 15px 80px;
+    padding: 15px 60px;
     border-radius: 43px;
     background: #F3F4F6;
-    border: none;
-    font-weight: 600;
-    font-size: 16px;
     text-decoration: none;
-    text-align: center;
     color: #323743;
+    font-weight: 600;
 }
 
+/* Create */
 .btn-create {
-    padding: 15px 80px;
+    padding: 15px 60px;
     border-radius: 43px;
     background: #7B542F;
     border: none;
-    font-weight: 600;
-    font-size: 16px;
     color: white;
+    font-weight: 600;
 }
 
 .btn-create:hover {
     background: #6A4728;
-}
-
-.btn-cancel:hover {
-    background: #E0E0E0;
 }

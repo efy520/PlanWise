@@ -2,7 +2,7 @@
 session_start();
 include 'db_connection.php';
 
-// Block access if not logged in
+// Redirect if user not logged in
 if (!isset($_SESSION['user_id'])) {
     header("Location: login.php");
     exit();
@@ -10,31 +10,26 @@ if (!isset($_SESSION['user_id'])) {
 
 $user_id = $_SESSION['user_id'];
 
-$success_msg = "";
-$error_msg = "";
-
-// When submitting the form
+// Insert task
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
-    $title = trim($_POST['title']);
-    $description = trim($_POST['description']);
+    $title = $_POST['title'];
+    $description = $_POST['description'];
     $due_date = $_POST['due_date'];
-
-    // Default status for new tasks
+    $created_date = date('Y-m-d'); // AUTO start date
     $status = "in progress";
 
-    // Insert task
-    $sql = "INSERT INTO task (user_id, title, description, due_date, status, created_date)
-            VALUES (?, ?, ?, ?, ?, NOW())";
+    $sql = "INSERT INTO task (user_id, title, description, due_date, created_date, status)
+            VALUES (?, ?, ?, ?, ?, ?)";
 
     $stmt = $conn->prepare($sql);
-    $stmt->bind_param("issss", $user_id, $title, $description, $due_date, $status);
+    $stmt->bind_param("isssss", $user_id, $title, $description, $due_date, $created_date, $status);
 
     if ($stmt->execute()) {
-        header("Location: task.php");
+        header("Location: task.php?created=1");
         exit();
     } else {
-        $error_msg = "Failed to create task.";
+        $error_message = "Failed to create task.";
     }
 }
 ?>
@@ -42,47 +37,57 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Create Task - PlanWise</title>
-
+    <title>Create Task</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="css/createTask.css">
-
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
 
 <body>
 
-<div class="create-container">
+<div class="container mt-4">
 
     <a href="task.php" class="back-btn">← Back</a>
 
-    <h1 class="title-text">Create Task</h1>
+    <div class="create-box">
 
-    <!-- Error message -->
-    <?php if (!empty($error_msg)): ?>
-        <div class="alert alert-danger"><?php echo $error_msg; ?></div>
-    <?php endif; ?>
+        <h1 class="title-text">Create Task</h1>
 
-    <!-- Create Task Form -->
-    <form action="createTask.php" method="POST">
+        <?php if(isset($error_message)): ?>
+            <div class="alert alert-danger"><?= $error_message ?></div>
+        <?php endif; ?>
 
-        <label class="label-text">Task name</label>
-        <input type="text" name="title" class="input-box" placeholder="Type name" required>
+        <form method="POST">
 
-        <label class="label-text">Description</label>
-        <textarea name="description" class="input-box" placeholder="Give some examples" rows="3"></textarea>
+            <!-- Title -->
+            <label class="label-text">Task name</label>
+            <input type="text" class="form-control input-field" name="title" placeholder="Type name" required>
 
-        <label class="label-text">Due date</label>
-        <input type="date" name="due_date" class="date-box" required>
+            <!-- Description -->
+            <label class="label-text">Description</label>
+            <textarea class="form-control input-field" name="description" placeholder="Give some examples" required></textarea>
 
-        <div class="button-row">
-            <a href="task.php" class="btn-cancel">Cancel</a>
-            <button type="submit" class="btn-create">Create</button>
-        </div>
+            <!-- Start + Due date side-by-side -->
+            <div class="row mt-3">
+                <div class="col-md-6">
+                    <label class="label-text">Start date</label>
+                    <input type="text" class="form-control input-field" value="<?= date('Y-m-d'); ?>" readonly>
+                </div>
 
-    </form>
+                <div class="col-md-6">
+                    <label class="label-text">Due date</label>
+                    <input type="date" class="form-control input-field" name="due_date" required>
+                </div>
+            </div>
 
+            <!-- Buttons -->
+            <div class="button-row mt-4">
+                <a href="task.php" class="btn-cancel">Cancel</a>
+                <button type="submit" class="btn-create">Create</button>
+            </div>
+
+        </form>
+
+    </div>
 </div>
 
 </body>
