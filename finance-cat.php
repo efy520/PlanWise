@@ -27,7 +27,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_category'])) {
         $stmt = $conn->prepare($sql);
         $stmt->bind_param("iss", $user_id, $category_name, $category_type);
         $stmt->execute();
-        header("Location: finance-set.php?added=1");
+        header("Location: finance-cat.php?added=1");
         exit();
     }
 }
@@ -39,7 +39,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_category_id'])
     $stmt = $conn->prepare($sql);
     $stmt->bind_param("ii", $category_id, $user_id);
     $stmt->execute();
-    header("Location: finance-set.php?deleted=1");
+    header("Location: finance-cat.php?deleted=1");
     exit();
 }
 
@@ -50,7 +50,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['ignore_category_id'])
     $stmt = $conn->prepare($sql);
     $stmt->bind_param("ii", $category_id, $user_id);
     $stmt->execute();
-    header("Location: finance-set.php?ignored=1");
+    header("Location: finance-cat.php?ignored=1");
     exit();
 }
 
@@ -64,7 +64,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['edit_category'])) {
         $stmt = $conn->prepare($sql);
         $stmt->bind_param("sii", $category_name, $category_id, $user_id);
         $stmt->execute();
-        header("Location: finance-set.php?edited=1");
+        header("Location: finance-cat.php?edited=1");
         exit();
     }
 }
@@ -76,7 +76,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['restore_category_id']
     $stmt = $conn->prepare($sql);
     $stmt->bind_param("ii", $category_id, $user_id);
     $stmt->execute();
-    header("Location: finance-set.php?restored=1");
+    header("Location: finance-cat.php?restored=1");
     exit();
 }
 
@@ -110,7 +110,7 @@ $ignored_categories = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
     <title>Finance Settings - PlanWise</title>
     
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="css/finance-set.css">
+    <link rel="stylesheet" href="css/finance-cat.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
 
