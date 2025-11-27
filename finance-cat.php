@@ -282,9 +282,9 @@ $ignored_categories = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
             </div>
         </div>
 
-        <!-- ACCOUNT TAB CONTENT (hidden by default) -->
-        <div id="accountContent" style="display: none;">
-            <p class="text-muted">Account management coming soon.</p>
+        <!-- ACCOUNT TAB CONTENT -->
+        <div id="accountContent">
+            <a href="finance-acc.php">Finance Accounts</a>
 
     </div>
 </div>

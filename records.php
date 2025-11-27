@@ -116,7 +116,7 @@ $records = $stmt->get_result();
     </div>
 
     <!-- RIGHT side add button -->
-    <button class="btn-add-record">+</button>
+    <button class="btn-add-record" onclick="window.location='t-income.php'">+</button>
 
 </div>
 

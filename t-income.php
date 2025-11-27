@@ -105,7 +105,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <div class="row mb-4 g-3">
                         <div class="col-12 col-md-6">
                             <select name="account_id" class="txn-select form-select" required>
-                                <option value="">Account</option>
+                                
                                 <?php while ($a = $accounts->fetch_assoc()): ?>
                                     <option value="<?= $a['account_id'] ?>"><?= $a['account_name'] ?></option>
                                 <?php endwhile; ?>
@@ -114,7 +114,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                         <div class="col-12 col-md-6">
                             <select name="category_id" class="txn-select form-select" required>
-                                <option value="">Category</option>
+            
                                 <?php while ($c = $categories->fetch_assoc()): ?>
                                     <option value="<?= $c['category_id'] ?>"><?= $c['category_name'] ?></option>
                                 <?php endwhile; ?>
