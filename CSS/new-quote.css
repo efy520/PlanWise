@@ -1,0 +1,237 @@
+/* ==========================================
+   NEW QUOTE PAGE STYLES
+   ==========================================
+   Page for adding new motivational quotes
+   ========================================== */
+
+/* --- Global Styles --- */
+body {
+    font-family: 'Inter', sans-serif;
+    background: #F9E7B2; /* Warm beige background from Figma */
+    color: #323743;
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* --- Main Container --- */
+.new-quote-container {
+    width: 100%;
+    max-width: 1200px;
+    padding: 40px 60px;
+}
+
+/* --- Header Section --- */
+.header-section {
+    display: flex;
+    align-items: center;
+    gap: 30px;
+    margin-bottom: 50px;
+}
+
+/* Back button from Figma */
+.btn-back {
+    display: flex;
+    width: 102px; /* Width from Figma */
+    padding: 0.5px 31px; /* Padding from Figma */
+    justify-content: center;
+    align-items: center;
+    border-radius: 29px; /* Border radius from Figma */
+    border: 1px solid rgba(0, 0, 0, 0.00); /* Border from Figma */
+    background: #A72703; /* Red background from Figma */
+    color: #FFF;
+    text-decoration: none;
+    font-size: 16px;
+    font-weight: 600;
+    height: 40px;
+    transition: all 0.3s ease;
+}
+
+.btn-back:hover {
+    background: #8B1F03;
+    color: #FFF;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Page title "New Quote" from Figma */
+.page-title {
+    color: #323743; /* Text color from Figma */
+    font-family: 'Inter', sans-serif; /* Font from Figma */
+    font-size: 64px; /* Font size from Figma */
+    font-weight: 700; /* Bold from Figma */
+    line-height: 84px; /* Line height from Figma */
+    margin: 0;
+}
+
+/* --- Form Container --- */
+.form-container {
+    background: #FFF;
+    border-radius: 12px;
+    padding: 50px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* --- Form Label --- */
+.form-label-custom {
+    color: #323743;
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 12px;
+    display: block;
+}
+
+/* --- Quote Textarea from Figma --- */
+.quote-textarea {
+    display: flex;
+    width: 100%; /* Full width instead of fixed 959px for responsiveness */
+    min-height: 129px; /* Min height from Figma */
+    padding: 20px; /* Adjusted padding from Figma */
+    align-items: flex-start; /* Align text to top */
+    border-radius: 6px; /* Border radius from Figma */
+    border: 1px solid rgba(0, 0, 0, 0.00); /* Border from Figma */
+    background: #F3F4F6; /* Gray background from Figma */
+    font-family: 'Inter', sans-serif;
+    font-size: 16px;
+    color: #171A1F;
+    resize: vertical; /* Allow vertical resize */
+    transition: all 0.3s ease;
+}
+
+.quote-textarea:focus {
+    outline: none;
+    background: #FFFFFF;
+    border: 1px solid #7B542F;
+    box-shadow: 0 0 0 3px rgba(123, 84, 47, 0.1);
+}
+
+.quote-textarea::placeholder {
+    color: #9095A0;
+}
+
+/* --- Button Group --- */
+.button-group {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    margin-top: 40px;
+}
+
+/* Cancel button from Figma */
+.btn-cancel-large {
+    display: flex;
+    width: 252px; /* Width from Figma */
+    padding: 25px 86.5px; /* Padding from Figma */
+    justify-content: center;
+    align-items: center;
+    border-radius: 43px; /* Border radius from Figma */
+    border: 1px solid rgba(0, 0, 0, 0.00); /* Border from Figma */
+    background: #A72703; /* Red background from Figma */
+    color: #FFF;
+    text-decoration: none;
+    font-size: 20px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    height: auto;
+}
+
+.btn-cancel-large:hover {
+    background: #8B1F03;
+    color: #FFF;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* Add button from Figma */
+.btn-add-large {
+    display: flex;
+    width: 252px; /* Width from Figma */
+    padding: 25px 86.5px; /* Padding from Figma */
+    justify-content: center;
+    align-items: center;
+    border-radius: 43px; /* Border radius from Figma */
+    border: 1px solid rgba(0, 0, 0, 0.00); /* Border from Figma */
+    background: #16A34A; /* Green background from Figma */
+    color: #FFF;
+    text-decoration: none;
+    font-size: 20px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    height: auto;
+}
+
+.btn-add-large:hover {
+    background: #15803D;
+    color: #FFF;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* --- Responsive Design --- */
+@media (max-width: 1024px) {
+    .new-quote-container {
+        padding: 40px 40px;
+    }
+    
+    .page-title {
+        font-size: 48px;
+        line-height: 60px;
+    }
+    
+    .form-container {
+        padding: 40px;
+    }
+}
+
+@media (max-width: 768px) {
+    .new-quote-container {
+        padding: 30px 20px;
+    }
+    
+    .header-section {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 20px;
+    }
+    
+    .page-title {
+        font-size: 36px;
+        line-height: 48px;
+    }
+    
+    .form-container {
+        padding: 30px 20px;
+    }
+    
+    .button-group {
+        flex-direction: column;
+        gap: 15px;
+    }
+    
+    .btn-cancel-large,
+    .btn-add-large {
+        width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+    .page-title {
+        font-size: 28px;
+        line-height: 40px;
+    }
+    
+    .btn-back {
+        width: 80px;
+        padding: 0.5px 20px;
+        font-size: 14px;
+    }
+    
+    .quote-textarea {
+        min-height: 100px;
+    }
+}
