@@ -1,0 +1,179 @@
+/* GLOBAL */
+body {
+    font-family: 'Inter', sans-serif;
+    background: #F9E7B2;
+    color: #171A1F;
+    margin: 0;
+}
+
+/* NAVBAR (same as task.php) */
+.navbar-custom {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logo {
+    width: 180px;
+}
+
+/* --- Navigation Menu --- */
+/* Container for navigation links (To-Do, Finance, Dashboard, Profile) */
+.nav-menu {
+    display: flex; /* Arranges links horizontally */
+    gap: 40px; /* Space between menu items from Figma */
+    align-items: center; /* Vertically center items */
+}
+
+/* Individual navigation links */
+.nav-item {
+    color: #171A1F; /* Dark text color */
+    text-decoration: none; /* Remove underline */
+    font-size: 18px; /* Font size */
+    font-weight: 400; /* Normal weight */
+    padding-bottom: 8px; /* Space for underline effect */
+    border-bottom: 2px solid transparent; /* Invisible border by default */
+    transition: all 0.3s ease; /* Smooth transition */
+}
+
+/* Active/current page styling */
+.nav-item.active {
+    border-bottom: 2px solid #171A1F; /* Underline for active page */
+    font-weight: 500; /* Slightly bolder text */
+}
+
+/* Hover effect for navigation links */
+.nav-item:hover {
+    color: #7B542F; /* Brown color on hover */
+    border-bottom: 2px solid #7B542F; /* Brown underline on hover */
+}
+
+/* --- Motivational Quote Box --- */
+/* The orange box with the motivational quote */
+.quote-box {
+    width: 100%; /* Full width */
+    padding: 24px 32px; /* Space inside the box */
+    border-radius: 6px; /* Rounded corners from Figma */
+    border: 0 solid #BDC1CA; /* Border from Figma */
+    background: #FFCF71; /* Orange background from Figma */
+    box-shadow: 0 0 2px 0 rgba(23, 26, 31, 0.08), 0 0 1px 0 rgba(23, 26, 31, 0.05); /* Subtle shadow from Figma */
+}
+
+/* The quote text styling */
+.quote-text {
+    color: #171A1F; /* Dark text */
+    font-size: 18px; /* Text size */
+    font-style: italic; /* Italic for quote style */
+    font-weight: 400; /* Normal weight */
+    margin: 0; /* Remove default margin */
+    text-align: center; /* Center the quote */
+}
+
+/* --- Task and Calendar Tabs --- */
+/* Container for the tab buttons */
+.tabs-container {
+    display: flex; /* Arranges tabs horizontally */
+    gap: 0; /* No gap - tabs are connected */
+    width: 100%; /* Full width */
+}
+
+/* Individual tab button */
+.tab-button {
+    flex: 1; /* Both tabs take equal width */
+    padding: 12px 24px; /* Space inside button */
+    border: 0 solid #BDC1CA; /* Border from Figma */
+    background: #FFF; /* White background by default */
+    color: #84994F; /* Dark text */
+    font-size: 18px; /* Text size */
+    font-weight: 500; /* Medium weight */
+    cursor: pointer; /* Hand cursor on hover */
+    transition: all 0.3s ease; /* Smooth transition */
+}
+
+/* First tab (Task) - left rounded corners */
+.tab-button:first-child {
+    border-radius: 6px 0 0 0; /* Rounded top-left corner only */
+}
+
+/* Second tab (Calendar) - right rounded corners */
+.tab-button:last-child {
+    border-radius: 0 6px 0 0; /* Rounded top-right corner only */
+}
+
+/* Active tab styling */
+.tab-button.active {
+    background: #84994F; /* Brown background from Figma */
+    color: #FFF; /* White text */
+}
+
+/* Hover effect for non-active tabs */
+.tab-button:not(.active):hover {
+    background: #F3F4F6; /* Light gray on hover */
+}
+
+/* MAIN BOX */
+.content-box {
+    background: #FAFAFB;
+    border-radius: 10px;
+    padding: 25px;
+}
+
+/* FILTER DROPDOWNS */
+.records-select {
+    padding: 10px 14px;
+    background: #F3F4F6;
+    border-radius: 10px;
+    border: none;
+    font-size: 14px;
+}
+
+/* ADD BUTTON */
+.btn-add-record {
+    padding: 0 22px;
+    background: #A72703;
+    border-radius: 16px;
+    font-size: 26px;
+    color: white;
+    border: none;
+    height: 40px;
+    line-height: 40px;
+
+}
+
+/* TABLE */
+.records-table-container {
+    margin-top: 20px;
+    overflow-x: auto;
+}
+
+.records-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.records-table thead th {
+    background: #F3F4F6;
+    padding: 12px;
+    font-weight: 600;
+    font-size: 12px;
+}
+
+.records-table tbody td {
+    padding: 14px;
+    background: #FAFAFB;
+    border-top: 1px solid #F3F4F6;
+    border-bottom: 1px solid #F3F4F6;
+}
+
+/* TYPE COLORS */
+.type-expense {
+    color: #F77F00;
+}
+
+.type-income {
+    color: #3A914D;
+}
+
+.type-transfer {
+    color: #2E5AAC;
+}
