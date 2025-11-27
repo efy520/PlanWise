@@ -14,6 +14,49 @@ $user_id = $_SESSION['user_id'];
 
 
 // -------------------------------------------
+// HANDLE EDIT TRANSACTION
+// -------------------------------------------
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['edit_transaction'])) {
+    $transaction_id = (int)$_POST['transaction_id'];
+    $amount = (float)$_POST['amount'];
+    $description = trim($_POST['description']);
+    $txn_date_time = $_POST['txn_date_time'];
+    $category_id = (int)$_POST['category_id'];
+    $source_account_id = (int)$_POST['source_account_id'];
+    $destination_account_id = !empty($_POST['destination_account_id']) ? (int)$_POST['destination_account_id'] : null;
+    
+    $sql_update = "UPDATE transaction_table 
+                   SET amount = ?, description = ?, txn_date_time = ?, category_id = ?, 
+                       source_account_id = ?, destination_account_id = ?
+                   WHERE transaction_id = ? AND user_id = ?";
+    
+    $stmt = $conn->prepare($sql_update);
+    $stmt->bind_param("dssiiiii", $amount, $description, $txn_date_time, $category_id, 
+                      $source_account_id, $destination_account_id, $transaction_id, $user_id);
+    
+    if ($stmt->execute()) {
+        header("Location: records.php?updated=1");
+        exit();
+    }
+}
+
+// -------------------------------------------
+// HANDLE DELETE TRANSACTION
+// -------------------------------------------
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_transaction'])) {
+    $transaction_id = (int)$_POST['transaction_id'];
+    
+    $sql_delete = "DELETE FROM transaction_table WHERE transaction_id = ? AND user_id = ?";
+    $stmt = $conn->prepare($sql_delete);
+    $stmt->bind_param("ii", $transaction_id, $user_id);
+    
+    if ($stmt->execute()) {
+        header("Location: records.php?deleted=1");
+        exit();
+    }
+}
+
+// -------------------------------------------
 // FETCH MOTIVATIONAL QUOTE
 // -------------------------------------------
 $sql_quote = "SELECT quote_text FROM quote WHERE is_active = 1 ORDER BY RAND() LIMIT 1";
@@ -28,7 +71,7 @@ if ($result_quote && $result_quote->num_rows > 0) {
 // -------------------------------------------
 // FETCH ALL TRANSACTIONS (REAL DATA)
 // -------------------------------------------
-// JOIN Category + Account names
+// JOIN Category + Account names + include IDs
 $sql = "
     SELECT 
         t.transaction_id,
@@ -36,6 +79,9 @@ $sql = "
         t.amount,
         t.description,
         t.txn_date_time,
+        t.category_id,
+        t.source_account_id,
+        t.destination_account_id,
         
         c.category_name,
         c.category_type,
@@ -57,7 +103,22 @@ $sql = "
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("i", $user_id);
 $stmt->execute();
-$records = $stmt->get_result();
+$records = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+
+// -------------------------------------------
+// FETCH ACCOUNTS AND CATEGORIES FOR MODAL
+// -------------------------------------------
+$sql_accounts = "SELECT account_id, account_name FROM account WHERE user_id = ? AND is_active = 1 ORDER BY account_name";
+$stmt_accounts = $conn->prepare($sql_accounts);
+$stmt_accounts->bind_param("i", $user_id);
+$stmt_accounts->execute();
+$accounts = $stmt_accounts->get_result()->fetch_all(MYSQLI_ASSOC);
+
+$sql_categories = "SELECT category_id, category_name, category_type FROM category WHERE user_id = ? AND is_active = 1 ORDER BY category_name";
+$stmt_categories = $conn->prepare($sql_categories);
+$stmt_categories->bind_param("i", $user_id);
+$stmt_categories->execute();
+$categories = $stmt_categories->get_result()->fetch_all(MYSQLI_ASSOC);
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -93,6 +154,20 @@ $records = $stmt->get_result();
     <div class="quote-box mb-3">
         <p class="quote-text">"<?php echo htmlspecialchars($quote_text); ?>"</p>
     </div>
+
+    <?php if (isset($_GET['updated'])): ?>
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            Transaction updated successfully!
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    <?php endif; ?>
+
+    <?php if (isset($_GET['deleted'])): ?>
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            Transaction deleted successfully!
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    <?php endif; ?>
 
     <!-- TABS -->
     <div class="tabs-container mb-3">
@@ -133,17 +208,18 @@ $records = $stmt->get_result();
                         <th>Account</th>
                         <th>Time</th>
                         <th>Description</th>
+                        <th>Action</th>
                     </tr>
                 </thead>
 
                 <tbody>
-                <?php if ($records->num_rows == 0): ?>
+                <?php if (count($records) == 0): ?>
                     <tr>
-                        <td colspan="7" class="text-center py-4">No records found.</td>
+                        <td colspan="8" class="text-center py-4">No records found.</td>
                     </tr>
                 <?php else: ?>
 
-                    <?php while ($r = $records->fetch_assoc()): ?>
+                    <?php foreach ($records as $r): ?>
 
                         <?php
                         // Format date + time
@@ -174,9 +250,13 @@ $records = $stmt->get_result();
                             <td><?= $time ?></td>
 
                             <td><?= htmlspecialchars($r['description']) ?></td>
+
+                            <td>
+                                <button class="btn btn-sm btn-primary" onclick="openEditModal(<?php echo htmlspecialchars(json_encode($r)); ?>)">Edit</button>
+                            </td>
                         </tr>
 
-                    <?php endwhile; ?>
+                    <?php endforeach; ?>
                 <?php endif; ?>
                 </tbody>
 
@@ -185,6 +265,232 @@ $records = $stmt->get_result();
 
     </div>
 </div>
+
+<!-- Edit Transaction Modal -->
+<div class="modal fade" id="editTransactionModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Edit Transaction</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form method="POST" id="editTransactionForm">
+                    <input type="hidden" name="edit_transaction" value="1">
+                    <input type="hidden" name="transaction_id" id="editTransactionId" value="">
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="edit_type" class="form-label">Type</label>
+                            <input type="text" class="form-control" id="edit_type" readonly>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="edit_amount" class="form-label">Amount</label>
+                            <input type="number" step="0.01" class="form-control" id="edit_amount" name="amount" required>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="edit_category" class="form-label">Category</label>
+                            <select class="form-control" id="edit_category" name="category_id" required>
+                                <option value="">Select Category</option>
+                                <?php foreach ($categories as $cat): ?>
+                                    <option value="<?= $cat['category_id'] ?>"><?= htmlspecialchars($cat['category_name']) ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="edit_source_account" class="form-label">From Account</label>
+                            <select class="form-control" id="edit_source_account" name="source_account_id" required>
+                                <option value="">Select Account</option>
+                                <?php foreach ($accounts as $acc): ?>
+                                    <option value="<?= $acc['account_id'] ?>"><?= htmlspecialchars($acc['account_name']) ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="edit_datetime" class="form-label">Date & Time</label>
+                            <input type="datetime-local" class="form-control" id="edit_datetime" name="txn_date_time" required>
+                        </div>
+                    </div>
+                    
+                    <input type="hidden" name="destination_account_id" id="edit_destination_account" value="">
+
+                    <div class="mb-3">
+                        <label for="edit_description" class="form-label">Description</label>
+                        <textarea class="form-control" id="edit_description" name="description" rows="3" required></textarea>
+                    </div>
+                    
+                    <div class="d-flex gap-2">
+                        <button type="button" class="btn btn-secondary flex-fill" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary flex-fill">Save Changes</button>
+                        <button type="button" class="btn btn-danger flex-fill" onclick="deleteTransaction()">Delete</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Transfer Edit Modal -->
+<div class="modal fade" id="editTransferModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Edit Transfer</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form method="POST" id="editTransferForm">
+                    <input type="hidden" name="edit_transaction" value="1">
+                    <input type="hidden" name="transaction_id" id="editTransferId" value="">
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="edit_transfer_type" class="form-label">Type</label>
+                            <input type="text" class="form-control" id="edit_transfer_type" value="Transfer" readonly>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="edit_transfer_amount" class="form-label">Amount</label>
+                            <input type="number" step="0.01" class="form-control" id="edit_transfer_amount" name="amount" required>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="edit_transfer_from" class="form-label">From Account</label>
+                            <select class="form-control" id="edit_transfer_from" name="source_account_id" required>
+                                <option value="">Select Account</option>
+                                <?php foreach ($accounts as $acc): ?>
+                                    <option value="<?= $acc['account_id'] ?>"><?= htmlspecialchars($acc['account_name']) ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="edit_transfer_to" class="form-label">To Account</label>
+                            <select class="form-control" id="edit_transfer_to" name="destination_account_id" required>
+                                <option value="">Select Account</option>
+                                <?php foreach ($accounts as $acc): ?>
+                                    <option value="<?= $acc['account_id'] ?>"><?= htmlspecialchars($acc['account_name']) ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-12">
+                            <label for="edit_transfer_datetime" class="form-label">Date & Time</label>
+                            <input type="datetime-local" class="form-control" id="edit_transfer_datetime" name="txn_date_time" required>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="edit_transfer_description" class="form-label">Description</label>
+                        <textarea class="form-control" id="edit_transfer_description" name="description" rows="3"></textarea>
+                    </div>
+                    
+                    <div class="d-flex gap-2">
+                        <button type="button" class="btn btn-secondary flex-fill" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary flex-fill">Save Changes</button>
+                        <button type="button" class="btn btn-danger flex-fill" onclick="deleteTransaction()">Delete</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Delete Transaction</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete this transaction?</p>
+            </div>
+            <div class="modal-footer">
+                <form method="POST" style="display: inline;">
+                    <input type="hidden" name="delete_transaction" value="1">
+                    <input type="hidden" name="transaction_id" id="deleteTransactionId" value="">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-danger">Delete</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+function openEditModal(transaction) {
+    console.log('Edit button clicked, transaction:', transaction);
+    
+    try {
+        // Convert datetime format from 'YYYY-MM-DD HH:MM:SS' to 'YYYY-MM-DDTHH:MM'
+        const datetime = transaction.txn_date_time.replace(' ', 'T').substring(0, 16);
+        
+        // Check if it's a transfer
+        if (transaction.type === 'transfer') {
+            console.log('Opening transfer modal');
+            document.getElementById('editTransferId').value = transaction.transaction_id;
+            document.getElementById('edit_transfer_amount').value = transaction.amount;
+            document.getElementById('edit_transfer_from').value = transaction.source_account_id;
+            document.getElementById('edit_transfer_to').value = transaction.destination_account_id;
+            document.getElementById('edit_transfer_datetime').value = datetime;
+            document.getElementById('edit_transfer_description').value = transaction.description;
+            
+            const modal = new bootstrap.Modal(document.getElementById('editTransferModal'));
+            modal.show();
+        } else {
+            // Income or Expense
+            console.log('Opening income/expense modal');
+            document.getElementById('editTransactionId').value = transaction.transaction_id;
+            document.getElementById('edit_type').value = transaction.type.charAt(0).toUpperCase() + transaction.type.slice(1);
+            document.getElementById('edit_amount').value = transaction.amount;
+            document.getElementById('edit_category').value = transaction.category_id;
+            document.getElementById('edit_source_account').value = transaction.source_account_id;
+            document.getElementById('edit_destination_account').value = transaction.destination_account_id || '';
+            document.getElementById('edit_datetime').value = datetime;
+            document.getElementById('edit_description').value = transaction.description;
+            
+            const modal = new bootstrap.Modal(document.getElementById('editTransactionModal'));
+            modal.show();
+        }
+        
+        console.log('Modal shown successfully');
+    } catch (error) {
+        console.error('Error showing modal:', error);
+        alert('Error opening edit form: ' + error.message);
+    }
+}
+
+function deleteTransaction() {
+    let transactionId = '';
+    
+    // Check which modal is open to get the correct transaction ID
+    const editModal = document.getElementById('editTransactionModal');
+    const transferModal = document.getElementById('editTransferModal');
+    
+    if (editModal.classList.contains('show')) {
+        transactionId = document.getElementById('editTransactionId').value;
+        bootstrap.Modal.getInstance(editModal).hide();
+    } else if (transferModal.classList.contains('show')) {
+        transactionId = document.getElementById('editTransferId').value;
+        bootstrap.Modal.getInstance(transferModal).hide();
+    }
+    
+    document.getElementById('deleteTransactionId').value = transactionId;
+    const deleteModal = new bootstrap.Modal(document.getElementById('deleteConfirmModal'));
+    deleteModal.show();
+}
+</script>
 
 </body>
 </html>
