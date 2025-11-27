@@ -10,21 +10,58 @@ body {
     font-family: 'Inter', sans-serif;
     color: #171A1F;
 }
-
-/* --- Button Styles --- */
-/* Back button - orange */
-.btn-back {
-    background: #F77F00;
-    color: #fff;
-    border-radius: 20px;
-    padding: 6px 16px;
-    border: none;
+/* --- Top Navigation Bar --- */
+/* Container for logo and navigation menu */
+.navbar-custom {
+    display: flex; /* Arranges items horizontally */
+    justify-content: space-between; /* Space between logo and menu */
+    align-items: center; /* Vertically center items */
+    padding: 20px 0; /* Vertical padding */
 }
 
-.btn-back:hover {
-    background: #E06E00;
-    color: #fff;
+/* --- Logo Styling --- */
+.logo-container {
+    flex-shrink: 0; /* Logo doesn't shrink */
 }
+
+.logo {
+    width: 180px; /* Width from Figma */
+    height: auto; /* Maintains aspect ratio */
+    display: block;
+}
+
+/* --- Navigation Menu --- */
+/* Container for navigation links (To-Do, Finance, Dashboard, Profile) */
+.nav-menu {
+    display: flex; /* Arranges links horizontally */
+    gap: 40px; /* Space between menu items from Figma */
+    align-items: center; /* Vertically center items */
+}
+
+/* Individual navigation links */
+.nav-item {
+    color: #171A1F; /* Dark text color */
+    text-decoration: none; /* Remove underline */
+    font-size: 18px; /* Font size */
+    font-weight: 400; /* Normal weight */
+    padding-bottom: 8px; /* Space for underline effect */
+    border-bottom: 2px solid transparent; /* Invisible border by default */
+    transition: all 0.3s ease; /* Smooth transition */
+}
+
+/* Active/current page styling */
+.nav-item.active {
+    border-bottom: 2px solid #171A1F; /* Underline for active page */
+    font-weight: 500; /* Slightly bolder text */
+}
+
+/* Hover effect for navigation links */
+.nav-item:hover {
+    color: #7B542F; /* Brown color on hover */
+    border-bottom: 2px solid #7B542F; /* Brown underline on hover */
+}
+
+
 
 /* New Task button - brown */
 .btn-new-task {
@@ -40,19 +77,6 @@ body {
     color: #fff;
 }
 
-/* Go to Tasks button - brown */
-.btn-go-tasks {
-    background: #7B542F;
-    color: #fff;
-    border-radius: 8px;
-    padding: 6px 16px;
-    border: none;
-}
-
-.btn-go-tasks:hover {
-    background: #6A4728;
-    color: #fff;
-}
 
 /* --- Quote Box --- */
 .quote-box {
@@ -70,7 +94,47 @@ body {
     font-size: 16px;
     text-align: center;
 }
+/* --- Task and Calendar Tabs --- */
+/* Container for the tab buttons */
+.tabs-container {
+    display: flex; /* Arranges tabs horizontally */
+    gap: 0; /* No gap - tabs are connected */
+    width: 100%; /* Full width */
+}
 
+/* Individual tab button */
+.tab-button {
+    flex: 1; /* Both tabs take equal width */
+    padding: 12px 24px; /* Space inside button */
+    border: 0 solid #BDC1CA; /* Border from Figma */
+    background: #FFF; /* White background by default */
+    color: #171A1F; /* Dark text */
+    font-size: 18px; /* Text size */
+    font-weight: 500; /* Medium weight */
+    cursor: pointer; /* Hand cursor on hover */
+    transition: all 0.3s ease; /* Smooth transition */
+}
+
+/* First tab (Task) - left rounded corners */
+.tab-button:first-child {
+    border-radius: 6px 0 0 0; /* Rounded top-left corner only */
+}
+
+/* Second tab (Calendar) - right rounded corners */
+.tab-button:last-child {
+    border-radius: 0 6px 0 0; /* Rounded top-right corner only */
+}
+
+/* Active tab styling */
+.tab-button.active {
+    background: #7B542F; /* Brown background from Figma */
+    color: #FFF; /* White text */
+}
+
+/* Hover effect for non-active tabs */
+.tab-button:not(.active):hover {
+    background: #F3F4F6; /* Light gray on hover */
+}
 /* --- Calendar Header --- */
 .calendar-header .month-name {
     font-size: 20px;

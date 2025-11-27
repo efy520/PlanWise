@@ -103,20 +103,28 @@ if ($result_quote && $result_quote->num_rows > 0) {
     <link rel="stylesheet" href="css/calendar.css">
 </head>
 <body>
+<div class="container-fluid px-4 py-3">
 
-<div class="container py-3">
+    <!-- TOP NAVIGATION BAR -->
+    <div class="row mb-3">
+        <div class="col-12">
+            <nav class="navbar-custom">
+                <div class="logo-container">
+                    <img src="images/logo.png" alt="PlanWise Logo" class="logo">
+                </div>
 
-    <!-- Top: header / nav -->
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <div>
-            <a href="task.php" class="btn btn-sm btn-back">← Back</a>
-            <span class="ms-3 h4">Calendar</span>
+                <div class="nav-menu">
+                    <a href="task.php" class="nav-item active">To-Do</a>
+                    <a href="finance.php" class="nav-item">Finance</a>
+                    <a href="dashboard.php" class="nav-item">Dashboard</a>
+                    <a href="profile.php" class="nav-item">Profile</a>
+                </div>
+            </nav>
         </div>
-
-        <div>
-            <a href="createTask.php" id="btnNewTask" class="btn btn-new-task">+ New Task</a>
-        </div>
+        
     </div>
+
+
 
    <!-- QUOTE BOX -->
     <div class="row mb-3">
@@ -137,12 +145,22 @@ if ($result_quote && $result_quote->num_rows > 0) {
             </div>
             <a href="calendar.php?m=<?= $nextM ?>&y=<?= $nextY ?>" class="btn btn-sm btn-light">&gt;</a>
         </div>
-
-        <div class="d-flex align-items-center gap-2">
-            <button class="btn btn-sm btn-outline-secondary" onclick="location.href='calendar.php?m=<?= date('n') ?>&y=<?= date('Y') ?>'">Today</button>
-            <a class="btn btn-sm btn-go-tasks" href="task.php">Go to Tasks</a>
+<div>
+            <a href="createTask.php" id="btnNewTask" class="btn btn-new-task">+ New Task</a>
         </div>
     </div>
+
+ <!-- TABS -->
+    <div class="row mb-3">
+        <div class="col-12">
+            <div class="tabs-container">
+                 <button class="tab-button" onclick="window.location='task.php'">Task</button>
+                 <button class="tab-button active">Calendar</button>
+               
+            </div>
+        </div>
+    </div>
+   
 
     <!-- Calendar box -->
     <div class="calendar-wrap p-4">
