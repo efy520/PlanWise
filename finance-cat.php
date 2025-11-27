@@ -17,6 +17,90 @@ if ($result_quote && $result_quote->num_rows > 0) {
     $quote_text = $result_quote->fetch_assoc()['quote_text'];
 }
 
+// ============================================
+// ACCOUNT OPERATIONS
+// ============================================
+
+// Handle Add New Account
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_account'])) {
+    $account_name = trim($_POST['account_name']);
+    
+    if (!empty($account_name)) {
+        $sql = "INSERT INTO account (user_id, account_name, is_active) VALUES (?, ?, 1)";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("is", $user_id, $account_name);
+        $stmt->execute();
+        header("Location: finance-cat.php?account_added=1");
+        exit();
+    }
+}
+
+// Handle Delete Account
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_account_id'])) {
+    $account_id = (int)$_POST['delete_account_id'];
+    $sql = "DELETE FROM account WHERE account_id = ? AND user_id = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("ii", $account_id, $user_id);
+    $stmt->execute();
+    header("Location: finance-cat.php?account_deleted=1");
+    exit();
+}
+
+// Handle Ignore Account (set is_active = 0)
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['ignore_account_id'])) {
+    $account_id = (int)$_POST['ignore_account_id'];
+    $sql = "UPDATE account SET is_active = 0 WHERE account_id = ? AND user_id = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("ii", $account_id, $user_id);
+    $stmt->execute();
+    header("Location: finance-cat.php?account_ignored=1");
+    exit();
+}
+
+// Handle Edit Account
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['edit_account'])) {
+    $account_id = (int)$_POST['account_id'];
+    $account_name = trim($_POST['account_name']);
+    
+    if (!empty($account_name)) {
+        $sql = "UPDATE account SET account_name = ? WHERE account_id = ? AND user_id = ?";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("sii", $account_name, $account_id, $user_id);
+        $stmt->execute();
+        header("Location: finance-cat.php?account_edited=1");
+        exit();
+    }
+}
+
+// Handle Restore Account (set is_active = 1)
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['restore_account_id'])) {
+    $account_id = (int)$_POST['restore_account_id'];
+    $sql = "UPDATE account SET is_active = 1 WHERE account_id = ? AND user_id = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("ii", $account_id, $user_id);
+    $stmt->execute();
+    header("Location: finance-cat.php?account_restored=1");
+    exit();
+}
+
+// Fetch Active Accounts
+$account_sql = "SELECT account_id, account_name FROM account WHERE user_id = ? AND is_active = 1";
+$stmt = $conn->prepare($account_sql);
+$stmt->bind_param("i", $user_id);
+$stmt->execute();
+$active_accounts = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+
+// Fetch Ignored Accounts (is_active = 0)
+$ignored_account_sql = "SELECT account_id, account_name FROM account WHERE user_id = ? AND is_active = 0";
+$stmt = $conn->prepare($ignored_account_sql);
+$stmt->bind_param("i", $user_id);
+$stmt->execute();
+$ignored_accounts = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+
+// ============================================
+// CATEGORY OPERATIONS
+// ============================================
+
 // Handle Add New Category
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_category'])) {
     $category_name = trim($_POST['category_name']);
@@ -182,6 +266,41 @@ $ignored_categories = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
             </div>
         <?php endif; ?>
 
+        <?php if (isset($_GET['account_added'])): ?>
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                Account added successfully!
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        <?php endif; ?>
+
+        <?php if (isset($_GET['account_deleted'])): ?>
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                Account deleted successfully!
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        <?php endif; ?>
+
+        <?php if (isset($_GET['account_edited'])): ?>
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                Account updated successfully!
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        <?php endif; ?>
+
+        <?php if (isset($_GET['account_ignored'])): ?>
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                Account ignored successfully!
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        <?php endif; ?>
+
+        <?php if (isset($_GET['account_restored'])): ?>
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                Account restored successfully!
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        <?php endif; ?>
+
         <!-- Account/Category Toggle -->
         <div class="category-tabs-container mb-4">
             <button class="category-tab" id="accountTab" onclick="showTab('account')">Account</button>
@@ -284,7 +403,61 @@ $ignored_categories = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
 
         <!-- ACCOUNT TAB CONTENT -->
         <div id="accountContent">
-            <a href="finance-acc.php">Finance Accounts</a>
+            <!-- Accounts Section -->
+            <div class="category-section mb-5">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h3 class="category-title">Accounts</h3>
+                    <button class="btn-add-category" onclick="showAddAccountModal()">ADD NEW ACCOUNT</button>
+                </div>
+                
+                <div class="categories-list">
+                    <?php if (count($active_accounts) > 0): ?>
+                        <?php foreach ($active_accounts as $account): ?>
+                            <div class="category-item">
+                                <span class="category-name"><?php echo htmlspecialchars($account['account_name']); ?></span>
+                                <div class="dropdown">
+                                    <button class="btn-dots" data-bs-toggle="dropdown">⋯</button>
+                                    <ul class="dropdown-menu category-dropdown">
+                                        <li><a class="dropdown-item" href="#" onclick="showEditAccountModal(<?php echo $account['account_id']; ?>, '<?php echo htmlspecialchars($account['account_name']); ?>')">Edit</a></li>
+                                        <li><a class="dropdown-item" href="#" onclick="showDeleteAccountModal(<?php echo $account['account_id']; ?>, '<?php echo htmlspecialchars($account['account_name']); ?>')">Delete</a></li>
+                                        <li>
+                                            <form method="POST" style="display: inline;">
+                                                <input type="hidden" name="ignore_account_id" value="<?php echo $account['account_id']; ?>">
+                                                <button type="submit" class="dropdown-item" style="border: none; background: none; cursor: pointer;">Ignore</button>
+                                            </form>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        <?php endforeach; ?>
+                    <?php else: ?>
+                        <p class="text-muted">No accounts yet.</p>
+                    <?php endif; ?>
+                </div>
+            </div>
+
+            <!-- Ignored Accounts Section -->
+            <div class="category-section">
+                <h3 class="category-title">Ignored Accounts</h3>
+                <p class="text-muted mb-3">Restore ignored accounts to use them again in transactions.</p>
+                
+                <div class="categories-list">
+                    <?php if (count($ignored_accounts) > 0): ?>
+                        <?php foreach ($ignored_accounts as $account): ?>
+                            <div class="category-item">
+                                <span class="category-name"><?php echo htmlspecialchars($account['account_name']); ?></span>
+                                <form method="POST" style="display: inline;">
+                                    <input type="hidden" name="restore_account_id" value="<?php echo $account['account_id']; ?>">
+                                    <button type="submit" class="btn btn-sm btn-success">Restore</button>
+                                </form>
+                            </div>
+                        <?php endforeach; ?>
+                    <?php else: ?>
+                        <p class="text-muted">No ignored accounts.</p>
+                    <?php endif; ?>
+                </div>
+            </div>
+        </div>
 
     </div>
 </div>
@@ -367,6 +540,83 @@ $ignored_categories = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
     </div>
 </div>
 
+<!-- Add Account Modal -->
+<div class="modal fade" id="addAccountModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add New Account</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form method="POST">
+                    <input type="hidden" name="add_account" value="1">
+                    
+                    <div class="mb-3">
+                        <label for="account_name" class="form-label">Account Name</label>
+                        <input type="text" class="form-control" id="account_name" name="account_name" placeholder="e.g., Cash, Savings, Credit Card" required>
+                    </div>
+                    
+                    <div class="d-flex gap-2">
+                        <button type="button" class="btn btn-secondary flex-fill" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary flex-fill">Add Account</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Account Modal -->
+<div class="modal fade" id="deleteAccountModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Delete Account</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete "<span id="deleteAccountName"></span>"?</p>
+                <form method="POST">
+                    <input type="hidden" name="delete_account_id" id="deleteAccountId">
+                    <div class="d-flex gap-2">
+                        <button type="button" class="btn btn-secondary flex-fill" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-danger flex-fill">Delete</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Account Modal -->
+<div class="modal fade" id="editAccountModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Edit Account</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form method="POST">
+                    <input type="hidden" name="edit_account" value="1">
+                    <input type="hidden" name="account_id" id="editAccountId" value="">
+                    
+                    <div class="mb-3">
+                        <label for="edit_account_name" class="form-label">Account Name</label>
+                        <input type="text" class="form-control" id="edit_account_name" name="account_name" required>
+                    </div>
+                    
+                    <div class="d-flex gap-2">
+                        <button type="button" class="btn btn-secondary flex-fill" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary flex-fill">Save Changes</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
 function showAddModal(type) {
@@ -406,6 +656,25 @@ function showTab(tab) {
         categoryContent.style.display = 'block';
         accountContent.style.display = 'none';
     }
+}
+
+function showAddAccountModal() {
+    const modal = new bootstrap.Modal(document.getElementById('addAccountModal'));
+    modal.show();
+}
+
+function showDeleteAccountModal(accountId, accountName) {
+    document.getElementById('deleteAccountId').value = accountId;
+    document.getElementById('deleteAccountName').textContent = accountName;
+    const modal = new bootstrap.Modal(document.getElementById('deleteAccountModal'));
+    modal.show();
+}
+
+function showEditAccountModal(accountId, accountName) {
+    document.getElementById('editAccountId').value = accountId;
+    document.getElementById('edit_account_name').value = accountName;
+    const modal = new bootstrap.Modal(document.getElementById('editAccountModal'));
+    modal.show();
 }
 </script>
 
