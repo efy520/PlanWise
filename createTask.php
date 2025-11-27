@@ -86,7 +86,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     <input type="date" class="form-control input-field"
                            name="due_date"
                            value="<?= $autoDue ?>"   <!-- Autofill here -->
-                           required>
+                        
                 </div>
             </div>
 
