@@ -115,7 +115,7 @@ if ($result_quote && $result_quote->num_rows > 0) {
 
                 <div class="nav-menu">
                     <a href="task.php" class="nav-item active">To-Do</a>
-                    <a href="finance.php" class="nav-item">Finance</a>
+                    <a href="records.php" class="nav-item">Finance</a>
                     <a href="dashboard.php" class="nav-item">Dashboard</a>
                     <a href="profile.php" class="nav-item">Profile</a>
                 </div>
