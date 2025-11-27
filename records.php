@@ -97,7 +97,7 @@ $records = $stmt->get_result();
     <!-- TABS -->
     <div class="tabs-container mb-3">
         <button class="tab-button active">Records</button>
-        <button class="tab-button" onclick="window.location='finance-settings.php'">Finance Settings</button>
+        <button class="tab-button" onclick="window.location='finance-set.php'">Finance Settings</button>
         <button class="tab-button" onclick="window.location='budgets.php'">Budgets</button>
     </div>
 
