@@ -79,12 +79,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['restore_account_id'])
     exit();
 }
 
-// Fetch Active Accounts
-$account_sql = "SELECT account_id, account_name FROM account WHERE user_id = ? AND is_active = 1";
+// Fetch Active Accounts with Balance
+$account_sql = "
+    SELECT 
+        a.account_id, 
+        a.account_name,
+        COALESCE(SUM(CASE 
+            WHEN t.type = 'income' AND t.source_account_id = a.account_id THEN t.amount 
+            WHEN t.type = 'expense' AND t.source_account_id = a.account_id THEN -t.amount 
+            WHEN t.type = 'transfer' AND t.source_account_id = a.account_id THEN -t.amount
+            WHEN t.type = 'transfer' AND t.destination_account_id = a.account_id THEN t.amount
+            ELSE 0 
+        END), 0) AS balance
+    FROM account a
+    LEFT JOIN transaction_table t ON (t.user_id = a.user_id AND (t.source_account_id = a.account_id OR t.destination_account_id = a.account_id))
+    WHERE a.user_id = ? AND a.is_active = 1
+    GROUP BY a.account_id, a.account_name, a.user_id
+    ORDER BY a.account_name
+";
 $stmt = $conn->prepare($account_sql);
 $stmt->bind_param("i", $user_id);
 $stmt->execute();
-$active_accounts = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+$result = $stmt->get_result();
+$active_accounts = $result->fetch_all(MYSQLI_ASSOC);
 
 // Fetch Ignored Accounts (is_active = 0)
 $ignored_sql = "SELECT account_id, account_name FROM account WHERE user_id = ? AND is_active = 0";
@@ -193,7 +210,10 @@ $ignored_accounts = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
                     <?php if (count($active_accounts) > 0): ?>
                         <?php foreach ($active_accounts as $account): ?>
                             <div class="category-item">
-                                <span class="category-name"><?php echo htmlspecialchars($account['account_name']); ?></span>
+                                <div>
+                                    <span class="category-name"><?php echo htmlspecialchars($account['account_name']); ?></span>
+                                    <div class="account-balance">RM <?php echo isset($account['balance']) ? number_format((float)$account['balance'], 2) : '0.00'; ?></div>
+                                </div>
                                 <div class="dropdown">
                                     <button class="btn-dots" data-bs-toggle="dropdown">⋯</button>
                                     <ul class="dropdown-menu category-dropdown">

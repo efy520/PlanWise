@@ -208,6 +208,15 @@ body {
     font-weight: 500;
 }
 
+.account-balance {
+    color: #84994F;
+    font-size: 15px;
+    font-weight: 700;
+    margin-top: 6px;
+    display: block;
+    letter-spacing: 0.3px;
+}
+
 /* --- Three Dots Button --- */
 .btn-dots {
     border-radius: 6px;
