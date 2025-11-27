@@ -127,25 +127,7 @@ $ignored_accounts = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
 
 <div class="container-fluid px-4 py-3">
 
-    <!-- TOP NAV -->
-    <nav class="navbar-custom mb-3">
-        <div class="logo-container">
-            <img src="images/logo.png" class="logo" alt="PlanWise">
-        </div>
-
-        <div class="nav-menu">
-            <a href="task.php" class="nav-item">To-Do</a>
-            <a href="records.php" class="nav-item">Finance</a>
-            <a href="dashboard.php" class="nav-item">Dashboard</a>
-            <a href="profile.php" class="nav-item">Profile</a>
-        </div>
-    </nav>
-
-    <!-- QUOTE -->
-    <div class="quote-box mb-3">
-        <p class="quote-text">"<?php echo htmlspecialchars($quote_text); ?>"</p>
-    </div>
-
+  <?php include 'nav-bar.php'; ?>
     <!-- TABS: Records, Finance Settings, Budgets -->
     <div class="tabs-container mb-3">
         <button class="tab-button" onclick="window.location='records.php'">Records</button>

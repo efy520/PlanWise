@@ -135,8 +135,8 @@ $categories = $stmt_categories->get_result()->fetch_all(MYSQLI_ASSOC);
 <body>
 
 <div class="container-fluid px-4 py-3">
-
-    <!-- TOP NAV -->
+<?php include 'nav-bar.php'; ?>
+    <!-- TOP NAV
     <nav class="navbar-custom mb-3">
         <div class="logo-container">
             <img src="images/logo.png" class="logo" alt="PlanWise">
@@ -150,10 +150,7 @@ $categories = $stmt_categories->get_result()->fetch_all(MYSQLI_ASSOC);
         </div>
     </nav>
 
-    <!-- QUOTE -->
-    <div class="quote-box mb-3">
-        <p class="quote-text">"<?php echo htmlspecialchars($quote_text); ?>"</p>
-    </div>
+   
 
     <?php if (isset($_GET['updated'])): ?>
         <div class="alert alert-success alert-dismissible fade show" role="alert">

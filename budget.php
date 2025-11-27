@@ -120,24 +120,7 @@ if (isset($_GET['remove'])) {
 <body>
 
 <div class="container-fluid px-4 py-3">
-
-    <!-- NAVBAR -->
-    <nav class="navbar-custom mb-3">
-        <img src="images/logo.png" class="logo">
-
-        <div class="nav-menu">
-            <a href="task.php" class="nav-item">To-Do</a>
-            <a href="records.php" class="nav-item">Finance</a>
-            <a href="dashboard.php" class="nav-item">Dashboard</a>
-            <a href="profile.php" class="nav-item">Profile</a>
-        </div>
-    </nav>
-
-    <!-- QUOTE BOX -->
-    <div class="quote-box mb-3">
-        <p class="quote-text">"<?php echo htmlspecialchars($quote_text); ?>"</p>
-    </div>
-
+<?php include 'nav-bar.php'; ?>
     <!-- TABS -->
     <div class="tabs-container mb-3">
         <button class="tab-button" onclick="window.location='records.php'">Records</button>
