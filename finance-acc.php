@@ -150,7 +150,7 @@ $ignored_accounts = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
     <div class="tabs-container mb-3">
         <button class="tab-button" onclick="window.location='records.php'">Records</button>
         <button class="tab-button active">Finance Settings</button>
-        <button class="tab-button" onclick="window.location='budgets.php'">Budgets</button>
+        <button class="tab-button" onclick="window.location='budget.php'">Budgets</button>
     </div>
 
     <!-- MAIN CONTENT -->

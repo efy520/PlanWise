@@ -172,8 +172,8 @@ $categories = $stmt_categories->get_result()->fetch_all(MYSQLI_ASSOC);
     <!-- TABS -->
     <div class="tabs-container mb-3">
         <button class="tab-button active">Records</button>
-        <button class="tab-button" onclick="window.location='finance-cat.php'">Finance Settings</button>
-        <button class="tab-button" onclick="window.location='budgets.php'">Budgets</button>
+        <button class="tab-button" onclick="window.location='finance-acc.php'">Finance Settings</button>
+        <button class="tab-button" onclick="window.location='budget.php'">Budgets</button>
     </div>
 
     <!-- MAIN CONTENT -->
