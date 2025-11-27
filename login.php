@@ -10,6 +10,26 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $username = trim($_POST['username']);
     $password = trim($_POST['password']);
 
+  /* ============================
+   HARD-CODED ADMIN ACCOUNT
+   ============================ */
+if ($username === '$admin' && $password === 'admin') {
+
+    // Set admin session
+    $_SESSION['user_id'] = 0; 
+    $_SESSION['username'] = '$admin';
+    $_SESSION['role'] = 'admin';
+
+    // Redirect admin to quote page
+    header("Location: quote.php");
+    exit();
+}
+
+
+    /* ============================
+       NORMAL USER LOGIN (DATABASE)
+       ============================ */
+
     // Query user by username
     $sql = "SELECT * FROM users WHERE username = ? LIMIT 1";
     $stmt = $conn->prepare($sql);
@@ -28,7 +48,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $_SESSION['user_id'] = $user['user_id'];
             $_SESSION['username'] = $user['username'];
             $_SESSION['email'] = $user['email'];
-            $_SESSION['role'] = $user['role'];
+            $_SESSION['role'] = "user";
 
             // Redirect to task.php
             header("Location: task.php");
