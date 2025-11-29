@@ -1,0 +1,304 @@
+/* ==========================================
+   USER DETAIL PAGE STYLES (ADMIN)
+   ==========================================
+   Admin page for viewing all user details
+   ========================================== */
+
+/* --- Global Styles --- */
+body {
+    font-family: 'Inter', sans-serif;
+    background: #F9E7B2; /* Warm beige background */
+    color: #000;
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+}
+
+/* --- Main Container --- */
+.user-detail-container {
+    display: flex;
+    min-height: 100vh;
+    width: 100%;
+}
+
+/* --- Left Sidebar --- */
+/* Red sidebar with navigation */
+.sidebar {
+    width: 523px;
+    background: #A72703; /* Red background */
+    padding: 40px 30px;
+    display: flex;
+    flex-direction: column;
+    border-radius: 0 50px 50px 0; /* Rounded right corners */
+}
+
+/* Logo container */
+.logo-container {
+    margin-bottom: 60px;
+    text-align: center;
+}
+
+.logo {
+    width: 180px;
+    height: auto;
+}
+
+/* Sidebar navigation */
+.sidebar-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* Navigation links */
+.nav-link {
+    display: flex;
+    width: 228px;
+    height: 48px;
+    padding: 2px 4px;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 4px;
+    background: transparent;
+    color: #FFF;
+    text-decoration: none;
+    font-size: 18px;
+    font-weight: 500;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    padding-left: 20px;
+}
+
+/* Active navigation link */
+.nav-link.active {
+    background: #CE7E5A; /* Light brown background */
+}
+
+/* Hover effect for navigation links */
+.nav-link:hover {
+    background: #CE7E5A;
+    color: #FFF;
+}
+
+/* --- Content Area --- */
+.content-area {
+    flex: 1;
+    padding: 40px 60px;
+    overflow-y: auto;
+}
+
+/* --- Header Section --- */
+.content-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 40px;
+}
+
+/* Page title "User Details" */
+.page-title {
+    color: #323743;
+    font-family: 'Inter', sans-serif;
+    font-size: 48px;
+    font-weight: 700;
+    margin: 0;
+    line-height: 1.2;
+}
+
+/* Section label "Section 2" */
+.page-section {
+    color: #565D6D;
+    font-size: 16px;
+    font-weight: 400;
+    margin: 8px 0 0 0;
+}
+
+/* Export to PDF button */
+.btn-export-pdf {
+    display: inline-flex;
+    padding: 10px 24px;
+    justify-content: center;
+    align-items: center;
+    border-radius: 8px;
+    background: #A72703; /* Red background */
+    color: #FFF;
+    border: none;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-export-pdf:hover {
+    background: #8B1F03;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* --- Users Table Container --- */
+.users-table-container {
+    background: #FFF;
+    border-radius: 12px;
+    padding: 30px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* --- Table Styles --- */
+.users-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+/* Table header */
+.users-table thead th {
+    background: #FFF;
+    color: #000;
+    font-family: 'Inter', sans-serif;
+    font-size: 16px;
+    font-weight: 600;
+    text-align: left;
+    padding: 16px 20px;
+    border-bottom: 2px solid #E0E0E0;
+}
+
+/* Table body rows */
+.users-table tbody tr {
+    border-bottom: 1px solid #F3F4F6;
+    transition: background-color 0.2s ease;
+}
+
+.users-table tbody tr:hover {
+    background-color: #F9FAFB;
+}
+
+/* Table cells */
+.users-table tbody td {
+    padding: 18px 20px;
+    vertical-align: middle;
+    font-size: 15px;
+    color: #171A1F;
+}
+
+/* --- Responsive Design --- */
+@media (max-width: 1200px) {
+    .sidebar {
+        width: 280px;
+    }
+    
+    .content-area {
+        padding: 30px 40px;
+    }
+    
+    .page-title {
+        font-size: 36px;
+    }
+}
+
+@media (max-width: 992px) {
+    .sidebar {
+        width: 250px;
+        padding: 30px 20px;
+    }
+    
+    .logo {
+        width: 140px;
+    }
+    
+    .nav-link {
+        width: 100%;
+        font-size: 16px;
+    }
+    
+    .content-area {
+        padding: 25px 30px;
+    }
+    
+    .page-title {
+        font-size: 32px;
+    }
+}
+
+@media (max-width: 768px) {
+    .user-detail-container {
+        flex-direction: column;
+    }
+    
+    .sidebar {
+        width: 100%;
+        border-radius: 0 0 30px 30px;
+        padding: 25px 20px;
+        min-height: auto;
+    }
+    
+    .logo-container {
+        margin-bottom: 30px;
+    }
+    
+    .logo {
+        width: 120px;
+    }
+    
+    .sidebar-nav {
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 10px;
+        justify-content: center;
+    }
+    
+    .nav-link {
+        width: auto;
+        padding: 10px 20px;
+        height: auto;
+        font-size: 14px;
+    }
+    
+    .content-area {
+        padding: 20px;
+    }
+    
+    .content-header {
+        flex-direction: column;
+        gap: 20px;
+        align-items: stretch;
+    }
+    
+    .page-title {
+        font-size: 28px;
+    }
+    
+    .btn-export-pdf {
+        width: 100%;
+    }
+    
+    .users-table-container {
+        overflow-x: auto;
+        padding: 20px;
+    }
+    
+    .users-table thead th,
+    .users-table tbody td {
+        padding: 12px 16px;
+        font-size: 14px;
+    }
+}
+
+@media (max-width: 480px) {
+    .logo {
+        width: 100px;
+    }
+    
+    .page-title {
+        font-size: 24px;
+    }
+    
+    .page-section {
+        font-size: 14px;
+    }
+    
+    .users-table thead th,
+    .users-table tbody td {
+        padding: 10px 12px;
+        font-size: 13px;
+    }
+}

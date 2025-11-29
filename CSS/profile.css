@@ -1,0 +1,216 @@
+/* ==========================================
+   PROFILE PAGE STYLES
+   ==========================================
+   User profile page with logout functionality
+   ========================================== */
+
+/* --- Global Styles --- */
+body {
+    font-family: 'Inter', sans-serif;
+    background: #F9E7B2; /* Warm beige background */
+    color: #171A1F;
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* --- Main Container --- */
+.profile-container {
+    width: 100%;
+    max-width: 600px;
+    padding: 40px 20px;
+    position: relative;
+}
+
+/* --- Back Button --- */
+.back-button-container {
+    margin-bottom: 30px;
+}
+
+.btn-back {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 56px;
+    height: 56px;
+    border-radius: 28px;
+    background: #FFA500; /* Orange background */
+    color: #FFF;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.btn-back:hover {
+    background: #FF8C00;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* --- Profile Card --- */
+.profile-card {
+    background: #F5E6D3; /* Light cream background */
+    border-radius: 12px;
+    padding: 50px 60px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* --- Username Title --- */
+.profile-username {
+    color: #171A1F;
+    font-family: 'Inter', sans-serif;
+    font-size: 32px;
+    font-weight: 600;
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+/* --- Form Labels --- */
+.form-label-profile {
+    color: #171A1F;
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 8px;
+    display: block;
+}
+
+/* --- Input Container with Icon --- */
+.input-with-icon {
+    position: relative;
+    margin-bottom: 20px;
+}
+
+.input-with-icon svg {
+    position: absolute;
+    left: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+}
+
+/* --- Form Inputs --- */
+.form-control-profile {
+    width: 100%;
+    padding: 12px 16px 12px 48px; /* Left padding for icon */
+    border-radius: 8px;
+    border: 1px solid #DEE1E6;
+    background: #FFF;
+    font-size: 15px;
+    font-family: 'Inter', sans-serif;
+    color: #171A1F;
+}
+
+.form-control-profile:read-only {
+    background: #F3F4F6;
+    cursor: not-allowed;
+}
+
+/* --- Gender Radio Buttons --- */
+.gender-options {
+    display: flex;
+    gap: 30px;
+    margin-top: 12px;
+}
+
+.form-check-inline {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.form-check-input-profile {
+    width: 20px;
+    height: 20px;
+    margin: 0;
+    cursor: pointer;
+}
+
+.form-check-input-profile:disabled {
+    cursor: not-allowed;
+}
+
+.form-check-input-profile:checked {
+    background-color: #A72703;
+    border-color: #A72703;
+}
+
+.form-check-label-profile {
+    font-size: 15px;
+    font-weight: 400;
+    color: #171A1F;
+    cursor: pointer;
+    margin: 0;
+}
+
+/* --- Logout Button --- */
+.btn-logout {
+    display: block;
+    width: 100%;
+    padding: 14px 24px;
+    border-radius: 8px;
+    background: #DC3545; /* Red background */
+    color: #FFF;
+    border: none;
+    font-size: 16px;
+    font-weight: 600;
+    font-family: 'Inter', sans-serif;
+    text-align: center;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 30px;
+}
+
+.btn-logout:hover {
+    background: #BB2D3B;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3);
+    color: #FFF;
+}
+
+/* --- Responsive Design --- */
+@media (max-width: 768px) {
+    .profile-container {
+        padding: 30px 15px;
+    }
+    
+    .profile-card {
+        padding: 40px 30px;
+    }
+    
+    .profile-username {
+        font-size: 28px;
+    }
+}
+
+@media (max-width: 480px) {
+    .profile-container {
+        padding: 20px 10px;
+    }
+    
+    .profile-card {
+        padding: 30px 20px;
+    }
+    
+    .profile-username {
+        font-size: 24px;
+        margin-bottom: 30px;
+    }
+    
+    .btn-back {
+        width: 48px;
+        height: 48px;
+    }
+    
+    .btn-back svg {
+        width: 20px;
+        height: 20px;
+    }
+    
+    .gender-options {
+        gap: 20px;
+    }
+}
