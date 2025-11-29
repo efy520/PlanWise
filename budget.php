@@ -113,9 +113,19 @@ if (isset($_GET['remove'])) {
 <!DOCTYPE html>
 <html>
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Budgets - PlanWise</title>
+    
+    <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     
+    <!-- Google Fonts (Inter) - IMPORTANT: Load before custom CSS -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Custom CSS - Load in correct order -->
     <link rel="stylesheet" href="css/nav-bar.css">
     <link rel="stylesheet" href="css/budget.css">
 </head>
@@ -123,20 +133,23 @@ if (isset($_GET['remove'])) {
 
 <div class="container-fluid px-4 py-3">
 
-<?php include 'nav-bar.php'; ?>
-    <!-- TABS -->
+    <!-- Include Navigation Bar -->
+    <?php include 'nav-bar.php'; ?>
+
+    <!-- TABS: Records, Finance Settings, Budgets -->
     <div class="tabs-container mb-3">
         <button class="tab-button" onclick="window.location='records.php'">Records</button>
         <button class="tab-button" onclick="window.location='finance-acc.php'">Finance Settings</button>
-        <button class="tab-button active">Budgets</button>
+        <button class="tab-button active" onclick="window.location='budget.php'">Budgets</button>
     </div>
 
     <!-- MAIN CONTENT -->
     <div class="content-box">
 
         <!-- MONTH DROPDOWN -->
-        <div class="d-flex justify-content-end mb-3">
-            <form method="GET">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h5 class="budget-section-title">Budgeted categories</h5>
+            <form method="GET" class="d-inline">
                 <select name="month" class="month-select" onchange="this.form.submit()">
                     <?php foreach (range(1,12) as $m): ?>
                         <option value="<?= date("F", mktime(0,0,0,$m,1)) ?>"
@@ -148,9 +161,7 @@ if (isset($_GET['remove'])) {
             </form>
         </div>
 
-        <!-- BUDGETED -->
-        <h5 class="budget-section-title">Budgeted categories</h5>
-
+        <!-- BUDGETED CATEGORIES -->
         <?php while ($b = $budgeted->fetch_assoc()): ?>
             <?php 
                 $remaining = $b['limit_amount'] - $b['spent'];
@@ -162,106 +173,161 @@ if (isset($_GET['remove'])) {
             <div class="budget-item">
                 <div class="budget-info">
                     <strong><?= $b['category_name'] ?></strong><br>
-                    Limit: RM <?= number_format($b['limit_amount'], 2) ?><br>
-                    Spent: RM <?= number_format($b['spent'], 2) ?><br>
-                    Remaining: RM <?= number_format($remaining, 2) ?>
+                    <span class="budget-details">Limit: RM <?= number_format($b['limit_amount'], 2) ?></span><br>
+                    <span class="budget-details">Spent: RM <?= number_format($b['spent'], 2) ?></span><br>
+                    <span class="budget-details">Remaining: RM <?= number_format($remaining, 2) ?></span>
                 </div>
 
                 <div class="menu-container">
-                    <button class="menu-button">•••</button>
+                    <button class="menu-button" onclick="toggleMenu(this)">•••</button>
 
                     <div class="menu-box">
                         <a href="#" class="menu-item edit-btn"
-                           data-id="<?= $b['budget_id'] ?>"
-                           data-name="<?= $b['category_name'] ?>"
-                           data-limit="<?= $b['limit_amount'] ?>">Change limit</a>
+                           onclick="openEditModal(<?= $b['budget_id'] ?>, '<?= $b['category_name'] ?>', <?= $b['limit_amount'] ?>); return false;">Change limit</a>
 
-                        <a href="budget.php?remove=<?= $b['budget_id'] ?>" class="menu-item">Remove budget</a>
+                        <a href="budget.php?remove=<?= $b['budget_id'] ?>" class="menu-item" onclick="return confirm('Are you sure you want to remove this budget?');">Remove budget</a>
                     </div>
                 </div>
             </div>
 
-            <!-- GREEN BAR -->
+            <!-- GREEN PROGRESS BAR -->
             <div class="limit-bar">
                 <div class="limit-bar-fill" style="width: <?= $percent ?>%;"></div>
             </div>
 
         <?php endwhile; ?>
 
-        <!-- NON-BUDGETED -->
-        <h5 class="budget-section-title mt-4">Not budgeted this month</h5>
+        <!-- NON-BUDGETED CATEGORIES -->
+        <h5 class="budget-section-title mt-5 mb-3">Not budgeted this month</h5>
 
-        <?php while ($c = $non_budgeted->fetch_assoc()): ?>
-            <div class="budget-item">
-                <strong><?= $c['category_name'] ?></strong>
-                <button class="set-budget-btn"
-                        data-id="<?= $c['category_id'] ?>"
-                        data-name="<?= $c['category_name'] ?>">SET BUDGET</button>
+        <?php if ($non_budgeted->num_rows == 0): ?>
+            <p class="text-muted">All expense categories have budgets set for this month.</p>
+        <?php else: ?>
+            <?php while ($c = $non_budgeted->fetch_assoc()): ?>
+                <div class="budget-item-simple">
+                    <strong><?= $c['category_name'] ?></strong>
+                    <button class="set-budget-btn"
+                            onclick="openSetModal(<?= $c['category_id'] ?>, '<?= $c['category_name'] ?>')">
+                        SET BUDGET
+                    </button>
+                </div>
+            <?php endwhile; ?>
+        <?php endif; ?>
+    </div>
+</div>
+
+
+<!-- SET BUDGET MODAL (Bootstrap Style) -->
+<div class="modal fade" id="setBudgetModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content budget-modal">
+            <div class="modal-header budget-modal-header">
+                <div class="d-flex align-items-center gap-2">
+                    <div class="budget-icon-circle">!</div>
+                    <h5 class="modal-title mb-0">Set budget</h5>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
-        <?php endwhile; ?>
+            <div class="modal-body budget-modal-body">
+                <form method="POST" id="setBudgetForm">
+                    <input type="hidden" name="set_budget" value="1">
+                    <input type="hidden" name="category_id" id="set_cat_id">
+                    
+                    <div class="mb-3">
+                        <label for="set_cat_name" class="form-label-budget">Name</label>
+                        <input type="text" class="form-control-budget" id="set_cat_name" readonly>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label for="set_limit" class="form-label-budget">Limit</label>
+                        <input type="number" step="0.01" class="form-control-budget" name="limit_amount" id="set_limit" placeholder="200" required>
+                    </div>
+                    
+                    <button type="submit" class="btn-save-budget">Save</button>
+                </form>
+            </div>
+        </div>
     </div>
 </div>
 
-
-<!-- SET BUDGET POPUP -->
-<div id="setPopup" class="popup-overlay">
-    <div class="popup-box">
-        <h4>Set budget</h4>
-        <form method="POST">
-            <input type="hidden" name="category_id" id="set_cat_id">
-            <div>Name: <input type="text" id="set_cat_name" disabled></div>
-            <div>Limit: <input type="number" step="0.01" name="limit_amount" required></div>
-            <button name="set_budget" class="popup-save">Save</button>
-        </form>
+<!-- EDIT BUDGET MODAL (Bootstrap Style) -->
+<div class="modal fade" id="editBudgetModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content budget-modal">
+            <div class="modal-header budget-modal-header">
+                <div class="d-flex align-items-center gap-2">
+                    <div class="budget-icon-circle">!</div>
+                    <h5 class="modal-title mb-0">Edit budget</h5>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body budget-modal-body">
+                <form method="POST" id="editBudgetForm">
+                    <input type="hidden" name="update_budget" value="1">
+                    <input type="hidden" name="budget_id" id="edit_budget_id">
+                    
+                    <div class="mb-3">
+                        <label for="edit_cat_name" class="form-label-budget">Name</label>
+                        <input type="text" class="form-control-budget" id="edit_cat_name" readonly>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label for="edit_limit" class="form-label-budget">Limit</label>
+                        <input type="number" step="0.01" class="form-control-budget" name="limit_amount" id="edit_limit" required>
+                    </div>
+                    
+                    <button type="submit" class="btn-save-budget">Save</button>
+                </form>
+            </div>
+        </div>
     </div>
 </div>
 
-<!-- EDIT BUDGET POPUP -->
-<div id="editPopup" class="popup-overlay">
-    <div class="popup-box">
-        <h4>Edit budget</h4>
-        <form method="POST">
-            <input type="hidden" name="budget_id" id="edit_budget_id">
-            <div>Name: <input type="text" id="edit_cat_name" disabled></div>
-            <div>Limit: <input type="number" step="0.01" name="limit_amount" id="edit_limit" required></div>
-            <button name="update_budget" class="popup-save">Save</button>
-        </form>
-    </div>
-</div>
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
-/* Menu toggle */
-document.querySelectorAll(".menu-button").forEach(btn => {
-    btn.addEventListener("click", () => {
-        btn.nextElementSibling.classList.toggle("open");
+// Toggle three dots menu
+function toggleMenu(button) {
+    // Close all other open menus
+    document.querySelectorAll('.menu-box').forEach(menu => {
+        if (menu !== button.nextElementSibling) {
+            menu.classList.remove('open');
+        }
     });
+    
+    // Toggle current menu
+    button.nextElementSibling.classList.toggle('open');
+}
+
+// Close menus when clicking outside
+document.addEventListener('click', function(e) {
+    if (!e.target.classList.contains('menu-button')) {
+        document.querySelectorAll('.menu-box').forEach(menu => {
+            menu.classList.remove('open');
+        });
+    }
 });
 
-/* Open Set Budget popup */
-document.querySelectorAll(".set-budget-btn").forEach(btn => {
-    btn.addEventListener("click", () => {
-        document.getElementById("set_cat_id").value = btn.dataset.id;
-        document.getElementById("set_cat_name").value = btn.dataset.name;
-        document.getElementById("setPopup").style.display = "flex";
-    });
-});
+// Open Set Budget modal
+function openSetModal(categoryId, categoryName) {
+    document.getElementById('set_cat_id').value = categoryId;
+    document.getElementById('set_cat_name').value = categoryName;
+    document.getElementById('set_limit').value = '';
+    
+    const modal = new bootstrap.Modal(document.getElementById('setBudgetModal'));
+    modal.show();
+}
 
-/* Open Edit Budget popup */
-document.querySelectorAll(".edit-btn").forEach(btn => {
-    btn.addEventListener("click", () => {
-        document.getElementById("edit_budget_id").value = btn.dataset.id;
-        document.getElementById("edit_cat_name").value = btn.dataset.name;
-        document.getElementById("edit_limit").value = btn.dataset.limit;
-        document.getElementById("editPopup").style.display = "flex";
-    });
-});
-
-/* Close on outside click */
-document.querySelectorAll(".popup-overlay").forEach(p => {
-    p.addEventListener("click", (e) => {
-        if (e.target === p) p.style.display = "none";
-    });
-});
+// Open Edit Budget modal
+function openEditModal(budgetId, categoryName, currentLimit) {
+    document.getElementById('edit_budget_id').value = budgetId;
+    document.getElementById('edit_cat_name').value = categoryName;
+    document.getElementById('edit_limit').value = currentLimit;
+    
+    const modal = new bootstrap.Modal(document.getElementById('editBudgetModal'));
+    modal.show();
+}
 </script>
 
 </body>

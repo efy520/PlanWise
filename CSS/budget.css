@@ -1,75 +1,165 @@
-/* GLOBAL */
+/* ==========================================
+   BUDGET PAGE STYLES
+   ==========================================
+   Page for managing budgets
+   ========================================== */
+
+/* GLOBAL - Ensure proper font inheritance */
+* {
+    box-sizing: border-box;
+}
+
 body {
-    font-family: 'Inter', sans-serif;
+    font-family: 'Inter', sans-serif !important;
     background: #F9E7B2;
     margin: 0;
     color: #171A1F;
 }
 
-/* TABS */
+/* ==========================================
+   TABS STYLING (Same as records.php)
+   ========================================== */
 .tabs-container {
     display: flex;
+    gap: 0;
+    width: 100%;
 }
 
 .tab-button {
     flex: 1;
-    padding: 12px;
-    background: white;
+    padding: 12px 24px;
+    border: 0 solid #BDC1CA;
+    background: #FFF;
+    color: #84994F;
+    font-size: 18px;
     font-weight: 500;
-    border: none;
+    font-family: 'Inter', sans-serif !important;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.tab-button:first-child {
+    border-radius: 6px 0 0 0;
+}
+
+.tab-button:last-child {
+    border-radius: 0 6px 0 0;
 }
 
 .tab-button.active {
     background: #84994F;
-    color: white;
+    color: #FFF;
 }
 
-/* MAIN BOX */
-.content-box {
-    background: #FAFAFB;
-    padding: 25px;
-    border-radius: 10px;
-}
-
-/* MONTH SELECT */
-.month-select {
-    padding: 8px;
-    border-radius: 10px;
-    border: none;
+.tab-button:not(.active):hover {
     background: #F3F4F6;
 }
 
-/* SECTION TITLE */
+/* ==========================================
+   MAIN CONTENT BOX
+   ========================================== */
+.content-box {
+    background: #FAFAFB;
+    padding: 30px;
+    border-radius: 0 0 6px 6px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+/* ==========================================
+   MONTH SELECT DROPDOWN
+   ========================================== */
+.month-select {
+    padding: 8px 16px;
+    border-radius: 10px;
+    border: 1px solid #DEE1E6;
+    background: #FFF;
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.month-select:focus {
+    outline: none;
+    border-color: #A72703;
+    box-shadow: 0 0 0 3px rgba(167, 39, 3, 0.1);
+}
+
+/* ==========================================
+   SECTION TITLES
+   ========================================== */
 .budget-section-title {
     font-size: 20px;
     font-weight: 700;
-    margin-bottom: 10px;
+    font-family: 'Inter', sans-serif;
+    margin-bottom: 16px;
+    color: #171A1F;
 }
 
-/* ITEM */
+/* ==========================================
+   BUDGET ITEMS (Budgeted categories)
+   ========================================== */
 .budget-item {
     display: flex;
     justify-content: space-between;
-    padding: 18px 10px;
-    border-bottom: 1px solid #EEE;
+    align-items: center;
+    padding: 18px 16px;
+    border-bottom: 1px solid #E5E7EB;
+    background: #FFF;
+    margin-bottom: 2px;
 }
 
-/* THREE DOTS BUTTON */
+.budget-info {
+    flex: 1;
+}
+
+.budget-info strong {
+    font-size: 16px;
+    font-weight: 600;
+    color: #171A1F;
+    display: block;
+    margin-bottom: 8px;
+}
+
+.budget-details {
+    font-size: 14px;
+    color: #565D6D;
+    line-height: 1.6;
+}
+
+/* ==========================================
+   THREE DOTS MENU
+   ========================================== */
+.menu-container {
+    position: relative;
+}
+
 .menu-button {
     border-radius: 16px;
     border: 5px solid #A72703;
     background: #FFF;
     padding: 3px 18px;
+    font-size: 18px;
+    font-weight: 700;
+    color: #A72703;
+    cursor: pointer;
+    transition: all 0.3s ease;
 }
 
-/* MENU */
+.menu-button:hover {
+    background: #F9E7B2;
+}
+
 .menu-box {
     display: none;
     position: absolute;
+    right: 0;
     margin-top: 10px;
     background: #FFF;
     border-radius: 16px;
     border: 5px solid #A72703;
+    min-width: 180px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    z-index: 1000;
 }
 
 .menu-box.open {
@@ -77,70 +167,236 @@ body {
 }
 
 .menu-item {
-    padding: 8px 14px;
+    padding: 10px 16px;
     display: block;
     color: #565D6D;
+    font-size: 16px;
+    font-weight: 400;
+    text-decoration: none;
+    transition: all 0.2s ease;
 }
 
-/* GREEN BAR */
-.limit-bar {
-    width: 750px;
-    height: 6px;
-    background: #C1DCC9;
-    border-radius: 3px;
-    margin: 6px 0 20px;
+.menu-item:hover {
+    background: #F9E7B2;
+    color: #171A1F;
+}
 
-    /* Added for progress */
+/* ==========================================
+   GREEN PROGRESS BAR
+   ========================================== */
+.limit-bar {
+    width: 100%;
+    max-width: 750px;
+    height: 8px;
+    background: #C1DCC9;
+    border-radius: 4px;
+    margin: 8px 0 20px;
     position: relative;
     overflow: hidden;
 }
 
-/* Added: The actual progress fill */
 .limit-bar-fill {
     position: absolute;
     top: 0;
     left: 0;
     height: 100%;
     background: #2E8B57;
-    border-radius: 3px;
+    border-radius: 4px;
+    transition: width 0.3s ease;
 }
 
-/* SET BUDGET BUTTON */
+/* ==========================================
+   SIMPLE BUDGET ITEMS (Not budgeted)
+   ========================================== */
+.budget-item-simple {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px;
+    border-bottom: 1px solid #E5E7EB;
+    background: #FFF;
+    margin-bottom: 2px;
+}
+
+.budget-item-simple strong {
+    font-size: 16px;
+    font-weight: 600;
+    color: #171A1F;
+}
+
+/* ==========================================
+   SET BUDGET BUTTON
+   ========================================== */
 .set-budget-btn {
-    padding: 4px 14px;
+    padding: 8px 20px;
     border-radius: 16px;
     border: 3px solid #A72703;
-    background: white;
+    background: #FFF;
     color: #A72703;
+    font-size: 14px;
+    font-weight: 600;
+    font-family: 'Inter', sans-serif;
+    cursor: pointer;
+    transition: all 0.3s ease;
 }
 
-/* POPUP */
-.popup-overlay {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0,0,0,0.35);
-    justify-content: center;
-    align-items: center;
-}
-
-.popup-box {
-    background: white;
-    padding: 25px;
-    border-radius: 8px;
-    width: 350px;
-    border: 4px solid #A72703;
-}
-
-.popup-save {
-    width: 120px;
-    margin-top: 15px;
+.set-budget-btn:hover {
     background: #A72703;
-    color: white;
-    border-radius: 20px;
-    padding: 8px;
+    color: #FFF;
+}
+
+/* ==========================================
+   BUDGET MODALS (Matching your screenshot)
+   ========================================== */
+.budget-modal .modal-content {
+    border-radius: 12px;
+    border: 4px solid #A72703;
+    overflow: hidden;
+}
+
+.budget-modal-header {
+    background: #FFF;
+    border-bottom: 2px solid #E5E7EB;
+    padding: 20px 24px;
+}
+
+.budget-icon-circle {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #A72703;
+    color: #FFF;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    font-weight: 700;
+}
+
+.budget-modal-header .modal-title {
+    font-size: 20px;
+    font-weight: 700;
+    color: #171A1F;
+    font-family: 'Inter', sans-serif;
+}
+
+.budget-modal-body {
+    padding: 24px;
+    background: #FFF;
+}
+
+/* Form Labels in Modal */
+.form-label-budget {
+    font-size: 14px;
+    font-weight: 600;
+    color: #171A1F;
+    font-family: 'Inter', sans-serif;
+    margin-bottom: 8px;
+    display: block;
+}
+
+/* Form Inputs in Modal */
+.form-control-budget {
+    width: 100%;
+    padding: 12px 16px;
+    border-radius: 6px;
+    border: 1px solid #DEE1E6;
+    background: #F3F4F6;
+    font-size: 16px;
+    font-family: 'Inter', sans-serif;
+    color: #171A1F;
+    transition: all 0.3s ease;
+}
+
+.form-control-budget:focus {
+    outline: none;
+    background: #FFF;
+    border-color: #A72703;
+    box-shadow: 0 0 0 3px rgba(167, 39, 3, 0.1);
+}
+
+.form-control-budget:read-only {
+    background: #E5E7EB;
+    cursor: not-allowed;
+}
+
+.form-control-budget::placeholder {
+    color: #9095A0;
+}
+
+/* Save Button in Modal */
+.btn-save-budget {
+    width: 100%;
+    padding: 12px 24px;
+    border-radius: 30px;
     border: none;
+    background: #A72703;
+    color: #FFF;
+    font-size: 18px;
+    font-weight: 600;
+    font-family: 'Inter', sans-serif;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-save-budget:hover {
+    background: #8B1F03;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(167, 39, 3, 0.3);
+}
+
+/* ==========================================
+   RESPONSIVE DESIGN
+   ========================================== */
+@media (max-width: 768px) {
+    .content-box {
+        padding: 20px;
+    }
+    
+    .budget-section-title {
+        font-size: 18px;
+    }
+    
+    .budget-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+    }
+    
+    .menu-container {
+        align-self: flex-end;
+    }
+    
+    .limit-bar {
+        max-width: 100%;
+    }
+    
+    .budget-item-simple {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+    }
+    
+    .set-budget-btn {
+        width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+    .tab-button {
+        font-size: 14px;
+        padding: 10px 16px;
+    }
+    
+    .budget-section-title {
+        font-size: 16px;
+    }
+    
+    .budget-info strong {
+        font-size: 14px;
+    }
+    
+    .budget-details {
+        font-size: 13px;
+    }
 }
