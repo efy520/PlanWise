@@ -115,11 +115,14 @@ if (isset($_GET['remove'])) {
 <head>
     <title>Budgets - PlanWise</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <link rel="stylesheet" href="css/nav-bar.css">
     <link rel="stylesheet" href="css/budget.css">
 </head>
 <body>
 
 <div class="container-fluid px-4 py-3">
+
 <?php include 'nav-bar.php'; ?>
     <!-- TABS -->
     <div class="tabs-container mb-3">

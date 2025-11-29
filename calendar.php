@@ -100,42 +100,13 @@ if ($result_quote && $result_quote->num_rows > 0) {
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
     <!-- Your calendar styles -->
+     <link rel="stylesheet" href="css/nav-bar.css">
     <link rel="stylesheet" href="css/calendar.css">
 </head>
 <body>
 <div class="container-fluid px-4 py-3">
+<?php include 'nav-bar.php'; ?>
 
-    <!-- TOP NAVIGATION BAR -->
-    <div class="row mb-3">
-        <div class="col-12">
-            <nav class="navbar-custom">
-                <div class="logo-container">
-                    <img src="images/logo.png" alt="PlanWise Logo" class="logo">
-                </div>
-
-                <div class="nav-menu">
-                    <a href="task.php" class="nav-item active">To-Do</a>
-                    <a href="records.php" class="nav-item">Finance</a>
-                    <a href="dashboard.php" class="nav-item">Dashboard</a>
-                    <a href="profile.php" class="nav-item">Profile</a>
-                </div>
-            </nav>
-        </div>
-        
-    </div>
-
-
-
-   <!-- QUOTE BOX -->
-    <div class="row mb-3">
-        <div class="col-12">
-            <div class="quote-box">
-                <p class="quote-text">
-                    "<?php echo htmlspecialchars($quote_text); ?>"
-                </p>
-            </div>
-        </div>
-    </div>
     <!-- calendar header: month & navigation -->
     <div class="calendar-header d-flex justify-content-between align-items-center mb-2">
         <div class="d-flex align-items-center gap-2">

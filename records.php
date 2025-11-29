@@ -128,6 +128,7 @@ $categories = $stmt_categories->get_result()->fetch_all(MYSQLI_ASSOC);
     <title>Finance Records - PlanWise</title>
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/nav-bar.css">
     <link rel="stylesheet" href="css/records.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
@@ -136,21 +137,7 @@ $categories = $stmt_categories->get_result()->fetch_all(MYSQLI_ASSOC);
 
 <div class="container-fluid px-4 py-3">
 <?php include 'nav-bar.php'; ?>
-    <!-- TOP NAV
-    <nav class="navbar-custom mb-3">
-        <div class="logo-container">
-            <img src="images/logo.png" class="logo" alt="PlanWise">
-        </div>
 
-        <div class="nav-menu">
-            <a href="task.php" class="nav-item">To-Do</a>
-            <a href="records.php" class="nav-item active">Finance</a>
-            <a href="dashboard.php" class="nav-item">Dashboard</a>
-            <a href="profile.php" class="nav-item">Profile</a>
-        </div>
-    </nav>
-
-   
 
     <?php if (isset($_GET['updated'])): ?>
         <div class="alert alert-success alert-dismissible fade show" role="alert">

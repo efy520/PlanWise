@@ -56,6 +56,7 @@ while ($row = $result_task->fetch_assoc()) {
     <title>Manage Task - PlanWise</title>
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/nav-bar.css">
     <link rel="stylesheet" href="css/task.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
@@ -64,7 +65,6 @@ while ($row = $result_task->fetch_assoc()) {
 
 <div class="container-fluid px-4 py-3">
 <?php include 'nav-bar.php'; ?>
-
     <!-- TABS -->
     <div class="row mb-3">
         <div class="col-12">
