@@ -4,6 +4,31 @@ include 'db_connection.php';
 
 $error_message = "";
 
+// Function to create default categories for new user
+function createDefaultCategories($conn, $user_id) {
+    // Default EXPENSE categories
+    $default_expense = ['Shopping', 'Health', 'Food', 'Bills', 'Petrol'];
+    
+    // Default INCOME categories
+    $default_income = ['Salary', 'PAMA'];
+    
+    // Insert expense categories
+    foreach ($default_expense as $cat_name) {
+        $sql = "INSERT INTO category (user_id, category_name, category_type, is_active) VALUES (?, ?, 'expense', 1)";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("is", $user_id, $cat_name);
+        $stmt->execute();
+    }
+    
+    // Insert income categories
+    foreach ($default_income as $cat_name) {
+        $sql = "INSERT INTO category (user_id, category_name, category_type, is_active) VALUES (?, ?, 'income', 1)";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("is", $user_id, $cat_name);
+        $stmt->execute();
+    }
+}
+
 // When form is submitted
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
@@ -30,6 +55,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $stmt->bind_param("ssssss", $email, $username, $hashedPassword, $gender, $phone, $role);
 
         if ($stmt->execute()) {
+            // Get the newly created user_id
+            $new_user_id = $conn->insert_id;
+            
+            // Create default categories for this new user
+            createDefaultCategories($conn, $new_user_id);
+            
             // Redirect to login after successful registration
             header("Location: login.php?registered=1");
             exit();

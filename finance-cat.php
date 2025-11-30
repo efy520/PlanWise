@@ -9,6 +9,46 @@ if (!isset($_SESSION['user_id'])) {
 
 $user_id = $_SESSION['user_id'];
 
+// ============================================
+// CHECK AND CREATE DEFAULT CATEGORIES
+// ============================================
+function createDefaultCategories($conn, $user_id) {
+    // Default EXPENSE categories
+    $default_expense = ['Shopping', 'Health', 'Food', 'Bills', 'Petrol'];
+    
+    // Default INCOME categories
+    $default_income = ['Salary', 'PAMA'];
+    
+    // Check if user already has categories
+    $check_sql = "SELECT COUNT(*) as count FROM category WHERE user_id = ?";
+    $stmt = $conn->prepare($check_sql);
+    $stmt->bind_param("i", $user_id);
+    $stmt->execute();
+    $result = $stmt->get_result()->fetch_assoc();
+    
+    // Only create defaults if user has NO categories yet
+    if ($result['count'] == 0) {
+        // Insert expense categories
+        foreach ($default_expense as $cat_name) {
+            $sql = "INSERT INTO category (user_id, category_name, category_type, is_active) VALUES (?, ?, 'expense', 1)";
+            $stmt = $conn->prepare($sql);
+            $stmt->bind_param("is", $user_id, $cat_name);
+            $stmt->execute();
+        }
+        
+        // Insert income categories
+        foreach ($default_income as $cat_name) {
+            $sql = "INSERT INTO category (user_id, category_name, category_type, is_active) VALUES (?, ?, 'income', 1)";
+            $stmt = $conn->prepare($sql);
+            $stmt->bind_param("is", $user_id, $cat_name);
+            $stmt->execute();
+        }
+    }
+}
+
+// Create default categories on first access
+createDefaultCategories($conn, $user_id);
+
 // Fetch motivational quote
 $sql_quote = "SELECT quote_text FROM quote WHERE is_active = 1 ORDER BY RAND() LIMIT 1";
 $result_quote = $conn->query($sql_quote);
@@ -128,7 +168,7 @@ $ignored_categories = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
     <div class="tabs-container mb-3">
         <button class="tab-button" onclick="window.location='records.php'">Records</button>
         <button class="tab-button active">Finance Settings</button>
-        <button class="tab-button" onclick="window.location='budgets.php'">Budgets</button>
+        <button class="tab-button" onclick="window.location='budget.php'">Budgets</button>
     </div>
 
     <!-- MAIN CONTENT -->
@@ -241,7 +281,7 @@ $ignored_categories = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
             </div>
 
             <!-- Ignored Categories Section -->
-            <div class="category-section">
+            <div class="category-section mt-5">
                 <h3 class="category-title">Ignored Categories</h3>
                 <p class="text-muted mb-3">Restore ignored categories to use them again in transactions.</p>
                 
