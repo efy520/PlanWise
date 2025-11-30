@@ -24,7 +24,7 @@ body {
 /* --- Left Sidebar --- */
 /* Red sidebar with navigation */
 .sidebar {
-    width: 523px;
+    width: 280px;
     background: #A72703; /* Red background */
     padding: 40px 30px;
     display: flex;

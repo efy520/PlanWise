@@ -51,20 +51,19 @@ if (isset($_GET['logout'])) {
 
 <div class="profile-container">
     
-    <!-- Back Button -->
-    <div class="back-button-container">
-        <a href="dashboard.php" class="btn-back">
+    <!-- Header with Back Button and Username -->
+    <div class="profile-header-outer">
+        <a href="task.php" class="btn-back">
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M19 12H5M12 19l-7-7 7-7"/>
             </svg>
         </a>
+        <h2 class="profile-username"><?php echo htmlspecialchars($user['username']); ?></h2>
+        <div class="spacer"></div>
     </div>
     
     <!-- Profile Card -->
     <div class="profile-card">
-        
-        <!-- Username Title -->
-        <h2 class="profile-username"><?php echo htmlspecialchars($user['username']); ?></h2>
         
         <!-- User Details Form -->
         <form>
