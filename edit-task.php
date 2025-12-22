@@ -33,6 +33,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['update'])) {
     $due_date = $_POST['due_date'];
     $status = $_POST['status'];
 
+    // Check if due date is in the past and set warning message
+    $today = date('Y-m-d');
+    $warning_message = "";
+    if ($due_date < $today) {
+        $warning_message = "⚠️ Warning: This due date is in the past. You can still update, but consider setting a future date.";
+    }
+
     $sql = "UPDATE task SET title=?, description=?, due_date=?, status=? WHERE task_id=? AND user_id=?";
     $stmt = $conn->prepare($sql);
     $stmt->bind_param("ssssii", $title, $description, $due_date, $status, $task_id, $user_id);
@@ -83,6 +90,10 @@ if (isset($_POST['delete'])) {
             <div class="alert alert-danger"><?= $error_message ?></div>
         <?php endif; ?>
 
+        <?php if(isset($warning_message)): ?>
+            <div class="alert alert-warning"><?= $warning_message ?></div>
+        <?php endif; ?>
+
         <form method="POST">
 
             <label class="label-text">Task name</label>
@@ -97,7 +108,7 @@ if (isset($_POST['delete'])) {
                 <div class="col-md-6">
                     <label class="label-text">Start date</label>
                     <input type="text" class="form-control input-field"
-                           value="<?= $task['created_date']; ?>" readonly>
+                           value="<?= date('d/m/Y', strtotime($task['created_date'])); ?>" readonly>
                 </div>
 
                 <div class="col-md-6">
@@ -126,6 +137,41 @@ if (isset($_POST['delete'])) {
     </div>
 
 </div>
+
+<script>
+// Show warning when user selects a past due date
+document.addEventListener('DOMContentLoaded', function() {
+    const dueDateInput = document.querySelector('input[name="due_date"]');
+    
+    if (dueDateInput) {
+        dueDateInput.addEventListener('change', function() {
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            
+            const selectedDate = new Date(this.value);
+            selectedDate.setHours(0, 0, 0, 0);
+            
+            const warningDiv = document.getElementById('dateWarning');
+            
+            if (selectedDate < today) {
+                // Show warning if it doesn't exist
+                if (!warningDiv) {
+                    const alertDiv = document.createElement('div');
+                    alertDiv.id = 'dateWarning';
+                    alertDiv.className = 'alert alert-warning mt-2';
+                    alertDiv.innerHTML = '⚠️ Warning: This due date is in the past. You can still update, but consider setting a future date.';
+                    this.parentElement.appendChild(alertDiv);
+                }
+            } else {
+                // Remove warning if it exists and date is valid
+                if (warningDiv) {
+                    warningDiv.remove();
+                }
+            }
+        });
+    }
+});
+</script>
 
 </body>
 </html>
