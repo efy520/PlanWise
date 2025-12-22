@@ -160,6 +160,10 @@ body {
     letter-spacing: 0.3px;
 }
 
+.account-balance.negative {
+    color: #DC3545;
+}
+
 /* --- Three Dots Button --- */
 .btn-dots {
     border-radius: 6px;

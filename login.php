@@ -27,7 +27,7 @@ if ($username === '$admin' && $password === 'admin') {
 
 
     /* ============================
-       NORMAL USER LOGIN (DATABASE)
+       NORMAL USER LOGIN 
        ============================ */
 
     // Query user by username
@@ -49,6 +49,15 @@ if ($username === '$admin' && $password === 'admin') {
             $_SESSION['username'] = $user['username'];
             $_SESSION['email'] = $user['email'];
             $_SESSION['role'] = "user";
+            
+            // Fetch and store quote for the session (changes daily)
+            $sql_quote = "SELECT quote_text FROM quote WHERE is_active = 1 ORDER BY RAND() LIMIT 1";
+            $result_quote = $conn->query($sql_quote);
+            if ($result_quote && $result_quote->num_rows > 0) {
+                $_SESSION['quote_text'] = $result_quote->fetch_assoc()['quote_text'];
+            } else {
+                $_SESSION['quote_text'] = "No quote available";
+            }
 
             // Redirect to task.php
             header("Location: task.php");
@@ -143,7 +152,7 @@ if ($username === '$admin' && $password === 'admin') {
                         </div>
                     </div>
 
-                    <button type="submit" class="btn btn-login w-100">Continue</button>
+                    <button type="submit" class=" btn-login w-100">Continue</button>
 
                 </form>
 

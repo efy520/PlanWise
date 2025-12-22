@@ -5,14 +5,12 @@ session_start();
 // Connect to database
 include 'db_connection.php';
 
-// Check if user is admin (hardcoded - only admin can access)
-// You can check against user_id or role from database
-$is_admin = true; // Hardcoded for now - you can add proper admin check
+$is_admin = true; // check if admin
 
-if (!$is_admin) {
-    header("Location: login.php");
-    exit();
-}
+// if (!$is_admin) {
+//     header("Location: login.php");
+//     exit();
+// }
 
 // Handle logout
 if (isset($_GET['logout'])) {
@@ -100,18 +98,19 @@ if ($result->num_rows > 0) {
         </div>
         
         <!-- Logout Button -->
-        <a href="quote.php?logout=1" class="btn-logout-sidebar">
+         <div class="btn"><a href="quote.php?logout=1" class="btn-logout-sidebar">
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
                 <polyline points="16 17 21 12 16 7"></polyline>
                 <line x1="21" y1="12" x2="9" y2="12"></line>
             </svg>
             LOG OUT
-        </a>
+        </a></div>
+        
         
         <!-- Navigation Menu -->
         <nav class="sidebar-nav">
-            <a href="dashboard.php" class="nav-link">Dashboard</a>
+            <a href="admin-dashboard.php" class="nav-link">Dashboard</a>
             <a href="quote.php" class="nav-link active">Quote</a>
             <a href="user-detail.php" class="nav-link">User Detail</a>
         </nav>

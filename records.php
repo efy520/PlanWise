@@ -12,7 +12,6 @@ if (!isset($_SESSION['user_id'])) {
 
 $user_id = $_SESSION['user_id'];
 
-
 // -------------------------------------------
 // HANDLE EDIT TRANSACTION
 // -------------------------------------------
@@ -67,11 +66,18 @@ if ($result_quote && $result_quote->num_rows > 0) {
     $quote_text = $result_quote->fetch_assoc()['quote_text'];
 }
 
+// -------------------------------------------
+// GET FILTER VALUES FROM URL
+// -------------------------------------------
+$sort_order = isset($_GET['sort']) ? $_GET['sort'] : 'newest';
+$filter_month = isset($_GET['month']) ? $_GET['month'] : '';
+$filter_category = isset($_GET['category']) ? (int)$_GET['category'] : '';
+$filter_account = isset($_GET['account']) ? (int)$_GET['account'] : '';
+$filter_type = isset($_GET['type']) ? $_GET['type'] : '';
 
 // -------------------------------------------
-// FETCH ALL TRANSACTIONS (REAL DATA)
+// FETCH ALL TRANSACTIONS WITH FILTERS
 // -------------------------------------------
-// JOIN Category + Account names + include IDs
 $sql = "
     SELECT 
         t.transaction_id,
@@ -97,16 +103,55 @@ $sql = "
     LEFT JOIN account a2 
         ON t.destination_account_id = a2.account_id
     WHERE t.user_id = ?
-    ORDER BY t.txn_date_time DESC
 ";
 
+// Add filters to SQL
+$params = [$user_id];
+$param_types = "i";
+
+// Filter by Month
+if (!empty($filter_month)) {
+    $sql .= " AND DATE_FORMAT(t.txn_date_time, '%Y-%m') = ?";
+    $params[] = $filter_month;
+    $param_types .= "s";
+}
+
+// Filter by Category
+if (!empty($filter_category)) {
+    $sql .= " AND t.category_id = ?";
+    $params[] = $filter_category;
+    $param_types .= "i";
+}
+
+// Filter by Account
+if (!empty($filter_account)) {
+    $sql .= " AND (t.source_account_id = ? OR t.destination_account_id = ?)";
+    $params[] = $filter_account;
+    $params[] = $filter_account;
+    $param_types .= "ii";
+}
+
+// Filter by Type
+if (!empty($filter_type)) {
+    $sql .= " AND t.type = ?";
+    $params[] = $filter_type;
+    $param_types .= "s";
+}
+
+// Sort order
+if ($sort_order === 'oldest') {
+    $sql .= " ORDER BY t.txn_date_time ASC";
+} else {
+    $sql .= " ORDER BY t.txn_date_time DESC";
+}
+
 $stmt = $conn->prepare($sql);
-$stmt->bind_param("i", $user_id);
+$stmt->bind_param($param_types, ...$params);
 $stmt->execute();
 $records = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
 
 // -------------------------------------------
-// FETCH ACCOUNTS AND CATEGORIES FOR MODAL
+// FETCH ACCOUNTS AND CATEGORIES FOR FILTERS AND MODALS
 // -------------------------------------------
 $sql_accounts = "SELECT account_id, account_name FROM account WHERE user_id = ? AND is_active = 1 ORDER BY account_name";
 $stmt_accounts = $conn->prepare($sql_accounts);
@@ -119,6 +164,16 @@ $stmt_categories = $conn->prepare($sql_categories);
 $stmt_categories->bind_param("i", $user_id);
 $stmt_categories->execute();
 $categories = $stmt_categories->get_result()->fetch_all(MYSQLI_ASSOC);
+
+// Get unique months from transactions
+$sql_months = "SELECT DISTINCT DATE_FORMAT(txn_date_time, '%Y-%m') as month 
+               FROM transaction_table 
+               WHERE user_id = ? 
+               ORDER BY month DESC";
+$stmt_months = $conn->prepare($sql_months);
+$stmt_months->bind_param("i", $user_id);
+$stmt_months->execute();
+$months = $stmt_months->get_result()->fetch_all(MYSQLI_ASSOC);
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -137,7 +192,6 @@ $categories = $stmt_categories->get_result()->fetch_all(MYSQLI_ASSOC);
 
 <div class="container-fluid px-4 py-3">
 <?php include 'nav-bar.php'; ?>
-
 
     <?php if (isset($_GET['updated'])): ?>
         <div class="alert alert-success alert-dismissible fade show" role="alert">
@@ -163,22 +217,67 @@ $categories = $stmt_categories->get_result()->fetch_all(MYSQLI_ASSOC);
     <!-- MAIN CONTENT -->
     <div class="content-box">
 
-       <div class="d-flex justify-content-between align-items-center mb-4">
+        <div class="d-flex justify-content-between align-items-center mb-4">
 
-    <!-- LEFT side filters -->
-    <div class="d-flex flex-wrap gap-3">
-        <select class="records-select"><option>Newest</option></select>
-        <select class="records-select"><option>Month</option></select>
-        <select class="records-select"><option>Category</option></select>
-        <select class="records-select"><option>Account</option></select>
-        <select class="records-select"><option>Type</option></select>
-    </div>
+            <!-- LEFT side filters -->
+            <div class="d-flex flex-wrap gap-3">
+                <!-- Sort Order -->
+                <select class="records-select" id="sortFilter" onchange="applyFilters()">
+                    <option value="newest" <?= $sort_order === 'newest' ? 'selected' : '' ?>>Newest</option>
+                    <option value="oldest" <?= $sort_order === 'oldest' ? 'selected' : '' ?>>Oldest</option>
+                </select>
 
-    <!-- RIGHT side add button -->
-    <button class="btn-add-record" onclick="window.location='t-income.php'">+</button>
+                <!-- Month Filter -->
+                <select class="records-select" id="monthFilter" onchange="applyFilters()">
+                    <option value="">All Months</option>
+                    <?php foreach ($months as $m): ?>
+                        <?php 
+                            $month_display = date('F Y', strtotime($m['month'] . '-01'));
+                        ?>
+                        <option value="<?= $m['month'] ?>" <?= $filter_month === $m['month'] ? 'selected' : '' ?>>
+                            <?= $month_display ?>
+                        </option>
+                    <?php endforeach; ?>
+                </select>
 
-</div>
+                <!-- Category Filter -->
+                <select class="records-select" id="categoryFilter" onchange="applyFilters()">
+                    <option value="">All Categories</option>
+                    <?php foreach ($categories as $cat): ?>
+                        <option value="<?= $cat['category_id'] ?>" <?= $filter_category == $cat['category_id'] ? 'selected' : '' ?>>
+                            <?= htmlspecialchars($cat['category_name']) ?>
+                        </option>
+                    <?php endforeach; ?>
+                </select>
 
+                <!-- Account Filter -->
+                <select class="records-select" id="accountFilter" onchange="applyFilters()">
+                    <option value="">All Accounts</option>
+                    <?php foreach ($accounts as $acc): ?>
+                        <option value="<?= $acc['account_id'] ?>" <?= $filter_account == $acc['account_id'] ? 'selected' : '' ?>>
+                            <?= htmlspecialchars($acc['account_name']) ?>
+                        </option>
+                    <?php endforeach; ?>
+                </select>
+
+                <!-- Type Filter -->
+                <select class="records-select" id="typeFilter" onchange="applyFilters()">
+                    <option value="">All Types</option>
+                    <option value="income" <?= $filter_type === 'income' ? 'selected' : '' ?>>Income</option>
+                    <option value="expense" <?= $filter_type === 'expense' ? 'selected' : '' ?>>Expense</option>
+                    <option value="transfer" <?= $filter_type === 'transfer' ? 'selected' : '' ?>>Transfer</option>
+                </select>
+
+                <!-- Clear Filters Button -->
+                <?php if (!empty($filter_month) || !empty($filter_category) || !empty($filter_account) || !empty($filter_type) || $sort_order !== 'newest'): ?>
+                    <button class="btn btn-sm btn-secondary" onclick="clearFilters()">Clear Filters</button>
+                <?php endif; ?>
+            </div>
+
+            <!-- RIGHT side add button -->
+            <button class="btn-add-record" onclick="window.location='t-income.php'">+</button>
+
+        </div>
 
         <!-- TABLE -->
         <div class="records-table-container">
@@ -413,6 +512,32 @@ $categories = $stmt_categories->get_result()->fetch_all(MYSQLI_ASSOC);
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
+// Filter functionality
+function applyFilters() {
+    const sort = document.getElementById('sortFilter').value;
+    const month = document.getElementById('monthFilter').value;
+    const category = document.getElementById('categoryFilter').value;
+    const account = document.getElementById('accountFilter').value;
+    const type = document.getElementById('typeFilter').value;
+    
+    let url = 'records.php?';
+    
+    if (sort) url += 'sort=' + sort + '&';
+    if (month) url += 'month=' + month + '&';
+    if (category) url += 'category=' + category + '&';
+    if (account) url += 'account=' + account + '&';
+    if (type) url += 'type=' + type + '&';
+    
+    // Remove trailing & or ?
+    url = url.replace(/[&?]$/, '');
+    
+    window.location.href = url;
+}
+
+function clearFilters() {
+    window.location.href = 'records.php';
+}
+
 function openEditModal(transaction) {
     console.log('Edit button clicked, transaction:', transaction);
     

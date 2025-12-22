@@ -4,10 +4,8 @@ if (!isset($conn)) {
     include 'db_connection.php';
 }
 
-// Fetch random quote
-$sql_quote = "SELECT quote_text FROM quote WHERE is_active = 1 ORDER BY RAND() LIMIT 1";
-$res = $conn->query($sql_quote);
-$quote_text = ($res && $res->num_rows > 0) ? $res->fetch_assoc()['quote_text'] : "No quote available";
+// Use session quote if available, otherwise fetch one
+$quote_text = isset($_SESSION['quote_text']) ? $_SESSION['quote_text'] : "No quote available";
 
 // Detect current file
 $current = basename($_SERVER['PHP_SELF']);

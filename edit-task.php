@@ -111,7 +111,6 @@ if (isset($_POST['delete'])) {
             <select class="form-select input-field" name="status" required>
                 <option value="in progress" <?= $task['status']=='in progress'?'selected':'' ?>>In Progress</option>
                 <option value="completed" <?= $task['status']=='completed'?'selected':'' ?>>Completed</option>
-                <option value="incomplete" <?= $task['status']=='incomplete'?'selected':'' ?>>Incomplete</option>
             </select>
 
             <div class="button-row mt-4">

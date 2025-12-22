@@ -13,7 +13,7 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 // else {
-//     // Uncomment the line below for debugging purposes
+//     
 //      echo "Connected successfully";
 // }
 ?>

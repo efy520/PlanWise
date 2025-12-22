@@ -10,7 +10,7 @@ function createDefaultCategories($conn, $user_id) {
     $default_expense = ['Shopping', 'Health', 'Food', 'Bills', 'Petrol'];
     
     // Default INCOME categories
-    $default_income = ['Salary', 'PAMA'];
+    $default_income = ['Salary'];
     
     // Insert expense categories
     foreach ($default_expense as $cat_name) {

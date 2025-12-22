@@ -1,7 +1,5 @@
 <?php
 session_start(); 
-//1.  kenapa kena start session?
-//=untuk mengakses data session yang disimpan di server, seperti user_id selepas login
 include 'db_connection.php';
 
 // -------------------------------------------
@@ -13,9 +11,20 @@ if (!isset($_SESSION['user_id'])) {
 }
 
 $user_id = $_SESSION['user_id']; 
-//2. kenapa ada code ni lepas kita check user dah login ke belum
-//=untuk menyimpan user_id dalam pembolehubah supaya boleh digunakan dalam query database seterusnya
 
+// -------------------------------------------
+// AUTO-MARK OVERDUE TASKS AS INCOMPLETE 
+// -------------------------------------------
+$update_sql = "
+    UPDATE task 
+    SET status = 'incomplete'
+    WHERE user_id = ?
+      AND status = 'in progress'
+      AND due_date < CURDATE()
+";
+$update_stmt = $conn->prepare($update_sql);
+$update_stmt->bind_param("i", $user_id);
+$update_stmt->execute();
 
 // -------------------------------------------
 // FETCH RANDOM ACTIVE QUOTE
@@ -26,44 +35,59 @@ $result_quote = $conn->query($sql_quote);
 $quote_text = "No quote available";
 if ($result_quote && $result_quote->num_rows > 0) {
     $row = $result_quote->fetch_assoc(); 
-    //3.  fecth assoc ni apa 
-    //Dia ambik satu row daripada result SQL dan pulangkan sebagai associative array.
-    
-    $quote_text = $row['quote_text']; // 4. explain ni please
-    //Dia ambik value column quote_text dari row tadi.
+    $quote_text = $row['quote_text'];
 }
 
+// -------------------------------------------
+// GET FILTER VALUES FROM URL
+// -------------------------------------------
+$search_query = isset($_GET['search']) ? trim($_GET['search']) : '';
+$filter_status = isset($_GET['status']) ? $_GET['status'] : '';
 
 // -------------------------------------------
-// FETCH ALL TASKS FOR LOGGED-IN USER
+// FETCH ALL TASKS FOR LOGGED-IN USER WITH FILTERS
 // -------------------------------------------
-$sql_task = "SELECT * FROM task WHERE user_id = ? ORDER BY due_date ASC"; // 
-// 5.apa maksud user_id = ? 
-//=Tanda soal (?) adalah placeholder untuk prepared statement. Ia akan digantikan dengan nilai sebenar (dalam kes ini, $user_id) semasa bind_param dijalankan.
+$sql_task = "SELECT * FROM task WHERE user_id = ?";
 
-$stmt = $conn->prepare($sql_task);// create prepared statement
-//$stmt = prepared statement object.
-$stmt->bind_param("i", $user_id);// isi placeholder "?" dgn value sebenar bind it
-$stmt->execute();// run the query
+$params = [$user_id];
+$param_types = "i";
+
+// Add search filter
+if (!empty($search_query)) {
+    $sql_task .= " AND (title LIKE ? OR description LIKE ?)";
+    $search_param = "%{$search_query}%";
+    $params[] = $search_param;
+    $params[] = $search_param;
+    $param_types .= "ss";
+}
+
+// Add status filter
+if (!empty($filter_status) && $filter_status !== 'all') {
+    $sql_task .= " AND status = ?";
+    $params[] = $filter_status;
+    $param_types .= "s";
+}
+
+$sql_task .= " ORDER BY due_date ASC";
+
+$stmt = $conn->prepare($sql_task);
+$stmt->bind_param($param_types, ...$params);
+$stmt->execute();
 $result_task = $stmt->get_result();
 
-$tasks = []; //empty array to keep user task data
+$tasks = [];
 $today = date('Y-m-d');
 
 while ($row = $result_task->fetch_assoc()) { 
 
-    // Auto-mark overdue tasks as incomplete
-    if ($row['status'] !== 'completed' && $row['due_date'] < $today) {
-        $row['status'] = 'incomplete';
-    }
 
-    $tasks[] = $row;//masukkan task ke array tasks
+    $tasks[] = $row;
 }
 ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8"> <!--Untuk display semua huruf, emoji,simbol etc.-->
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Manage Task - PlanWise</title>
 
@@ -76,12 +100,10 @@ while ($row = $result_task->fetch_assoc()) {
 <body>
 
 <div class="container-fluid px-4 py-3">
-    <!-- container fluid= layout full width, responsive
-     px= padding kiri kanan size 4
-     py= padding atas bawah size 3 -->
 
     <!-- NAV BAR -->
-<?php include 'nav-bar.php'; ?>
+    <?php include 'nav-bar.php'; ?>
+
     <!-- TABS -->
     <div class="row mb-3">
         <div class="col-12">
@@ -91,37 +113,63 @@ while ($row = $result_task->fetch_assoc()) {
             </div>
         </div>
     </div>
-    <div class="tabs-container">
-    <button class="tab-button active">Task</button>
-</div>
-
 
     <!-- MAIN CONTENT BOX -->
     <div class="row">
-        <div class="col-12"> <!--col-12 means ambik 12/12 space = full width -->
+        <div class="col-12">
             <div class="content-box">
 
                 <!-- SEARCH + FILTER + ADD BUTTON -->
-                <div class="row mb-4">
-                    <div class="col-md-4">
-                        <input type="text" class="form-control search-input" placeholder="🔍 Search task list">
-                    </div>
+                <form method="GET" action="task.php" id="filterForm">
+                    <div class="row mb-4">
+                        <div class="col-md-4">
+                            <input 
+                                type="text" 
+                                class="form-control search-input" 
+                                placeholder="🔍 Search task list"
+                                name="search"
+                                id="searchInput"
+                                value="<?= htmlspecialchars($search_query) ?>"
+                            >
+                        </div>
 
-                    <div class="col-md-4"> <!--md means bila screen medium ke atas colum ambik 4/12-->
-                        <select class="form-select filter-select">
-                            <option selected>All Status</option>
-                            <option value="incomplete">Incomplete</option>
-                            <option value="in progress">In Progress</option>
-                            <option value="completed">Completed</option>
-                        </select>
-                    </div>
+                        <div class="col-md-4">
+                            <select class="form-select filter-select" name="status" id="statusFilter" onchange="document.getElementById('filterForm').submit()">
+                                <option value="all" <?= empty($filter_status) || $filter_status === 'all' ? 'selected' : '' ?>>All Status</option>
+                                <option value="in progress" <?= $filter_status === 'in progress' ? 'selected' : '' ?>>In Progress</option>
+                                <option value="completed" <?= $filter_status === 'completed' ? 'selected' : '' ?>>Completed</option>
+                                <option value="incomplete" <?= $filter_status === 'incomplete' ? 'selected' : '' ?>>Incomplete (Overdue)</option>
+                            </select>
+                        </div>
 
-                    <div class="col-md-4 text-end">
-                        <button class="btn-add-task" onclick="window.location='createTask.php'">
-                            Add New Task
-                        </button>
+                        <div class="col-md-4 text-end">
+                            <?php if (!empty($search_query) || !empty($filter_status)): ?>
+                                <button type="button" class="btn btn-sm btn-secondary me-2" onclick="clearFilters()">
+                                    Clear Filters
+                                </button>
+                            <?php endif; ?>
+                            <button type="button" class="btn-add-task" onclick="window.location='createTask.php'">
+                                Add New Task
+                            </button>
+                        </div>
                     </div>
-                </div>
+                </form>
+
+                <!-- Show active filters -->
+                <?php if (!empty($search_query) || !empty($filter_status)): ?>
+                    <div class="mb-3">
+                        <small class="text-muted">
+                            Showing 
+                            <?php if (!empty($search_query)): ?>
+                                results for "<strong><?= htmlspecialchars($search_query) ?></strong>"
+                            <?php endif; ?>
+                            <?php if (!empty($filter_status)): ?>
+                                with status "<strong><?= ucfirst($filter_status) ?></strong>"
+                            <?php endif; ?>
+                            (<?= count($tasks) ?> task<?= count($tasks) !== 1 ? 's' : '' ?> found)
+                        </small>
+                    </div>
+                <?php endif; ?>
 
                 <!-- TASK TABLE -->
                 <div class="task-table-container">
@@ -140,14 +188,17 @@ while ($row = $result_task->fetch_assoc()) {
 
                         <?php if (empty($tasks)): ?>
                             <tr>
-                                <td colspan="5" class="text-center">No tasks found.</td>
+                                <td colspan="5" class="text-center py-4">
+                                    <?php if (!empty($search_query) || !empty($filter_status)): ?>
+                                        No tasks match your search criteria. <a href="task.php">Clear filters</a>
+                                    <?php else: ?>
+                                        No tasks found.
+                                    <?php endif; ?>
+                                </td>
                             </tr>
                         <?php else: ?>
 
-                            <?php foreach ($tasks as $task): ?> 
-                                <!--$tasks = list semua task each row 
-                                $task = satu row dalam setiap loop
-                                 $task['title'], $task['status'], etc.-->
+                            <?php foreach ($tasks as $task): ?>
                             <tr>
 
                                 <!-- EDIT BUTTON -->
@@ -157,31 +208,54 @@ while ($row = $result_task->fetch_assoc()) {
                                              viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                             <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
                                             <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
-                                        </svg> <!--svg is for icon-->
+                                        </svg>
                                     </a>
                                 </td>
 
                                 <!-- TITLE -->
                                 <td class="task-name">
-                                    <?php echo htmlspecialchars($task['title']); ?>
+                                    <?php 
+                                    // Highlight search term in title
+                                    if (!empty($search_query)) {
+                                        $highlighted = preg_replace(
+                                            '/(' . preg_quote($search_query, '/') . ')/i',
+                                            '<mark>$1</mark>',
+                                            htmlspecialchars($task['title'])
+                                        );
+                                        echo $highlighted;
+                                    } else {
+                                        echo htmlspecialchars($task['title']);
+                                    }
+                                    ?>
                                 </td>
 
                                 <!-- STATUS BADGE -->
                                 <td>
-                                    <span class="status-badge status-<?php echo strtolower(str_replace(' ', '-', $task['status'])); ?>"> 
-                                        
+                                    <span class="status-badge status-<?php echo strtolower(str_replace(' ', '-', $task['status'])); ?>">
                                         <?php echo htmlspecialchars($task['status']); ?>
                                     </span>
                                 </td>
 
                                 <!-- DUE DATE -->
                                 <td class="due-date">
-                                    <?php echo htmlspecialchars($task['due_date']); ?><!-- html special character  untuk browser show text sahaja bukan run script-->
+                                    <?php echo htmlspecialchars($task['due_date']); ?>
                                 </td>
 
                                 <!-- DESCRIPTION -->
                                 <td class="description">
-                                    <?php echo htmlspecialchars($task['description']); ?>
+                                    <?php 
+                                    // Highlight search term in description
+                                    if (!empty($search_query)) {
+                                        $highlighted = preg_replace(
+                                            '/(' . preg_quote($search_query, '/') . ')/i',
+                                            '<mark>$1</mark>',
+                                            htmlspecialchars($task['description'])
+                                        );
+                                        echo $highlighted;
+                                    } else {
+                                        echo htmlspecialchars($task['description']);
+                                    }
+                                    ?>
                                 </td>
 
                             </tr>
@@ -199,6 +273,42 @@ while ($row = $result_task->fetch_assoc()) {
     </div>
 
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+// Real-time search (debounced)
+let searchTimeout;
+document.getElementById('searchInput').addEventListener('input', function() {
+    clearTimeout(searchTimeout);
+    searchTimeout = setTimeout(function() {
+        document.getElementById('filterForm').submit();
+    }, 500); // Wait 500ms after user stops typing
+});
+
+// Clear filters function
+function clearFilters() {
+    window.location.href = 'task.php';
+}
+
+// Highlight functionality for search results
+document.addEventListener('DOMContentLoaded', function() {
+    const searchQuery = "<?= addslashes($search_query) ?>";
+    if (searchQuery) {
+        // Add highlight style
+        const style = document.createElement('style');
+        style.textContent = `
+            mark {
+                background-color: #FFFF00;
+                color: #000;
+                padding: 2px 4px;
+                border-radius: 3px;
+                font-weight: 600;
+            }
+        `;
+        document.head.appendChild(style);
+    }
+});
+</script>
 
 </body>
 </html>

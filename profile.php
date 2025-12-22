@@ -95,11 +95,11 @@ if (isset($_GET['logout'])) {
                 <label class="form-label-profile">Gender</label>
                 <div class="gender-options">
                     <div class="form-check-inline">
-                        <input class="form-check-input-profile" type="radio" name="gender" id="male" value="Male" <?php echo ($user['gender'] === 'Male') ? 'checked' : ''; ?> disabled>
+                        <input class="form-check-input-profile" type="radio" name="gender" id="male" value="male" <?php echo ($user['gender'] === 'male') ? 'checked' : ''; ?> disabled>
                         <label class="form-check-label-profile" for="male">Male</label>
                     </div>
                     <div class="form-check-inline">
-                        <input class="form-check-input-profile" type="radio" name="gender" id="female" value="Female" <?php echo ($user['gender'] === 'Female') ? 'checked' : ''; ?> disabled>
+                        <input class="form-check-input-profile" type="radio" name="gender" id="female" value="female" <?php echo ($user['gender'] === 'female') ? 'checked' : ''; ?> disabled>
                         <label class="form-check-label-profile" for="female">Female</label>
                     </div>
                 </div>

@@ -1,177 +1,151 @@
-/* ==========================================
-   LOGIN PAGE STYLES
-   ==========================================
-   This CSS file styles the login page with
-   a warm beige color scheme matching the design
-   ========================================== */
+/* LOGIN PAGE STYLES */
 
-/* --- Global Styles --- */
+/* Global */
 body {
-    font-family: 'Inter', sans-serif; /* Modern, clean font from Google Fonts */
-    background-color: #F9E7B2; /* Warm beige background color matching sign-up page */
-    color: #171A1F; /* Dark text color for good readability */
+    font-family: 'Inter', sans-serif;
+    background-color: #F9E7B2;
+    color: #171A1F;
     margin: 0;
     padding: 0;
 }
 
-/* --- Login Card Container --- */
-/* This is the cream box that contains the form */
+/* Login Card */
 .login-card {
-    background-color: #FFF9E6; /* Light cream background to stand out from page background */
-    border-radius: 6px; /* Rounded corners */
-    border: 0 solid #FFF; /* No visible border */
-    padding: 40px 50px; /* Space inside the card (top/bottom: 40px, left/right: 50px) */
-    box-shadow: 0 0 2px 0 rgba(23, 26, 31, 0.08), 0 0 1px 0 rgba(23, 26, 31, 0.05); /* Subtle shadow for depth */
-    max-width: 999px; /* Maximum width from design */
-    margin: 0 auto; /* Center the card horizontally */
+    background-color: #FFF9E6;
+    border-radius: 6px;
+    border: 0;
+    padding: 40px 50px;
+    box-shadow: 0 0 2px rgba(23, 26, 31, 0.08), 0 0 1px rgba(23, 26, 31, 0.05);
+    max-width: 999px;
+    margin: 0 auto;
 }
 
-/* --- Logo Styling --- */
+/* Logo */
 .logo {
-    display: block; /* Makes image a block element */
-    margin: 0 auto; /* Centers the logo horizontally */
-    max-width: 200px; /* Limits logo size */
-    height: auto; /* Maintains aspect ratio */
+    display: block;
+    margin: 0 auto;
+    max-width: 200px;
+    height: auto;
 }
 
-/* --- "First Time?" Text --- */
+/* "First Time?" */
 .signup-prompt {
-    color: #171A1F; /* Dark text color */
-    text-align: center; /* Center the text */
-    font-size: 18px; /* Medium text size */
-    font-weight: 500; /* Medium weight */
-    line-height: 1.5; /* Line height for readability */
-    margin-bottom: 12px; /* Space below the text */
+    color: #171A1F;
+    text-align: center;
+    font-size: 18px;
+    font-weight: 500;
+    line-height: 1.5;
+    margin-bottom: 12px;
 }
 
-/* --- Sign Up Button --- */
-/* The rounded button that links to sign-up page */
+/* Sign Up Button */
 .signup-button {
-    display: inline-block; /* Makes link behave like a button */
-    background-color: #D4AF37; /* Gold/tan background */
-    color: #171A1F; /* Dark text */
-    padding: 10px 80px; /* Horizontal padding makes button wider */
-    border-radius: 20px; /* Very rounded corners (pill shape) */
-    text-decoration: none; /* Remove underline from link */
-    font-size: 16px; /* Button text size */
-    font-weight: 500; /* Medium weight */
-    transition: all 0.3s ease; /* Smooth transition for hover effects */
+    display: inline-block;
+    background-color: #D4AF37;
+    color: #171A1F;
+    padding: 10px 80px;
+    border-radius: 20px;
+    text-decoration: none;
+    font-size: 16px;
+    font-weight: 500;
+    transition: 0.3s ease;
 }
 
-/* When hovering over Sign Up button */
 .signup-button:hover {
-    background-color: #C69F30; /* Slightly darker gold */
-    color: #171A1F; /* Keep dark text */
-    transform: translateY(-2px); /* Slight lift effect */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Add shadow on hover */
+    background-color: #C69F30;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
 }
 
-/* --- Divider Text --- */
-/* The "OR LOG IN WITH" text */
+/* Divider Text */
 .divider-text {
-    color: #9095A0; /* Light gray text */
-    font-size: 12px; /* Small text */
-    font-weight: 400; /* Normal weight */
-    letter-spacing: 0.5px; /* Slight spacing between letters */
-    margin: 24px 0; /* Space above and below */
+    color: #9095A0;
+    font-size: 12px;
+    font-weight: 400;
+    letter-spacing: 0.5px;
+    margin: 24px 0;
 }
 
-/* --- Form Labels --- */
-/* Labels like "Email" and "Password" */
+/* Form Labels */
 .form-label {
-    color: #565D6D; /* Medium gray color */
-    font-size: 14px; /* Small text size */
-    font-weight: 400; /* Normal weight */
-    line-height: 20px; /* Line height for readability */
-    margin-bottom: 6px; /* Small space between label and input */
-    display: block; /* Makes label take full width */
+    color: #565D6D;
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 20px;
+    margin-bottom: 6px;
+    display: block;
 }
 
-/* --- Form Inputs --- */
-/* Text input fields (email and password) */
+/* Inputs */
 .form-control {
-    background-color: #FFFFFF !important; /* White background for inputs */
-    border: 1px solid #DEE1E6 !important; /* Light gray border */
-    border-radius: 6px !important; /* Rounded corners */
-    padding: 10px 14px; /* Space inside the input field */
-    height: auto; /* Height adjusts to content */
-    font-size: 14px; /* Text size inside input */
-    color: #171A1F; /* Dark text color */
-    transition: all 0.2s ease; /* Smooth transition for hover/focus effects */
+    background-color: #FFFFFF !important;
+    border: 1px solid #DEE1E6 !important;
+    border-radius: 6px !important;
+    padding: 10px 14px;
+    font-size: 14px;
+    color: #171A1F;
+    transition: 0.2s ease;
 }
 
-/* Placeholder text styling (like "Enter email") */
 .form-control::placeholder {
-    color: #9095A0; /* Light gray placeholder text */
+    color: #9095A0;
 }
 
-/* When user clicks/focuses on an input field */
 .form-control:focus {
-    background-color: #FFFFFF !important; /* Keep white background */
-    border-color: #7B542F !important; /* Brown border to match theme */
-    box-shadow: 0 0 0 3px rgba(123, 84, 47, 0.1) !important; /* Subtle brown glow around input */
-    outline: none; /* Remove default browser outline */
+    border-color: #7B542F !important;
+    box-shadow: 0 0 0 3px rgba(123,84,47,0.1) !important;
+    outline: none;
 }
 
-/* --- Input Group (Password Field) --- */
-/* The password field has a special structure with the eye icon attached */
-
-/* The container holding the eye icon */
+/* Password Input Group */
 .input-group-text {
-    background-color: #FFFFFF !important; /* White background to match input */
-    border: 1px solid #DEE1E6 !important; /* Same border as input */
-    border-radius: 0 6px 6px 0 !important; /* Rounded only on the right side */
-    padding: 10px 14px; /* Same padding as input */
-    cursor: pointer; /* Shows hand cursor when hovering */
+    background-color: #FFFFFF !important;
+    border: 1px solid #DEE1E6 !important;
+    border-radius: 0 6px 6px 0 !important;
+    padding: 10px 14px;
+    cursor: pointer;
 }
-
-
 
 .input-group:focus-within .form-control {
-    border-color: #7B542F !important; /* Brown border */
+    border-color: #7B542F !important;
 }
 
-/* --- Continue/Login Button --- */
-/* The brown "Continue" submit button */
+/* Login Button */
 .btn-login {
-    display: flex; /* Flexbox for centering text */
-    width: 100%; /* Full width of container */
-    padding: 12px 0; /* Vertical padding */
-    justify-content: center; /* Center text horizontally */
-    align-items: center; /* Center text vertically */
-    border-radius: 6px; /* Rounded corners */
-    border: 1px solid rgba(0, 0, 0, 0.00); /* Transparent border */
-    background: #7B542F; /* Brown background color matching sign-up button */
-    color: #FFFFFF; /* White text */
-    font-size: 16px; /* Button text size */
-    font-weight: 500; /* Medium weight */
-    transition: background-color 0.3s ease; /* Smooth color change on hover */
-    cursor: pointer; /* Shows hand cursor */
+    display: flex;
+    width: 100%;
+    padding: 12px 0;
+    justify-content: center;
+    align-items: center;
+    border-radius: 6px;
+    border: 1px solid transparent;
+    background: #7B542F;
+    color: #FFFFFF;
+    font-size: 16px;
+    font-weight: 500;
+    transition: 0.3s ease;
+    cursor: pointer;
 }
 
-/* When hovering over the button */
 .btn-login:hover {
-    background-color: #6A4728; /* Darker brown */
-    color: #FFFFFF; /* Keep white text */
+    background-color: #6A4728;
 }
 
-/* When button is clicked/pressed */
 .btn-login:active {
-    background-color: #5A3C21; /* Even darker brown */
+    background-color: #5A3C21;
 }
 
-/* --- Responsive Design --- */
-/* Adjustments for smaller screens (tablets and phones) */
+/* Responsive */
 @media (max-width: 768px) {
     .login-card {
-        padding: 30px 25px; /* Less padding on small screens */
+        padding: 30px 25px;
     }
-    
+
     .logo {
-        max-width: 180px; /* Smaller logo on mobile */
+        max-width: 180px;
     }
-    
+
     .signup-button {
-        padding: 10px 60px; /* Less horizontal padding on mobile */
+        padding: 10px 60px;
     }
 }

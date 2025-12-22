@@ -195,7 +195,7 @@ $ignored_accounts = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
                             <div class="category-item">
                                 <div>
                                     <span class="category-name"><?php echo htmlspecialchars($account['account_name']); ?></span>
-                                    <div class="account-balance">RM <?php echo isset($account['balance']) ? number_format((float)$account['balance'], 2) : '0.00'; ?></div>
+                                    <div class="account-balance <?php echo isset($account['balance']) && (float)$account['balance'] < 0 ? 'negative' : ''; ?>">RM <?php echo isset($account['balance']) ? number_format((float)$account['balance'], 2) : '0.00'; ?></div>
                                 </div>
                                 <div class="dropdown">
                                     <button class="btn-dots" data-bs-toggle="dropdown">⋯</button>

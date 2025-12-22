@@ -69,3 +69,104 @@
     margin: 0; /* Remove default margin */
     text-align: center; /* Center the quote */
 }
+
+/* ==========================================
+   RESPONSIVE DESIGN - CONSISTENT ACROSS ALL PAGES
+   ========================================== */
+
+/* Tablet Screens (1024px and below) */
+@media (max-width: 1024px) {
+    .navbar-custom {
+        padding: 16px 0;
+    }
+
+    .logo {
+        width: 160px;
+    }
+
+    .nav-menu {
+        gap: 30px;
+    }
+
+    .nav-item {
+        font-size: 16px;
+    }
+
+    .quote-box {
+        padding: 20px 24px;
+    }
+
+    .quote-text {
+        font-size: 16px;
+    }
+}
+
+/* Mobile Screens (768px and below) */
+@media (max-width: 768px) {
+    .navbar-custom {
+        flex-direction: column;
+        gap: 20px;
+        padding: 12px 0;
+        align-items: center;
+    }
+
+    .logo {
+        width: 140px;
+    }
+
+    .nav-menu {
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 16px;
+        width: 100%;
+    }
+
+    .nav-item {
+        font-size: 14px;
+        padding-bottom: 6px;
+    }
+
+    .quote-box {
+        padding: 16px 20px;
+        width: 100%;
+    }
+
+    .quote-text {
+        font-size: 14px;
+        line-height: 1.5;
+    }
+}
+
+/* Small Mobile Screens (480px and below) */
+@media (max-width: 480px) {
+    .navbar-custom {
+        gap: 12px;
+        padding: 10px 0;
+    }
+
+    .logo {
+        width: 110px;
+    }
+
+    .nav-menu {
+        gap: 10px;
+        justify-content: center;
+    }
+
+    .nav-item {
+        font-size: 12px;
+        padding-bottom: 4px;
+        border-bottom-width: 2px;
+    }
+
+    .quote-box {
+        padding: 12px 16px;
+        border-radius: 4px;
+        width: 100%;
+    }
+
+    .quote-text {
+        font-size: 12px;
+        line-height: 1.4;
+    }
+}

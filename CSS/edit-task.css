@@ -81,3 +81,37 @@ body {
 .btn-delete:hover { background:#c82333; }
 .btn-update:hover { background:#6A4728; }
 .btn-cancel:hover { background:#E0E0E0; }
+@media (max-width: 768px) {
+
+    .edit-box {
+        padding: 25px 20px;
+    }
+
+    .title-text {
+        font-size: 28px;
+    }
+
+    .button-row {
+        flex-direction: column;   /* stack buttons */
+        gap: 12px;
+    }
+
+    .btn-cancel,
+    .btn-delete,
+    .btn-update {
+        width: 100%;              /* full width buttons */
+        padding: 14px 0;          /* remove horizontal overflow */
+        text-align: center;
+    }
+}
+@media (max-width: 768px) {
+    .btn-delete {
+        order: 3;
+    }
+    .btn-update {
+        order: 1;
+    }
+    .btn-cancel {
+        order: 2;
+    }
+}

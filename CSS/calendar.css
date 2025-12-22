@@ -95,7 +95,7 @@ body {
 }
 
 .weekday {
-    flex: 1;
+     flex: 1; /*flex means  */
     text-align: center;
     font-size: 14px;
     font-weight: 500;
@@ -386,7 +386,22 @@ body {
 .btn-close-modal:hover {
     background: #E5E7EB;
 }
+    /* NEW GREEN COLOR FOR COMPLETED */
+    .task-item.completed {
+    background-color: #e6f4ea; /* soft green */
+    border: 1px solid #9fd3b8;
+    opacity: 0.9;
+}
 
+.task-item.completed .task-title {
+    color: #2e7d32;
+    text-decoration: line-through;
+    font-weight: 600;
+}
+
+.task-item.completed .task-description {
+    color: #4f7f5f;
+}
 /* --- Responsive Design --- */
 @media (max-width: 992px) {
     .calendar-grid { 
@@ -427,4 +442,6 @@ body {
         width: 10px;
         height: 10px;
     }
+
+
 }

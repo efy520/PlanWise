@@ -8,6 +8,27 @@ if (!isset($_SESSION['user_id'])) {
     exit();
 }
 $user_id = $_SESSION['user_id'];
+// -------------------------------------------
+// HANDLE MARK TASK AS COMPLETED (POST)
+// -------------------------------------------
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['complete_task_id'])) {
+    $task_id = (int) $_POST['complete_task_id'];
+
+    $stmt = $conn->prepare("
+        UPDATE task 
+        SET status = 'completed' 
+        WHERE task_id = ? AND user_id = ?
+    ");
+    $stmt->bind_param("ii", $task_id, $user_id);
+    $stmt->execute();
+
+    $m = isset($_GET['m']) ? (int)$_GET['m'] : (int)date('n');
+    $y = isset($_GET['y']) ? (int)$_GET['y'] : (int)date('Y');
+
+    header("Location: calendar.php?m={$m}&y={$y}&completed=1");
+    exit();
+}
+
 
 // Handle deletion from modal (POST)
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_task_id'])) {
@@ -41,6 +62,14 @@ $endMonthDT = clone $firstOfMonth;
 $endMonthDT->modify('last day of this month');
 $endMonth = $endMonthDT->format('Y-m-d');
 
+//$firstOfMonth = DateTime untuk hari 1 bulan yang user tengah tengok.
+//$startMonth = hari pertama bulan itu.
+//Kalau dia modify $firstOfMonth terus → variable asal berubah.
+//So dia buat copy (clone) supaya original kekal
+//PHP automatik kira berapa hari bulan tu.
+//$endMonth = $endMonthDT->format('Y-m-d');
+//Convert DateTime object itu menjadi string tarikh:
+
 $sql = "SELECT task_id, title, description, due_date, status FROM task 
         WHERE user_id = ? AND due_date BETWEEN ? AND ?";
 $stmt = $conn->prepare($sql);
@@ -52,8 +81,21 @@ $tasks = [];
 // index tasks by yyyy-mm-dd
 while ($row = $res->fetch_assoc()) {
     $d = $row['due_date'];
-    if (!isset($tasks[$d])) $tasks[$d] = [];
-    $tasks[$d][] = $row;
+
+    if (!isset($tasks[$d])) {
+        $tasks[$d] = [
+            'all' => [],
+            'active_count' => 0
+        ];
+    }
+
+    $tasks[$d]['all'][] = $row;
+
+    // Count only non-completed tasks
+  if (strtolower($row['status']) !== 'completed') {
+
+        $tasks[$d]['active_count']++;
+    }
 }
 
 // Today's date for highlight
@@ -61,7 +103,7 @@ $today = date('Y-m-d');
 
 // month name
 $monthName = $firstOfMonth->format('F');
-
+// f means full month name
 // prepare prev/next links
 $prevDT = clone $firstOfMonth;
 $prevDT->modify('-1 month');
@@ -140,6 +182,7 @@ if ($result_quote && $result_quote->num_rows > 0) {
             <?php
             $weekdays = ['SUN','MON','TUE','WED','THU','FRI','SAT'];
             foreach ($weekdays as $wd) {
+                //foreach ($weekdays as $wd)  means untuk setiap item dalam array weekdays, assign item itu ke variable wd
                 echo "<div class='weekday'>$wd</div>";
             }
             ?>
@@ -150,6 +193,8 @@ if ($result_quote && $result_quote->num_rows > 0) {
             <?php
             // blank cells before first day
             $cell = 0;
+            //startWeekday = hari dalam seminggu hari pertama bulan tu (0=Ahad, 1=Isnin,...6=Sabtu)
+            //kalau i=0 sampai kurang dari startWeekday je loop jalan means kalau bulan tu start hari ahad die takde blank cell
             for ($i = 0; $i < $startWeekday; $i++, $cell++) {
                 echo "<div class='day empty'></div>";
             }
@@ -158,7 +203,8 @@ if ($result_quote && $result_quote->num_rows > 0) {
             for ($day = 1; $day <= $daysInMonth; $day++, $cell++) {
                 $dateStr = sprintf('%04d-%02d-%02d', $year, $month, $day);
                 $isToday = $dateStr === $today;
-                $hasTask = isset($tasks[$dateStr]) && count($tasks[$dateStr]) > 0;
+             $hasTask = isset($tasks[$dateStr]) && $tasks[$dateStr]['active_count'] > 0;
+
 
                 // CSS classes
                 $classes = 'day';
@@ -248,7 +294,8 @@ if ($result_quote && $result_quote->num_rows > 0) {
 
     function renderTasksFor(dateStr) {
         modalTasksList.innerHTML = '';
-        const arr = tasksByDate[dateStr] || [];
+        const arr = tasksByDate[dateStr]?.all || [];
+
         
         if (arr.length === 0) {
             modalTasksList.innerHTML = '<p class="text-muted text-center py-3">No tasks for this day.</p>';
@@ -256,42 +303,41 @@ if ($result_quote && $result_quote->num_rows > 0) {
         }
         
         // Create task items matching Figma design
-        arr.forEach(t => {
-            const taskItem = document.createElement('div');
-            taskItem.className = 'task-item';
+       arr.forEach(t => {
+    const isCompleted = t.status && t.status.toLowerCase() === 'completed';
+
+    const taskItem = document.createElement('div');
+    taskItem.className = 'task-item' + (isCompleted ? ' completed' : '');
+
             
             // Create action buttons with colors from Figma
-            taskItem.innerHTML = `
-                <div class="task-item-content">
-                    <div class="task-title">${escapeHtml(t.title)}</div>
-                    <div class="task-description">${escapeHtml(t.description || '')}</div>
-                </div>
-                <div class="task-actions">
-                    <a href="edit-task.php?task_id=${encodeURIComponent(t.task_id)}" class="btn-task-action btn-edit-yellow" title="Edit">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
-                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
-                            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
-                        </svg>
-                    </a>
-                    <form method="POST" style="display:inline-block;margin:0;">
-                        <input type="hidden" name="delete_task_id" value="${escapeHtml(t.task_id)}">
-                        <button type="submit" class="btn-task-action btn-complete-green" name="mark_done" title="Complete">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3">
-                                <polyline points="20 6 9 17 4 12"></polyline>
-                            </svg>
-                        </button>
-                    </form>
-                    <form method="POST" style="display:inline-block;margin:0;">
-                        <input type="hidden" name="delete_task_id" value="${escapeHtml(t.task_id)}">
-                        <button type="submit" class="btn-task-action btn-delete-red" onclick="return confirm('Delete this task?');" title="Delete">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
-                                <polyline points="3 6 5 6 21 6"></polyline>
-                                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-                            </svg>
-                        </button>
-                    </form>
-                </div>
-            `;
+           taskItem.innerHTML = `
+    <div class="task-item-content">
+        <div class="task-title">${escapeHtml(t.title)}</div>
+        <div class="task-description">${escapeHtml(t.description || '')}</div>
+    </div>
+
+    ${!isCompleted ? `
+    <div class="task-actions">
+        <a href="edit-task.php?task_id=${encodeURIComponent(t.task_id)}"
+           class="btn-task-action btn-edit-yellow" title="Edit">
+            ✏
+        </a>
+
+        <form method="POST" style="display:inline;">
+            <input type="hidden" name="complete_task_id" value="${escapeHtml(t.task_id)}">
+            <button type="submit" class="btn-task-action btn-complete-green" title="Complete">✔</button>
+        </form>
+
+        <form method="POST" style="display:inline;">
+            <input type="hidden" name="delete_task_id" value="${escapeHtml(t.task_id)}">
+            <button type="submit" class="btn-task-action btn-delete-red"
+                onclick="return confirm('Delete this task?');" title="Delete">🗑</button>
+        </form>
+    </div>
+    ` : ''}
+`;
+
             modalTasksList.appendChild(taskItem);
         });
     }
