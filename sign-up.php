@@ -54,18 +54,24 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $stmt = $conn->prepare($sql);
         $stmt->bind_param("ssssss", $email, $username, $hashedPassword, $gender, $phone, $role);
 
-        if ($stmt->execute()) {
-            // Get the newly created user_id
-            $new_user_id = $conn->insert_id;
-            
-            // Create default categories for this new user
-            createDefaultCategories($conn, $new_user_id);
-            
-            // Redirect to login after successful registration
-            header("Location: login.php?registered=1");
-            exit();
-        } else {
-            $error_message = "Registration failed. Email may already exist.";
+        try {
+            if ($stmt->execute()) {
+                // Get the newly created user_id
+                $new_user_id = $conn->insert_id;
+                
+                // Create default categories for this new user
+                createDefaultCategories($conn, $new_user_id);
+                
+                // Redirect to login after successful registration
+                header("Location: login.php?registered=1");
+                exit();
+            }
+        } catch (mysqli_sql_exception $e) {
+            if (strpos($e->getMessage(), 'Duplicate entry') !== false && strpos($e->getMessage(), 'email') !== false) {
+                $error_message = "This email is already registered. Please use a different email or try logging in.";
+            } else {
+                $error_message = "Registration failed. Please try again.";
+            }
         }
 
     } else {

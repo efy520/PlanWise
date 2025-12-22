@@ -197,6 +197,28 @@ body {
 
 /* --- Responsive Design --- */
 /* Adjustments for smaller screens (tablets and phones) */
+/* --- Alert Styles --- */
+.alert {
+    border-radius: 8px;
+    border: none;
+    padding: 14px 16px;
+    font-size: 14px;
+    font-weight: 500;
+    margin-bottom: 20px;
+}
+
+.alert-danger {
+    background: #FFE5E5;
+    color: #DC3545;
+    border-left: 4px solid #DC3545;
+}
+
+.alert-success {
+    background: #E5F5E5;
+    color: #28A745;
+    border-left: 4px solid #28A745;
+}
+
 @media (max-width: 768px) {
     .signup-card {
         padding: 30px 25px; /* Less padding on small screens */
