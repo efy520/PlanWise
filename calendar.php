@@ -25,8 +25,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['complete_task_id'])) 
     $m = isset($_GET['m']) ? (int)$_GET['m'] : (int)date('n');
     $y = isset($_GET['y']) ? (int)$_GET['y'] : (int)date('Y');
 
-    header("Location: calendar.php?m={$m}&y={$y}&completed=1");
-    exit();
+   $_SESSION['flash_success'] = "Task marked as completed!";
+header("Location: calendar.php?m={$m}&y={$y}");
+exit();
+
 }
 
 
@@ -39,8 +41,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_task_id'])) {
     // redirect back to same month to avoid resubmission
     $m = isset($_GET['m']) ? (int)$_GET['m'] : (int)date('n');
     $y = isset($_GET['y']) ? (int)$_GET['y'] : (int)date('Y');
-    header("Location: calendar.php?m={$m}&y={$y}&deleted=1");
-    exit();
+    $_SESSION['flash_success'] = "Task deleted successfully!";
+header("Location: calendar.php?m={$m}&y={$y}");
+exit();
+
 }
 
 // determine month/year to show
@@ -148,6 +152,21 @@ if ($result_quote && $result_quote->num_rows > 0) {
 <body>
 <div class="container-fluid px-4 py-3">
 <?php include 'nav-bar.php'; ?>
+
+<!-- FLASH NOTI -->
+<?php if (isset($_SESSION['flash_success'])): ?>
+<div class="toast-container position-fixed top-0 end-0 p-3" style="z-index:9999">
+    <div class="toast align-items-center text-bg-success border-0 show">
+        <div class="d-flex">
+            <div class="toast-body">
+                <?= $_SESSION['flash_success'] ?>
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto"
+                    data-bs-dismiss="toast"></button>
+        </div>
+    </div>
+</div>
+<?php unset($_SESSION['flash_success']); endif; ?>
 
     <!-- calendar header: month & navigation -->
     <div class="calendar-header d-flex justify-content-between align-items-center mb-2">
@@ -369,6 +388,12 @@ if ($result_quote && $result_quote->num_rows > 0) {
     });
 
 })();
+
+setTimeout(() => {
+    document.querySelectorAll('.toast').forEach(t => t.remove());
+}, 3000);
+
+
 </script>
 
 </body>

@@ -20,8 +20,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $description = trim($_POST['description']);
     $due_date = $_POST['due_date'];
 
-    $created_date = date('Y-m-d');      // system-controlled
-    $status = "in progress";            // system-controlled
+    $created_date = date('Y-m-d');      
+    $status = "in progress";            
 
     // -------------------------------
     // SERVER-SIDE VALIDATION
@@ -30,6 +30,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         $error_message = "All fields are required.";
     } else {
         $today = date('Y-m-d');
+        //COMMENT SEMENTARA
         if ($due_date < $today) {
             $error_message = "Due date cannot be earlier than today.";
         }
@@ -55,11 +56,10 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         );
 
         if ($stmt->execute()) {
-            header("Location: task.php?created=1");
-            exit();
-        } else {
-            $error_message = "Failed to create task. Please try again.";
-        }
+    $_SESSION['flash_success'] = "Task added successfully!";
+    header("Location: task.php");
+    exit();
+}
     }
 }
 ?>
@@ -112,7 +112,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                     <label class="label-text">Start date</label>
                     <input type="text"
                            class="form-control input-field"
-                           value="<?= date('Y-m-d'); ?>"
+                           value="<?= date('d/m/Y'); ?>"
                            readonly>
                 </div>
 

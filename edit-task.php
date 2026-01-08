@@ -22,8 +22,9 @@ if ($result->num_rows === 0) {
     echo "Task not found.";
     exit();
 }
+$task = $result->fetch_assoc();   
+$task['status'] = strtolower($task['status']);
 
-$task = $result->fetch_assoc();
 
 // UPDATE TASK
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['update'])) {
@@ -37,7 +38,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['update'])) {
     $today = date('Y-m-d');
     $warning_message = "";
     if ($due_date < $today) {
-        $warning_message = "⚠️ Warning: This due date is in the past. You can still update, but consider setting a future date.";
+       $warning_message = "⚠ This task will remain overdue until the due date is updated.";
+
     }
 
     $sql = "UPDATE task SET title=?, description=?, due_date=?, status=? WHERE task_id=? AND user_id=?";
@@ -45,8 +47,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['update'])) {
     $stmt->bind_param("ssssii", $title, $description, $due_date, $status, $task_id, $user_id);
 
     if ($stmt->execute()) {
-        header("Location: task.php?updated=1");
-        exit();
+        $_SESSION['flash_success'] = "Task updated successfully!";
+header("Location: task.php");
+exit();
+
     } else {
         $error_message = "Update failed.";
     }
@@ -54,17 +58,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['update'])) {
 
 // DELETE TASK
 if (isset($_POST['delete'])) {
-    $sql_delete = "DELETE FROM task WHERE task_id=? AND user_id=?";
-    $stmt_delete = $conn->prepare($sql_delete);
-    $stmt_delete->bind_param("ii", $task_id, $user_id);
+    $sql = "DELETE FROM task WHERE task_id=? AND user_id=?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("ii", $task_id, $user_id);
 
-    if ($stmt_delete->execute()) {
-        header("Location: task.php?deleted=1");
+    if ($stmt->execute()) {
+        $_SESSION['flash_success'] = "Task deleted successfully!";
+        header("Location: task.php");
         exit();
     } else {
         $error_message = "Delete failed.";
     }
 }
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -119,7 +125,7 @@ if (isset($_POST['delete'])) {
             </div>
 
             <label class="label-text mt-3">Status</label>
-            <select class="form-select input-field" name="status" required>
+            <select class="form-select input-field" name="status" id="statusSelect" required>
                 <option value="in progress" <?= $task['status']=='in progress'?'selected':'' ?>>In Progress</option>
                 <option value="completed" <?= $task['status']=='completed'?'selected':'' ?>>Completed</option>
             </select>
@@ -139,39 +145,45 @@ if (isset($_POST['delete'])) {
 </div>
 
 <script>
-// Show warning when user selects a past due date
 document.addEventListener('DOMContentLoaded', function() {
     const dueDateInput = document.querySelector('input[name="due_date"]');
-    
-    if (dueDateInput) {
-        dueDateInput.addEventListener('change', function() {
-            const today = new Date();
-            today.setHours(0, 0, 0, 0);
-            
-            const selectedDate = new Date(this.value);
-            selectedDate.setHours(0, 0, 0, 0);
-            
-            const warningDiv = document.getElementById('dateWarning');
-            
-            if (selectedDate < today) {
-                // Show warning if it doesn't exist
-                if (!warningDiv) {
-                    const alertDiv = document.createElement('div');
-                    alertDiv.id = 'dateWarning';
-                    alertDiv.className = 'alert alert-warning mt-2';
-                    alertDiv.innerHTML = '⚠️ Warning: This due date is in the past. You can still update, but consider setting a future date.';
-                    this.parentElement.appendChild(alertDiv);
-                }
-            } else {
-                // Remove warning if it exists and date is valid
-                if (warningDiv) {
-                    warningDiv.remove();
-                }
+    const statusSelect = document.getElementById('statusSelect');
+
+    function checkOverdueWarning() {
+        const warningId = 'dateWarning';
+        const existing = document.getElementById(warningId);
+
+        if (!dueDateInput || !statusSelect) return;
+
+        const today = new Date();
+        today.setHours(0,0,0,0);
+
+        const selectedDate = new Date(dueDateInput.value);
+        selectedDate.setHours(0,0,0,0);
+
+        const isInProgress = statusSelect.value === 'in progress';
+        const isPast = selectedDate < today;
+
+        if (isInProgress && isPast) {
+            if (!existing) {
+                const alertDiv = document.createElement('div');
+                alertDiv.id = warningId;
+                alertDiv.className = 'alert alert-warning mt-2';
+                alertDiv.innerHTML = '⚠ This task will remain overdue until the due date is updated.';
+                statusSelect.parentElement.appendChild(alertDiv);
             }
-        });
+        } else {
+            if (existing) existing.remove();
+        }
     }
+
+    dueDateInput.addEventListener('change', checkOverdueWarning);
+    statusSelect.addEventListener('change', checkOverdueWarning);
+
+    checkOverdueWarning(); // run once on load
 });
 </script>
+
 
 </body>
 </html>

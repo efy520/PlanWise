@@ -12,19 +12,7 @@ if (!isset($_SESSION['user_id'])) {
 
 $user_id = $_SESSION['user_id']; 
 
-// -------------------------------------------
-// AUTO-MARK OVERDUE TASKS AS INCOMPLETE 
-// -------------------------------------------
-$update_sql = "
-    UPDATE task 
-    SET status = 'incomplete'
-    WHERE user_id = ?
-      AND status = 'in progress'
-      AND due_date < CURDATE()
-";
-$update_stmt = $conn->prepare($update_sql);
-$update_stmt->bind_param("i", $user_id);
-$update_stmt->execute();
+
 
 // -------------------------------------------
 // FETCH RANDOM ACTIVE QUOTE
@@ -63,9 +51,18 @@ if (!empty($search_query)) {
 
 // Add status filter
 if (!empty($filter_status) && $filter_status !== 'all') {
-    $sql_task .= " AND status = ?";
-    $params[] = $filter_status;
-    $param_types .= "s";
+
+    // FILTER OVERDUE (derived logic)
+    if ($filter_status === 'overdue') {
+        $sql_task .= " AND status = 'In Progress' AND due_date < CURDATE()
+";
+    }
+    // FILTER NORMAL STATUS
+    else {
+        $sql_task .= " AND status = ?";
+        $params[] = $filter_status;
+        $param_types .= "s";
+    }
 }
 
 $sql_task .= " ORDER BY due_date ASC";
@@ -113,6 +110,19 @@ while ($row = $result_task->fetch_assoc()) {
             </div>
         </div>
     </div>
+     <!-- FLASH NOTI-->
+<?php if (isset($_SESSION['flash_success'])): ?>
+    <div class="toast-container position-fixed top-0 end-0 p-3" style="z-index:9999">
+        <div class="toast align-items-center text-bg-success border-0 show">
+            <div class="d-flex">
+                <div class="toast-body">
+                    <?= $_SESSION['flash_success'] ?>
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+            </div>
+        </div>
+    </div>
+<?php unset($_SESSION['flash_success']); endif; ?>
 
     <!-- MAIN CONTENT BOX -->
     <div class="row">
@@ -138,7 +148,8 @@ while ($row = $result_task->fetch_assoc()) {
                                 <option value="all" <?= empty($filter_status) || $filter_status === 'all' ? 'selected' : '' ?>>All Status</option>
                                 <option value="in progress" <?= $filter_status === 'in progress' ? 'selected' : '' ?>>In Progress</option>
                                 <option value="completed" <?= $filter_status === 'completed' ? 'selected' : '' ?>>Completed</option>
-                                <option value="incomplete" <?= $filter_status === 'incomplete' ? 'selected' : '' ?>>Incomplete (Overdue)</option>
+                           <option value="overdue" <?= $filter_status === 'overdue' ? 'selected' : '' ?>>Overdue</option>
+
                             </select>
                         </div>
 
@@ -201,6 +212,7 @@ while ($row = $result_task->fetch_assoc()) {
                             <?php foreach ($tasks as $task): ?>
                             <tr>
 
+
                                 <!-- EDIT BUTTON -->
                                 <td>
                                     <a href="edit-task.php?task_id=<?php echo $task['task_id']; ?>" class="btn-edit">
@@ -231,15 +243,28 @@ while ($row = $result_task->fetch_assoc()) {
 
                                 <!-- STATUS BADGE -->
                                 <td>
-                                    <span class="status-badge status-<?php echo strtolower(str_replace(' ', '-', $task['status'])); ?>">
-                                        <?php echo htmlspecialchars($task['status']); ?>
-                                    </span>
-                                </td>
+<?php
+$today = date('Y-m-d');
+$due_date = $task['due_date'];
+
+if ($task['status'] === 'Completed') {
+    echo '<span class="status-badge status-completed">Completed</span>';
+}
+elseif ($task['status'] === 'In Progress' && $due_date < $today) {
+    echo '<span class="status-badge status-overdue">Overdue</span>';
+}
+else {
+    echo '<span class="status-badge status-in-progress">In Progress</span>';
+}
+
+?>
+</td>
 
                                 <!-- DUE DATE -->
-                                <td class="due-date">
-                                    <?php echo htmlspecialchars($task['due_date']); ?>
-                                </td>
+                               <td class="due-date">
+    <?= date('d/m/Y', strtotime($task['due_date'])) ?>
+</td>
+
 
                                 <!-- DESCRIPTION -->
                                 <td class="description">
@@ -308,6 +333,12 @@ document.addEventListener('DOMContentLoaded', function() {
         document.head.appendChild(style);
     }
 });
+
+setTimeout(() => {
+    document.querySelectorAll('.toast').forEach(t => t.remove());
+}, 3000);
+
+
 </script>
 
 </body>
