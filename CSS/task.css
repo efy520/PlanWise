@@ -225,10 +225,10 @@ body {
     line-height: 20px; /* Line height from Figma */
 }
 
-/* Incomplete status - orange color from Figma */
-.status-incomplete {
-    color: #F77F00; /* Orange text from Figma */
-    background: #FFF4E6; /* Light orange background */
+.status-overdue {
+    background-color: #ffe0e0;
+    color: #b30000;
+    font-weight: 600;
 }
 
 /* Completed status - green color from Figma */
