@@ -11,21 +11,41 @@ $user_id = $_SESSION['user_id'];
 $month = date('Y-m');
 
 // -----------------------------
-// TASK COUNTS (CURRENT MONTH)
+// TASK COUNTS (NOT ONLY THIS MONTH)
 // -----------------------------
 $sql = "
-    SELECT
-        COUNT(*) AS total,
-        SUM(status = 'in progress') AS in_progress,
-        SUM(status = 'completed') AS completed,
-        SUM(status = 'in progress' AND due_date < CURDATE()) AS overdue
-    FROM task
-    WHERE user_id = ?
-      AND DATE_FORMAT(due_date, '%Y-%m') = ?
+   SELECT
+    COUNT(*) AS total,
+
+    -- In Progress (NOT overdue)
+    SUM(
+        CASE 
+            WHEN status = 'in progress'
+             AND due_date >= CURDATE()
+            THEN 1 
+            ELSE 0 
+        END
+    ) AS in_progress,
+
+    -- Completed
+    SUM(status = 'completed') AS completed,
+
+    -- Overdue
+    SUM(
+        CASE 
+            WHEN status = 'in progress'
+             AND due_date < CURDATE()
+            THEN 1 
+            ELSE 0 
+        END
+    ) AS overdue
+
+FROM task
+WHERE user_id = ?
 ";
 
 $stmt = $conn->prepare($sql);
-$stmt->bind_param("is", $user_id, $month);
+$stmt->bind_param("i", $user_id);
 $stmt->execute();
 $taskCounts = $stmt->get_result()->fetch_assoc();
 
