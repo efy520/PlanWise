@@ -74,6 +74,39 @@ body {
     padding-left: 12px;
     font-size: clamp(14px, 3vw, 18px);
     font-weight: 500;
+    appearance: none;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23A72703' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    background-size: 20px;
+    padding-right: 40px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.txn-select:hover {
+    border-color: #A72703;
+    box-shadow: 0 2px 8px rgba(167, 39, 3, 0.15);
+}
+
+.txn-select:focus {
+    outline: none;
+    border-color: #A72703;
+    box-shadow: 0 0 0 3px rgba(167, 39, 3, 0.1);
+}
+
+.txn-select option {
+    padding: 12px;
+    background: white;
+    color: #171A1F;
+    font-size: 16px;
+    line-height: 1.5;
+}
+
+.txn-select option:checked {
+    background: linear-gradient(#D4AF37, #D4AF37);
+    background-color: #D4AF37;
+    color: white;
 }
 
 /* DESCRIPTION BOX */
@@ -86,6 +119,21 @@ body {
     padding: 14px;
     font-size: clamp(14px, 3vw, 16px);
     resize: vertical;
+    font-family: 'Inter', sans-serif;
+}
+
+.txn-desc:focus {
+    outline: none;
+    background: #F3F4F6;
+    box-shadow: 0 0 0 3px rgba(167, 39, 3, 0.1);
+}
+
+/* FORM LABELS */
+.form-label {
+    color: #171A1F;
+    font-weight: 600;
+    font-size: clamp(14px, 3vw, 16px);
+    margin-bottom: 8px;
 }
 
 /* AMOUNT */

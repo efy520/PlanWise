@@ -204,7 +204,23 @@ body {
     border-radius: 4px;
     transition: width 0.3s ease;
 }
+/* over budget */
+.limit-bar-fill.over {
+    background-color: #d32f2f; /* red */
+}
 
+/* warning text */
+.budget-warning {
+    margin-top: 6px;
+    font-size: 13px;
+    color: #f57c00; /* orange */
+    font-weight: 500;
+}
+
+.budget-warning.danger {
+    color: #d32f2f;
+    font-weight: 600;
+}
 /* ==========================================
    SIMPLE BUDGET ITEMS (Not budgeted)
    ========================================== */

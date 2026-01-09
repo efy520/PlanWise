@@ -1,6 +1,8 @@
 <?php
 session_start();
 include 'db_connection.php';
+include 'finance_helper.php';
+
 
 if (!isset($_SESSION['user_id'])) {
     header("Location: login.php");
@@ -78,31 +80,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['restore_account_id'])
     header("Location: finance-acc.php?restored=1");
     exit();
 }
-
-// Fetch Active Accounts with Balance
-$account_sql = "
-    SELECT 
-        a.account_id, 
-        a.account_name,
-        COALESCE(SUM(CASE 
-            WHEN t.type = 'income' AND t.source_account_id = a.account_id THEN t.amount 
-            WHEN t.type = 'expense' AND t.source_account_id = a.account_id THEN -t.amount 
-            WHEN t.type = 'transfer' AND t.source_account_id = a.account_id THEN -t.amount
-            WHEN t.type = 'transfer' AND t.destination_account_id = a.account_id THEN t.amount
-            ELSE 0 
-        END), 0) AS balance
-    FROM account a
-    LEFT JOIN transaction_table t ON (t.user_id = a.user_id AND (t.source_account_id = a.account_id OR t.destination_account_id = a.account_id))
-    WHERE a.user_id = ? AND a.is_active = 1
-    GROUP BY a.account_id, a.account_name, a.user_id
-    ORDER BY a.account_name
-";
-$stmt = $conn->prepare($account_sql);
+// Fetch Active Accounts
+$sql = "SELECT account_id, account_name FROM account WHERE user_id = ? AND is_active = 1";
+$stmt = $conn->prepare($sql);
 $stmt->bind_param("i", $user_id);
 $stmt->execute();
-$result = $stmt->get_result();
-$active_accounts = $result->fetch_all(MYSQLI_ASSOC);
-
+$active_accounts = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+ 
 // Fetch Ignored Accounts (is_active = 0)
 $ignored_sql = "SELECT account_id, account_name FROM account WHERE user_id = ? AND is_active = 0";
 $stmt = $conn->prepare($ignored_sql);
@@ -191,27 +175,37 @@ $ignored_accounts = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
                 
                 <div class="categories-list">
                     <?php if (count($active_accounts) > 0): ?>
-                        <?php foreach ($active_accounts as $account): ?>
-                            <div class="category-item">
-                                <div>
-                                    <span class="category-name"><?php echo htmlspecialchars($account['account_name']); ?></span>
-                                    <div class="account-balance <?php echo isset($account['balance']) && (float)$account['balance'] < 0 ? 'negative' : ''; ?>">RM <?php echo isset($account['balance']) ? number_format((float)$account['balance'], 2) : '0.00'; ?></div>
-                                </div>
-                                <div class="dropdown">
-                                    <button class="btn-dots" data-bs-toggle="dropdown">⋯</button>
-                                    <ul class="dropdown-menu category-dropdown">
-                                        <li><a class="dropdown-item" href="#" onclick="showEditModal(<?php echo $account['account_id']; ?>, '<?php echo htmlspecialchars($account['account_name']); ?>')">Edit</a></li>
-                                        <li><a class="dropdown-item" href="#" onclick="showDeleteModal(<?php echo $account['account_id']; ?>, '<?php echo htmlspecialchars($account['account_name']); ?>')">Delete</a></li>
-                                        <li>
-                                            <form method="POST" style="display: inline;">
-                                                <input type="hidden" name="ignore_account_id" value="<?php echo $account['account_id']; ?>">
-                                                <button type="submit" class="dropdown-item" style="border: none; background: none; cursor: pointer;">Ignore</button>
-                                            </form>
-                                        </li>
-                                    </ul>
-                                </div>
-                            </div>
-                        <?php endforeach; ?>
+                        <?php foreach ($active_accounts as $account): 
+    $balance = getAccountBalance($conn, $user_id, $account['account_id']);
+?>
+<div class="category-item">
+    <div>
+        <span class="category-name">
+            <?= htmlspecialchars($account['account_name']); ?>
+        </span>
+        <div class="account-balance <?= $balance < 0 ? 'negative' : '' ?>">
+            RM <?= number_format($balance, 2) ?>
+        </div>
+    </div>
+
+    <div class="dropdown">
+        <button class="btn-dots" data-bs-toggle="dropdown">⋯</button>
+        <ul class="dropdown-menu category-dropdown">
+            <li><a class="dropdown-item" href="#"
+                onclick="showEditModal(<?= $account['account_id']; ?>, '<?= htmlspecialchars($account['account_name']); ?>')">Edit</a></li>
+            <li><a class="dropdown-item" href="#"
+                onclick="showDeleteModal(<?= $account['account_id']; ?>, '<?= htmlspecialchars($account['account_name']); ?>')">Delete</a></li>
+            <li>
+                <form method="POST">
+                    <input type="hidden" name="ignore_account_id" value="<?= $account['account_id']; ?>">
+                    <button type="submit" class="dropdown-item">Ignore</button>
+                </form>
+            </li>
+        </ul>
+    </div>
+</div>
+<?php endforeach; ?>
+
                     <?php else: ?>
                         <p class="text-muted">No accounts yet.</p>
                     <?php endif; ?>

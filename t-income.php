@@ -1,6 +1,7 @@
 <?php
 session_start();
 include 'db_connection.php';
+include 'finance_helper.php';
 
 if (!isset($_SESSION['user_id'])) {
     header("Location: login.php");
@@ -47,11 +48,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $datetime = $_POST['datetime'];
 
     $sql_ins = "INSERT INTO transaction_table 
-        (user_id, category_id, source_account_id, destination_account_id, txn_date_time, type, description, amount)
-        VALUES (?, ?, ?, NULL, ?, 'income', ?, ?)";
+    (user_id, category_id, destination_account_id, txn_date_time, type, description, amount)
+    VALUES (?, ?, ?, ?, 'income', ?, ?)";
+
 
     $stmt = $conn->prepare($sql_ins);
-    $stmt->bind_param("iiissd", $user_id, $category_id, $account_id, $datetime, $description, $amount);
+    $stmt->bind_param(
+    "iiissd",
+    $user_id,
+    $category_id,
+    $account_id,   // ✅ MASUK DESTINATION
+    $datetime,
+    $description,
+    $amount
+);
+
 
     if ($stmt->execute()) {
         header("Location: records.php?added=1");
@@ -104,17 +115,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <!-- ACCOUNT + CATEGORY -->
                     <div class="row mb-4 g-3">
                         <div class="col-12 col-md-6">
+                            <label class="form-label fw-600 mb-2">Account</label>
                             <select name="account_id" class="txn-select form-select" required>
-                                
-                                <?php while ($a = $accounts->fetch_assoc()): ?>
-                                    <option value="<?= $a['account_id'] ?>"><?= $a['account_name'] ?></option>
-                                <?php endwhile; ?>
-                            </select>
+    <option value="">Select Account</option>
+    <?php
+    $accounts->data_seek(0);
+    while ($a = $accounts->fetch_assoc()):
+        $balance = getAccountBalance($conn, $user_id, $a['account_id']);
+    ?>
+        <option value="<?= $a['account_id'] ?>" data-balance="<?= number_format($balance, 2) ?>">
+            <?= htmlspecialchars($a['account_name']) ?> — RM <?= number_format($balance, 2) ?>
+        </option>
+    <?php endwhile; ?>
+</select>
                         </div>
 
                         <div class="col-12 col-md-6">
+                            <label class="form-label fw-600 mb-2">Category</label>
                             <select name="category_id" class="txn-select form-select" required>
-            
+                                <option value="">Select Category</option>
                                 <?php while ($c = $categories->fetch_assoc()): ?>
                                     <option value="<?= $c['category_id'] ?>"><?= $c['category_name'] ?></option>
                                 <?php endwhile; ?>

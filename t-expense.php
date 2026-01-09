@@ -1,6 +1,9 @@
 <?php
 session_start();
 include 'db_connection.php';
+include 'finance_helper.php';
+
+
 
 if (!isset($_SESSION['user_id'])) {
     header("Location: login.php");
@@ -40,26 +43,67 @@ $categories = $stmt_cat->get_result();
 --------------------------------------------------------- */
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
-    $account_id = $_POST['account_id'];
+    $account_id  = $_POST['account_id'];
     $category_id = $_POST['category_id'];
     $description = $_POST['description'];
-    $amount = $_POST['amount'];
-    $datetime = $_POST['datetime'];
+    $amount      = (float)$_POST['amount'];
+    $datetime    = $_POST['datetime'];
 
-    $sql_ins = "INSERT INTO transaction_table 
-        (user_id, category_id, source_account_id, destination_account_id, txn_date_time, type, description, amount)
-        VALUES (?, ?, ?, NULL, ?, 'expense', ?, ?)";
+    // 1️⃣ check balance
+    $currentBalance = getAccountBalance($conn, $user_id, $account_id);
 
-    $stmt = $conn->prepare($sql_ins);
-    $stmt->bind_param("iiissd", $user_id, $category_id, $account_id, $datetime, $description, $amount);
+    if ($amount > $currentBalance) {
+        $error = "❌ Insufficient balance. Available: RM " . number_format($currentBalance, 2);
+    }
 
-    if ($stmt->execute()) {
-        header("Location: records.php?added=1");
-        exit();
-    } else {
-        $error = "Failed to save transaction.";
+    // 2️⃣ insert expense
+    if (!isset($error)) {
+
+        $sql_ins = "
+            INSERT INTO transaction_table
+            (user_id, category_id, source_account_id, destination_account_id, txn_date_time, type, description, amount)
+            VALUES (?, ?, ?, NULL, ?, 'expense', ?, ?)
+        ";
+
+        $stmt = $conn->prepare($sql_ins);
+        $stmt->bind_param(
+            "iiissd",
+            $user_id,
+            $category_id,
+            $account_id,
+            $datetime,
+            $description,
+            $amount
+        );
+if ($stmt->execute()) {
+
+    // CHECK BUDGET AFTER INSERT
+    $budgetInfo = checkBudgetUsage(
+        $conn,
+        $user_id,
+        $category_id,
+        $datetime
+    );
+
+    if ($budgetInfo) {
+        if ($budgetInfo['percent'] >= 100) {
+            $_SESSION['budget_alert'] = 'exceed';
+        } elseif ($budgetInfo['percent'] >= 80) {
+            $_SESSION['budget_alert'] = 'warning';
+        }
+    }
+
+    header("Location: records.php?added=1");
+    exit();
+}
+
+
+
     }
 }
+
+
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -104,15 +148,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <!-- ACCOUNT + CATEGORY -->
                     <div class="row mb-4 g-3">
                         <div class="col-12 col-md-6">
+                            <label class="form-label fw-600 mb-2">Account</label>
                             <select name="account_id" class="txn-select form-select" required>
-                                <option value="">Select Account</option>
-                                <?php while ($a = $accounts->fetch_assoc()): ?>
-                                    <option value="<?= $a['account_id'] ?>"><?= $a['account_name'] ?></option>
-                                <?php endwhile; ?>
-                            </select>
+    <option value="">Select Account</option>
+    <?php
+    $accounts->data_seek(0);
+    while ($a = $accounts->fetch_assoc()):
+        $balance = getAccountBalance($conn, $user_id, $a['account_id']);
+        $balanceClass = $balance < 0 ? 'negative' : '';
+    ?>
+        <option value="<?= $a['account_id'] ?>" data-balance="<?= number_format($balance, 2) ?>">
+            <?= htmlspecialchars($a['account_name']) ?> — RM <?= number_format($balance, 2) ?>
+        </option>
+    <?php endwhile; ?>
+</select>
+
                         </div>
 
                         <div class="col-12 col-md-6">
+                            <label class="form-label fw-600 mb-2">Category</label>
                             <select name="category_id" class="txn-select form-select" required>
                                 <option value="">Select Category</option>
                                 <?php while ($c = $categories->fetch_assoc()): ?>

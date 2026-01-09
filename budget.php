@@ -161,41 +161,83 @@ if (isset($_GET['remove'])) {
             </form>
         </div>
 
-        <!-- BUDGETED CATEGORIES -->
-        <?php while ($b = $budgeted->fetch_assoc()): ?>
-            <?php 
-                $remaining = $b['limit_amount'] - $b['spent'];
-                $percent = ($b['limit_amount'] > 0) 
-                    ? min(100, ($b['spent'] / $b['limit_amount']) * 100)
-                    : 0;
-            ?>
+       <!-- BUDGETED CATEGORIES -->
+<?php while ($b = $budgeted->fetch_assoc()): ?>
 
-            <div class="budget-item">
-                <div class="budget-info">
-                    <strong><?= $b['category_name'] ?></strong><br>
-                    <span class="budget-details">Limit: RM <?= number_format($b['limit_amount'], 2) ?></span><br>
-                    <span class="budget-details">Spent: RM <?= number_format($b['spent'], 2) ?></span><br>
-                    <span class="budget-details">Remaining: RM <?= number_format($remaining, 2) ?></span>
+    <?php
+        $remaining = $b['limit_amount'] - $b['spent'];
+
+        $percent_raw = ($b['limit_amount'] > 0)
+            ? ($b['spent'] / $b['limit_amount']) * 100
+            : 0;
+
+        $percent = min(100, $percent_raw);
+
+        $show_warning = ($percent_raw >= 80 && $percent_raw < 100);
+        $is_over = ($percent_raw >= 100);
+    ?>
+
+    <div class="budget-item">
+        <div class="budget-info">
+
+            <strong><?= htmlspecialchars($b['category_name']) ?></strong><br>
+
+            <?php if ($show_warning): ?>
+                <div class="budget-warning">
+                    ⚠️ You’ve used <?= round($percent_raw) ?>% of this budget
                 </div>
+            <?php endif; ?>
 
-                <div class="menu-container">
-                    <button class="menu-button" onclick="toggleMenu(this)">•••</button>
-
-                    <div class="menu-box">
-                        <a href="#" class="menu-item edit-btn"
-                           onclick="openEditModal(<?= $b['budget_id'] ?>, '<?= $b['category_name'] ?>', <?= $b['limit_amount'] ?>); return false;">Change limit</a>
-
-                        <a href="budget.php?remove=<?= $b['budget_id'] ?>" class="menu-item" onclick="return confirm('Are you sure you want to remove this budget?');">Remove budget</a>
-                    </div>
+            <?php if ($is_over): ?>
+                <div class="budget-warning danger">
+                    ❌ Budget exceeded
                 </div>
-            </div>
+            <?php endif; ?>
 
-            <!-- GREEN PROGRESS BAR -->
-            <div class="limit-bar">
-                <div class="limit-bar-fill" style="width: <?= $percent ?>%;"></div>
-            </div>
+            <span class="budget-details">
+                Limit: RM <?= number_format($b['limit_amount'], 2) ?>
+            </span><br>
 
-        <?php endwhile; ?>
+            <span class="budget-details">
+                Spent: RM <?= number_format($b['spent'], 2) ?>
+            </span><br>
+
+            <span class="budget-details">
+                Remaining: RM <?= number_format($remaining, 2) ?>
+            </span>
+        </div>
+
+        <div class="menu-container">
+            <button class="menu-button" onclick="toggleMenu(this)">•••</button>
+
+            <div class="menu-box">
+                <a href="#"
+                   class="menu-item edit-btn"
+                   onclick="openEditModal(
+                        <?= $b['budget_id'] ?>,
+                        '<?= htmlspecialchars($b['category_name']) ?>',
+                        <?= $b['limit_amount'] ?>
+                   ); return false;">
+                   Change limit
+                </a>
+
+                <a href="budget.php?remove=<?= $b['budget_id'] ?>"
+                   class="menu-item"
+                   onclick="return confirm('Remove this budget?');">
+                   Remove budget
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="limit-bar">
+        <div class="limit-bar-fill <?= $is_over ? 'over' : '' ?>"
+             style="width: <?= $percent ?>%;">
+        </div>
+    </div>
+
+<?php endwhile; ?>
+
 
         <!-- NON-BUDGETED CATEGORIES -->
         <h5 class="budget-section-title mt-5 mb-3">Not budgeted this month</h5>
@@ -240,7 +282,7 @@ if (isset($_GET['remove'])) {
                     
                     <div class="mb-4">
                         <label for="set_limit" class="form-label-budget">Limit</label>
-                        <input type="number" step="0.01" class="form-control-budget" name="limit_amount" id="set_limit" placeholder="200" required>
+                        <input type="number" step="0.01" class="form-control-budget" name="limit_amount" id="set_limit" placeholder="Set your budget limit" required>
                     </div>
                     
                     <button type="submit" class="btn-save-budget">Save</button>

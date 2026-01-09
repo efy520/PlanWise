@@ -1,6 +1,9 @@
 <?php
 session_start();
 include 'db_connection.php';
+include 'finance_helper.php';
+
+
 
 if (!isset($_SESSION['user_id'])) {
     header("Location: login.php");
@@ -36,33 +39,45 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $amount = $_POST['amount'];
     $datetime = $_POST['datetime'];
 
-    // prevent transferring to same account
-    if ($source_account_id == $destination_account_id) {
-        $error = "Source and destination accounts cannot be the same.";
+// 1️⃣ Block same account
+if ($source_account_id === $destination_account_id) {
+    $error = "Source and destination accounts cannot be the same.";
+}
+
+// 2️⃣ Check balance (INI PALING PENTING)
+$sourceBalance = getAccountBalance($conn, $user_id, $source_account_id);
+
+if ($amount > $sourceBalance) {
+    $error = "❌ Insufficient balance. Available: RM " . number_format($sourceBalance, 2);
+}
+
+   if (!isset($error)) {
+
+    $sql_ins = "
+        INSERT INTO transaction_table
+        (user_id, source_account_id, destination_account_id, txn_date_time, type, description, amount)
+        VALUES (?, ?, ?, ?, 'transfer', ?, ?)
+    ";
+
+    $stmt = $conn->prepare($sql_ins);
+    $stmt->bind_param(
+        "iiissd",
+        $user_id,
+        $source_account_id,
+        $destination_account_id,
+        $datetime,
+        $description,
+        $amount
+    );
+
+    if ($stmt->execute()) {
+        header("Location: records.php?added=1");
+        exit();
     } else {
-
-        $sql_ins = "INSERT INTO transaction_table 
-            (user_id, category_id, source_account_id, destination_account_id, txn_date_time, type, description, amount)
-            VALUES (?, NULL, ?, ?, ?, 'transfer', ?, ?)";
-
-        $stmt = $conn->prepare($sql_ins);
-        $stmt->bind_param(
-            "iiissd",
-            $user_id,
-            $source_account_id,
-            $destination_account_id,
-            $datetime,
-            $description,
-            $amount
-        );
-
-        if ($stmt->execute()) {
-            header("Location: records.php?added=1");
-            exit();
-        } else {
-            $error = "Failed to save transfer.";
-        }
+        $error = "Failed to save transfer.";
     }
+}
+
 }
 ?>
 <!DOCTYPE html>
@@ -111,29 +126,35 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <!-- FROM ACCOUNT + TO ACCOUNT -->
                     <div class="row mb-4 g-3">
                         <div class="col-12 col-md-6">
-                            <label class="form-label" style="margin-bottom: 8px; font-size: 14px; color: #666;">From</label>
+                            <label class="form-label fw-600 mb-2">From Account</label>
                             <select name="source_account_id" class="txn-select form-select" required>
-                                <option value="">Select Account</option>
-                                <?php 
-                                    $accounts->data_seek(0);
-                                    while ($a = $accounts->fetch_assoc()): 
-                                ?>
-                                    <option value="<?= $a['account_id'] ?>"><?= $a['account_name'] ?></option>
-                                <?php endwhile; ?>
-                            </select>
+    <option value="">Select Account</option>
+    <?php
+    $accounts->data_seek(0);
+    while ($a = $accounts->fetch_assoc()):
+        $balance = getAccountBalance($conn, $user_id, $a['account_id']);
+    ?>
+        <option value="<?= $a['account_id'] ?>" data-balance="<?= number_format($balance, 2) ?>">
+            <?= htmlspecialchars($a['account_name']) ?> — RM <?= number_format($balance, 2) ?>
+        </option>
+    <?php endwhile; ?>
+</select>
                         </div>
 
                         <div class="col-12 col-md-6">
-                            <label class="form-label" style="margin-bottom: 8px; font-size: 14px; color: #666;">To</label>
+                            <label class="form-label fw-600 mb-2">To Account</label>
                             <select name="destination_account_id" class="txn-select form-select" required>
-                                <option value="">Select Account</option>
-                                <?php 
-                                    $accounts->data_seek(0);
-                                    while ($a = $accounts->fetch_assoc()): 
-                                ?>
-                                    <option value="<?= $a['account_id'] ?>"><?= $a['account_name'] ?></option>
-                                <?php endwhile; ?>
-                            </select>
+    <option value="">Select Account</option>
+    <?php
+    $accounts->data_seek(0);
+    while ($a = $accounts->fetch_assoc()):
+        $balance = getAccountBalance($conn, $user_id, $a['account_id']);
+    ?>
+        <option value="<?= $a['account_id'] ?>" data-balance="<?= number_format($balance, 2) ?>">
+            <?= htmlspecialchars($a['account_name']) ?> — RM <?= number_format($balance, 2) ?>
+        </option>
+    <?php endwhile; ?>
+</select>
                         </div>
                     </div>
 

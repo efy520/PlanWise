@@ -1,5 +1,6 @@
 <?php
 session_start();
+
 include 'db_connection.php';
 
 // -------------------------------------------
@@ -600,6 +601,41 @@ function deleteTransaction() {
     deleteModal.show();
 }
 </script>
+<?php if (isset($_SESSION['budget_alert'])): ?>
+<div class="modal fade" id="budgetModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
 
+      <div class="modal-header">
+        <h5 class="modal-title">
+            <?= $_SESSION['budget_alert'] == 'exceed'
+                ? '🚨 Budget Exceeded'
+                : '⚠️ Budget Warning' ?>
+        </h5>
+      </div>
+
+      <div class="modal-body">
+        <?= $_SESSION['budget_alert'] == 'exceed'
+            ? 'You have exceeded your budget for this category.'
+            : 'You have used more than 80% of your budget.' ?>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-primary" data-bs-dismiss="modal">OK</button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    new bootstrap.Modal(document.getElementById('budgetModal')).show();
+});
+</script>
+
+<?php unset($_SESSION['budget_alert']); endif; ?>
 </body>
+
+
 </html>
