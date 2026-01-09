@@ -14,7 +14,8 @@ if (!isset($_SESSION['user_id'])) {
 $user_id = $_SESSION['user_id'];
 
 // Fetch user details
-$sql = "SELECT username, email, phone, gender FROM users WHERE user_id = ?";
+$sql = "SELECT username, email, phone, gender, age FROM users WHERE user_id = ?";
+
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("i", $user_id);
 $stmt->execute();
@@ -90,6 +91,23 @@ if (isset($_GET['logout'])) {
                 </div>
             </div>
             
+            <!-- Age -->
+<div class="mb-3">
+    <label class="form-label-profile">Age</label>
+    <div class="input-with-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#9095A0" stroke-width="2">
+            <circle cx="12" cy="12" r="10"></circle>
+            <path d="M12 6v6l4 2"></path>
+        </svg>
+        <input 
+            type="text" 
+            class="form-control-profile" 
+            value="<?= htmlspecialchars($user['age']) ?> years old" 
+            readonly
+        >
+    </div>
+</div>
+
             <!-- Gender -->
             <div class="mb-4">
                 <label class="form-label-profile">Gender</label>

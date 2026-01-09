@@ -149,9 +149,16 @@ if ($username === '$admin' && $password === 'admin') {
                                     <circle cx="12" cy="12" r="3"></circle>
                                 </svg>
                             </span>
+                            
+    
+
                         </div>
                     </div>
-
+                        <div class="text-end mb-3">
+    <a href="forgot-password.php" class="forgot-link">
+        Forgot password?
+    </a>
+</div>
                     <button type="submit" class=" btn-login w-100">Continue</button>
 
                 </form>

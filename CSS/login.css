@@ -105,9 +105,17 @@ body {
     padding: 10px 14px;
     cursor: pointer;
 }
-
+/* forgot password */
 .input-group:focus-within .form-control {
     border-color: #7B542F !important;
+}
+.forgot-link {
+    font-size: 14px;
+    color: #6c757d;
+    text-decoration: none;
+}
+.forgot-link:hover {
+    text-decoration: underline;
 }
 
 /* Login Button */

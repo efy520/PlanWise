@@ -1,6 +1,27 @@
 <?php
 session_start();
 include 'db_connection.php';
+$sort = $_GET['sort'] ?? '';
+
+$orderBy = "created_date DESC"; // default: latest user
+
+switch ($sort) {
+    case 'age_asc':
+        $orderBy = "age ASC";
+        break;
+
+    case 'age_desc':
+        $orderBy = "age DESC";
+        break;
+
+    case 'latest':
+        $orderBy = "created_date DESC";
+        break;
+
+    case 'oldest':
+        $orderBy = "created_date ASC";
+        break;
+}
 
 // TEMP: hardcoded admin access
 $is_admin = true;
@@ -17,9 +38,13 @@ if (isset($_GET['logout'])) {
 }
 
 // Fetch users
-$sql = "SELECT username, email, phone, gender, created_date 
-        FROM users 
-        ORDER BY created_date DESC";
+$sql = "
+    SELECT username, email, phone, gender, age, created_date
+    FROM users
+    ORDER BY $orderBy
+";
+
+
 $result = $conn->query($sql);
 
 $users = [];
@@ -42,6 +67,8 @@ $stats = $conn->query($sql_stats)->fetch_assoc();
 $total_users  = $stats['total_users'] ?? 0;
 $total_male   = $stats['total_male'] ?? 0;
 $total_female = $stats['total_female'] ?? 0;
+
+
 ?>
 
 <!DOCTYPE html>
@@ -119,17 +146,37 @@ $total_female = $stats['total_female'] ?? 0;
         </div>
 
         <!-- TABLE -->
+        <p class="text-muted d-flex align-items-center gap-2">
+    Sort users by age or registration date using the arrows
+    <a href="user-detail.php" class="btn btn-sm btn-outline-secondary">
+        Clear filter
+    </a>
+</p>
+
+
         <div class="users-table-container">
             <table class="users-table" id="usersTable">
                 <thead>
-                    <tr>
-                        <th>User</th>
-                        <th>Email</th>
-                        <th>Phone</th>
-                        <th>Gender</th>
-                        <th>Created date</th>
-                    </tr>
-                </thead>
+    <tr>
+        <th>User</th>
+        <th>Email</th>
+        <th>Phone</th>
+        <th>Gender</th>
+        <th>
+    Age
+    <a href="?sort=age_asc">▲</a>
+    <a href="?sort=age_desc">▼</a>
+</th>
+
+        <th>
+    Created Date
+    <a href="?sort=latest">▲</a>
+    <a href="?sort=oldest">▼</a>
+</th>
+
+    </tr>
+</thead>
+
                 <tbody>
                 <?php foreach ($users as $u): ?>
                     <tr>
@@ -137,6 +184,7 @@ $total_female = $stats['total_female'] ?? 0;
                         <td><?= htmlspecialchars($u['email']) ?></td>
                         <td><?= htmlspecialchars($u['phone']) ?></td>
                         <td><?= ucfirst($u['gender'] ?? 'Unknown') ?></td>
+                        <td><?= $u['age'] ? $u['age'] . ' yrs' : '-' ?></td>
                         <td><?= date('d/m/Y', strtotime($u['created_date'])) ?></td>
                     </tr>
                 <?php endforeach; ?>
@@ -159,16 +207,22 @@ function exportToPDF() {
     doc.text("Generated on: " + new Date().toLocaleDateString(), 14, 26);
 
     const table = document.getElementById("usersTable");
-    const headers = [];
-    const rows = [];
 
-    table.querySelectorAll("thead th").forEach(th => {
-        headers.push(th.textContent.trim());
-    });
+    // ✅ HEADER HARDCODE (UI-INDEPENDENT)
+    const headers = [
+        "User",
+        "Email",
+        "Phone",
+        "Gender",
+        "Age",
+        "Created Date"
+    ];
+
+    const rows = [];
 
     table.querySelectorAll("tbody tr").forEach(tr => {
         const row = [];
-        tr.querySelectorAll("td").forEach((td, i) => {
+        tr.querySelectorAll("td").forEach(td => {
             row.push(td.textContent.trim());
         });
         rows.push(row);
@@ -179,17 +233,11 @@ function exportToPDF() {
         body: rows,
         startY: 32,
         theme: "grid",
-
         styles: {
             fontSize: 10,
             cellPadding: 2,
-            valign: "top" // 🔥 IMPORTANT
+            valign: "top"
         },
-
-        columnStyles: {
-            3: { cellWidth: 22, valign: "top" } // Gender column
-        },
-
         headStyles: {
             fillColor: [167, 39, 3],
             textColor: 255,
@@ -200,6 +248,7 @@ function exportToPDF() {
     doc.save("user-details.pdf");
 }
 </script>
+
 
 </body>
 </html>

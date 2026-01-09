@@ -1,6 +1,31 @@
 <?php
 session_start();
 include 'db_connection.php';
+function getGenderFromIC($ic) {
+    $lastDigit = (int) substr(str_replace('-', '', $ic), -1);
+    return ($lastDigit % 2 === 0) ? 'female' : 'male';
+}
+
+function getAgeFromIC($ic) {
+    $ic = str_replace('-', '', $ic);
+
+    $yy = (int) substr($ic, 0, 2);
+    $mm = (int) substr($ic, 2, 2);
+    $dd = (int) substr($ic, 4, 2);
+
+    $birthYear = ($yy > (int)date('y')) ? 1900 + $yy : 2000 + $yy;
+
+    // 🔥 VALIDATE TARIKH
+    if (!checkdate($mm, $dd, $birthYear)) {
+        return false; // tarikh tak sah
+    }
+
+    $birthDate = new DateTime("$birthYear-$mm-$dd");
+    $today = new DateTime();
+
+    return $today->diff($birthDate)->y;
+}
+
 
 $error_message = "";
 
@@ -34,25 +59,79 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     $username = trim($_POST['username']);
     $phone = trim($_POST['phone']);
+    if (!preg_match('/^\d{10}$/', $phone)) {
+    $error_message = "Invalid Malaysian phone number. It should be 10 digits.";
+}
+
+    $ic = trim($_POST['ic']);
     $email = trim($_POST['email']);
     $password = trim($_POST['password']);
-    $gender = $_POST['gender'];
+    $security_question = trim($_POST['question']);
+$security_answer   = trim($_POST['answer']);
+
+if (empty($security_question) || empty($security_answer)) {
+    $error_message = "Security question and answer are required.";
+}
+
+    if (!preg_match('/^\d{6}-\d{2}-\d{4}$/', $ic)) {
+    $error_message = "Invalid IC format. Use XXXXXX-XX-XXXX.";
+}
+
+if (empty($error_message)) {
+    $gender  = getGenderFromIC($ic);
+    $age = getAgeFromIC($ic);
+
+if ($age === false) {
+    $error_message = "IC number contains invalid birth date.";
+}
+
+    $ic_hash = password_hash($ic, PASSWORD_DEFAULT);
+    // 🔥 SECURITY ANSWER HASH
+    $security_answer_hash = password_hash($security_answer, PASSWORD_DEFAULT);
+}
+
+
 
     // Validate simple required fields
-    if (!empty($username) && !empty($phone) && !empty($email) && !empty($password)) {
+   if (
+    empty($error_message) &&
+    !empty($username) &&
+    !empty($phone) &&
+    !empty($ic) &&
+    !empty($email) &&
+    !empty($password)
+)
+ {
 
         // Hash password
         $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
 
         // Default role: normal user
-        $role = "normal user";
+        $role = "normal";
 
         // Insert into DB
-        $sql = "INSERT INTO users (email, username, password, gender, phone, role, created_date) 
-                VALUES (?, ?, ?, ?, ?, ?, NOW())";
+        $sql = "INSERT INTO users 
+(email, username, password, gender, age, ic_hash, security_question, security_answer_hash, phone, role, created_date)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())
+
+";
 
         $stmt = $conn->prepare($sql);
-        $stmt->bind_param("ssssss", $email, $username, $hashedPassword, $gender, $phone, $role);
+       $stmt->bind_param(
+    "ssssisssss",
+    $email,
+    $username,
+    $hashedPassword,
+    $gender,
+    $age,
+    $ic_hash,
+    $security_question,
+    $security_answer_hash,
+    $phone,
+    $role
+);
+
+
 
         try {
             if ($stmt->execute()) {
@@ -74,10 +153,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             }
         }
 
-    } else {
-        $error_message = "All fields are required.";
-    }
+    } elseif (empty($error_message)) {
+    $error_message = "All fields are required.";
 }
+
+}
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -119,8 +200,34 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
                     <div class="mb-3">
                         <label for="phone" class="form-label">Phone</label>
-                        <input type="tel" class="form-control" id="phone" name="phone" required>
+                        <input
+    type="tel"
+    class="form-control"
+    id="phone"
+    name="phone"
+    required
+    pattern="\d{10}"
+    maxlength="10"
+    inputmode="numeric"
+    placeholder="e.g. 0123456789"
+    oninput="this.value = this.value.replace(/[^0-9]/g, '')"
+/>
                     </div>
+<div class="mb-3">
+    
+<label for="ic" class="form-label">IC Number</label>
+   <input
+    type="text"
+    class="form-control"
+    id="ic"
+    name="ic"
+    placeholder="e.g. 050101-03-0109"
+    maxlength="14"
+    required
+    oninput="formatIC(this)"
+>
+
+</div>
 
                     <div class="mb-3">
                         <label for="email" class="form-label">Email</label>
@@ -137,21 +244,18 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         </div>
                     </div>
 
-                    <div class="mb-4">
-                        <label class="form-label d-block">Gender</label>
-                        <div class="d-flex gap-5">
-                            <div class="form-check">
-                                <input class="form-check-input" type="radio" name="gender" id="male" value="male" required>
-                                <label class="form-check-label" for="male">Male</label>
-                            </div>
+                     <div class="mb-3">
+                    <label>Security Question</label>
+<select name="question" class="form-control" required>
+    <option value="">-- Select a question --</option>
+    <option value="What is your favourite food?">What is your favourite food?</option>
+    <option value="What is your favourite color?">What is your favourite color?</option>
+</select>
 
-                            <div class="form-check">
-                                <input class="form-check-input" type="radio" name="gender" id="female" value="female" required>
-                                <label class="form-check-label" for="female">Female</label>
-                            </div>
-                        </div>
-                    </div>
 
+<label>Answer</label>
+<input type="text" name="answer" class="form-control" required>
+</div>
                     <button type="submit" class="btn btn-signup w-100 mb-4">Sign up</button>
 
                     <p class="text-center login-link">
@@ -171,7 +275,27 @@ function togglePassword() {
     const passwordInput = document.getElementById('password');
     passwordInput.type = (passwordInput.type === 'password') ? 'text' : 'password';
 }
+
+function formatIC(input) {
+    // buang semua bukan nombor
+    let value = input.value.replace(/\D/g, '');
+
+    // max 12 digit sahaja
+    if (value.length > 12) {
+        value = value.slice(0, 12);
+    }
+
+    // format ikut panjang
+    if (value.length > 6 && value.length <= 8) {
+        value = value.slice(0,6) + '-' + value.slice(6);
+    } else if (value.length > 8) {
+        value = value.slice(0,6) + '-' + value.slice(6,8) + '-' + value.slice(8);
+    }
+
+    input.value = value;
+}
 </script>
+
 
 </body>
 </html>
