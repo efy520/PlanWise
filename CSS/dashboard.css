@@ -301,6 +301,47 @@ body {
     color: #9095A0;
     margin: 0;
 }
+.section-title {
+    font-weight: 600;
+    margin-bottom: 20px;
+    color: #2C2C2C;
+}
+
+.kpi-task {
+    grid-template-columns: repeat(4, 1fr);
+}
+
+.kpi-finance {
+    grid-template-columns: repeat(2, 1fr);
+}
+
+.dashboard-tabs {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 25px;
+}
+
+.dash-tab {
+    padding: 8px 20px;
+    border-radius: 20px;
+    border: none;
+    background: #eee;
+    font-weight: 500;
+    cursor: pointer;
+}
+
+.dash-tab.active {
+    background: #4D2B8C;
+    color: white;
+}
+
+.dash-content {
+    display: none;
+}
+
+.dash-content.active {
+    display: block;
+}
 
 /* ==========================================
    RESPONSIVE DESIGN
@@ -379,6 +420,7 @@ body {
         font-size: 13px;
     }
 }
+
 
 @media (max-width: 480px) {
     .content-box {

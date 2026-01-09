@@ -183,11 +183,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['complete_task_id'])) 
         <!-- DASHBOARD HEADER -->
         <div class="dashboard-header">
             <h2 class="dashboard-title">Welcome Back! 👋</h2>
-            <p class="dashboard-subtitle">Here's your overview for <?= date('F Y') ?></p>
-        </div>
+            
+            
+            <div class="dashboard-tabs">
+    <button class="dash-tab active" data-tab="tasks">Tasks</button>
+    <button class="dash-tab" data-tab="finance">Finance</button>
+</div>
 
-        <!-- KPI CARDS -->
-        <div class="kpi-grid">
+        </div>
+<div id="tab-tasks" class="dash-content active">
+        <!-- KPI CARDS - TASK OVERVIEW -->
+        <h3 class="section-title">Task Overview</h3>
+        <div class="kpi-grid kpi-task">
             <div class="kpi-card task-card">
                 <div class="kpi-icon">📋</div>
                 <div class="kpi-content">
@@ -219,7 +226,39 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['complete_task_id'])) 
                     <h3 class="kpi-value"><?= $taskCounts['overdue'] ?></h3>
                 </div>
             </div>
-
+        </div>
+            
+        <!-- UPCOMING TASKS -->
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="upcoming-card">
+                    <h4 class="upcoming-title">Upcoming Tasks</h4>
+                    <div class="upcoming-list">
+                        <?php if (count($upcomingTasks) > 0): ?>
+                            <?php foreach ($upcomingTasks as $t): ?>
+                                <form method="POST" class="upcoming-item">
+                                    <div class="upcoming-check">
+                                        <input type="checkbox" class="form-check-input" onchange="this.form.submit()" title="Mark as completed">
+                                        <input type="hidden" name="complete_task_id" value="<?= $t['task_id'] ?>">
+                                    </div>
+                                    <div class="upcoming-content">
+                                        <p class="upcoming-task"><?= htmlspecialchars($t['title']) ?></p>
+                                        <p class="upcoming-due">Due: <?= date('M d, Y', strtotime($t['due_date'])) ?></p>
+                                    </div>
+                                </form>
+                            <?php endforeach; ?>
+                        <?php else: ?>
+                            <p class="text-muted text-center py-4">No upcoming tasks</p>
+                        <?php endif; ?>
+                    </div>
+                </div>
+            </div>
+        </div>
+</div>
+        <!-- KPI CARDS - FINANCE OVERVIEW -->
+         <div id="tab-finance" class="dash-content">
+        <h3 class="section-title mt-5">Finance Overview for <?= date('F Y') ?></h3>
+        <div class="kpi-grid kpi-finance">
             <div class="kpi-card expense-card">
                 <div class="kpi-icon">💸</div>
                 <div class="kpi-content">
@@ -287,37 +326,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['complete_task_id'])) 
 
         </div>
 
-        <!-- UPCOMING TASKS -->
-        <div class="row mt-4">
-            <div class="col-12">
-                <div class="upcoming-card">
-                    <h4 class="upcoming-title">Upcoming Tasks</h4>
-                    <div class="upcoming-list">
-                        <?php if (count($upcomingTasks) > 0): ?>
-                            <?php foreach ($upcomingTasks as $t): ?>
-                                <form method="POST" class="upcoming-item">
-                                    <div class="upcoming-check">
-                                        <input type="checkbox" class="form-check-input" onchange="this.form.submit()" title="Mark as completed">
-                                        <input type="hidden" name="complete_task_id" value="<?= $t['task_id'] ?>">
-                                    </div>
-                                    <div class="upcoming-content">
-                                        <p class="upcoming-task"><?= htmlspecialchars($t['title']) ?></p>
-                                        <p class="upcoming-due">Due: <?= date('M d, Y', strtotime($t['due_date'])) ?></p>
-                                    </div>
-                                </form>
-                            <?php endforeach; ?>
-                        <?php else: ?>
-                            <p class="text-muted text-center py-4">No upcoming tasks</p>
-                        <?php endif; ?>
-                    </div>
-                </div>
-            </div>
-        </div>
+        
 
     </div>
 
 </div>
-
+</div>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
 // Expense Chart
@@ -333,14 +347,14 @@ if (ctx) {
                 datasets: [{
                     data: <?= json_encode($categoryAmounts) ?>,
                     backgroundColor: [
-                        '#FFC9BA',
-                        '#FFB399',
-                        '#FF9D83',
-                        '#FF876D',
-                        '#FF7157',
-                        '#84994F',
-                        '#A72703',
-                        '#D4AF37'
+                        '#4D2B8C',
+                        '#85409D',
+                        '#EEA727',
+                        '#FFEF5F',
+                        '#9929EA',
+                        '#FF5FCF',
+                        '#08CB00',
+                        '#FAEB92'
                     ],
                     borderColor: '#FFF',
                     borderWidth: 2
@@ -379,6 +393,20 @@ if (ctx) {
         });
     }
 }
+
+document.querySelectorAll('.dash-tab').forEach(btn => {
+    btn.addEventListener('click', () => {
+
+        // switch active button
+        document.querySelectorAll('.dash-tab').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+
+        // switch content
+        document.querySelectorAll('.dash-content').forEach(c => c.classList.remove('active'));
+        document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
+    });
+});
+
 </script>
 
 </body>
