@@ -151,6 +151,11 @@ body {
 /* ==========================================
    KPI GRID
    ========================================== */
+.section-title {
+  font-weight: 600;
+  margin-bottom: 12px;
+  color: #333;
+}
 
 .kpi-grid {
     display: grid;

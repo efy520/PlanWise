@@ -86,24 +86,55 @@ $most_active_count = $most_active['task_count'] ?? 0;
 $sql = "SELECT COUNT(*) AS total_quotes FROM quote";
 $result = $conn->query($sql);
 $total_quotes = $result->fetch_assoc()['total_quotes'];
+// KPI: ACTIVE QUOTES
+$sql = "SELECT COUNT(*) AS active_quotes FROM quote WHERE is_active = 1";
+$result = $conn->query($sql);
+$active_quotes = $result->fetch_assoc()['active_quotes'];
+
 
 // ============================================
 // CHART DATA: TASK STATUS DISTRIBUTION
 // ============================================
 $sql = "
-    SELECT 
-        status,
-        COUNT(*) AS count
-    FROM task
-    GROUP BY status
+    SELECT
+    SUM(
+        CASE 
+            WHEN status = 'completed' THEN 1
+            ELSE 0
+        END
+    ) AS completed,
+
+    SUM(
+        CASE 
+            WHEN status = 'in progress'
+             AND due_date >= CURDATE()
+            THEN 1
+            ELSE 0
+        END
+    ) AS in_progress,
+
+    SUM(
+        CASE 
+            WHEN status = 'in progress'
+             AND due_date < CURDATE()
+            THEN 1
+            ELSE 0
+        END
+    ) AS overdue
+
+FROM task;
+
 ";
 $result = $conn->query($sql);
-$task_statuses = [];
-$task_status_counts = [];
-while ($row = $result->fetch_assoc()) {
-    $task_statuses[] = ucfirst($row['status']);
-    $task_status_counts[] = $row['count'];
-}
+$row = $result->fetch_assoc();
+
+$task_statuses = ['Completed', 'In Progress', 'Overdue'];
+$task_status_counts = [
+    (int)$row['completed'],
+    (int)$row['in_progress'],
+    (int)$row['overdue']
+];
+
 
 // ============================================
 // CHART DATA: TOP 5 EXPENSE CATEGORIES
@@ -148,6 +179,8 @@ $sql = "
 ";
 $result = $conn->query($sql);
 $recent_activities = $result->fetch_all(MYSQLI_ASSOC);
+
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -208,8 +241,9 @@ $recent_activities = $result->fetch_all(MYSQLI_ASSOC);
         </div>
 
         <!-- KPI CARDS -->
-        <div class="kpi-grid">
-            
+      
+            <h3 class="section-title">Task & User Analytics</h3>
+<div class="kpi-grid kpi-task">
             <!-- Card 1: Total Users -->
             <div class="kpi-card users-card">
                 <div class="kpi-icon">👥</div>
@@ -240,15 +274,7 @@ $recent_activities = $result->fetch_all(MYSQLI_ASSOC);
                 </div>
             </div>
 
-            <!-- Card 4: Total Expense -->
-            <div class="kpi-card expense-card">
-                <div class="kpi-icon">💸</div>
-                <div class="kpi-info">
-                    <p class="kpi-label">This Month Expense</p>
-                    <h3 class="kpi-value">RM <?= number_format($total_expense, 2) ?></h3>
-                    <p class="kpi-subtitle"><?= date('F Y') ?></p>
-                </div>
-            </div>
+            
 
             <!-- Card 5: Most Active User -->
             <div class="kpi-card active-user-card">
@@ -259,19 +285,9 @@ $recent_activities = $result->fetch_all(MYSQLI_ASSOC);
                     <p class="kpi-subtitle"><?= $most_active_count ?> Tasks Created</p>
                 </div>
             </div>
+</div>
 
-            <!-- Card 6: Total Quotes -->
-            <div class="kpi-card quotes-card">
-                <div class="kpi-icon">💬</div>
-                <div class="kpi-info">
-                    <p class="kpi-label">Total Quotes</p>
-                    <h3 class="kpi-value"><?= $total_quotes ?></h3>
-                    <p class="kpi-subtitle">Motivational Quotes</p>
-                </div>
-            </div>
-        </div>
-
-        <!-- CHARTS ROW -->
+        <!-- CHARTS ROW TASK -->
         <div class="charts-row">
             
             <!-- Task Status Distribution Chart -->
@@ -285,7 +301,24 @@ $recent_activities = $result->fetch_all(MYSQLI_ASSOC);
                     <?php endif; ?>
                 </div>
             </div>
+</div>
 
+        <!-- FINANCE OVERVIEW -->
+<h3 class="section-title mt-4">Finance Analytics</h3>
+<div class="kpi-grid kpi-finance">
+<!-- Card 4: Total Expense -->
+            <div class="kpi-card expense-card">
+                <div class="kpi-icon">💸</div>
+                <div class="kpi-info">
+                    <p class="kpi-label">This Month Expense</p>
+                    <h3 class="kpi-value">RM <?= number_format($total_expense, 2) ?></h3>
+                    <p class="kpi-subtitle"><?= date('F Y') ?></p>
+                </div>
+            </div>
+</div>
+  <!-- CHARTS ROW EXPENSE -->
+        <div class="charts-row">
+            
             <!-- Top Expense Categories Chart -->
             <div class="chart-card">
                 <h4 class="chart-title">Top Expense Categories (This Month)</h4>
@@ -298,7 +331,8 @@ $recent_activities = $result->fetch_all(MYSQLI_ASSOC);
                 </div>
             </div>
         </div>
-
+        
+      
         <!-- RECENT ACTIVITIES -->
         <div class="activity-card">
             <h4 class="activity-title">Recent Transactions</h4>
@@ -327,6 +361,32 @@ $recent_activities = $result->fetch_all(MYSQLI_ASSOC);
             </div>
         </div>
 
+        <!-- SYSTEM CONTENT KPI -->
+<h3 class="section-title mt-5">System Content</h3>
+
+<div class="kpi-grid kpi-system">
+    <!-- Total Quotes -->
+<div class="kpi-card quotes-card">
+    <div class="kpi-icon">💬</div>
+    <div class="kpi-info">
+        <p class="kpi-label">Total Quotes</p>
+        <h3 class="kpi-value"><?= $total_quotes ?></h3>
+        <p class="kpi-subtitle">Quotes in System</p>
+    </div>
+</div>
+
+<!-- Active Quotes -->
+<div class="kpi-card quotes-card">
+    <div class="kpi-icon">🟢</div>
+    <div class="kpi-info">
+        <p class="kpi-label">Active Quotes</p>
+        <h3 class="kpi-value"><?= $active_quotes ?></h3>
+        <p class="kpi-subtitle">Displayed to Users</p>
+    </div>
+</div>
+
+</div>
+
     </div>
 
 </div>
@@ -341,15 +401,16 @@ if (taskStatusCtx) {
         data: {
             labels: <?= json_encode($task_statuses) ?>,
             datasets: [{
-                data: <?= json_encode($task_status_counts) ?>,
-                backgroundColor: [
-                    '#84994F',
-                    '#2196F3',
-                    '#FFA500'
-                ],
-                borderColor: '#FFF',
-                borderWidth: 2
-            }]
+    data: <?= json_encode($task_status_counts) ?>,
+    backgroundColor: [
+        '#3b8e48ff', // Completed
+        '#2196F3', // In Progress
+        '#E53935'  // Overdue
+    ],
+    borderColor: '#FFF',
+    borderWidth: 2
+}]
+
         },
         options: {
             responsive: true,
