@@ -114,3 +114,50 @@ body {
 .type-transfer {
     color: #2E5AAC;
 }
+/* ===============================
+   BUDGET WARNING MODAL
+================================ */
+
+.budget-modal {
+    border-radius: 14px;
+    padding: 10px;
+}
+
+.budget-warning {
+    border-top: 6px solid #F7B500;
+}
+
+.budget-danger {
+    border-top: 6px solid #E53935;
+}
+
+.budget-icon {
+    font-size: 48px;
+    margin-bottom: 10px;
+}
+
+.budget-text {
+    font-size: 16px;
+    font-weight: 500;
+    color: #171A1F;
+}
+
+.budget-warning .budget-text {
+    color: #8A6D00;
+}
+
+.budget-danger .budget-text {
+    color: #B71C1C;
+}
+
+.budget-btn {
+    padding: 8px 24px;
+    border-radius: 20px;
+    border: none;
+    color: #fff;
+    background: #84994F;
+}
+
+.budget-danger .budget-btn {
+    background: #E53935;
+}

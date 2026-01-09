@@ -140,27 +140,31 @@ $task_status_counts = [
 // CHART DATA: TOP 5 EXPENSE CATEGORIES
 // ============================================
 $sql = "
-    SELECT 
-        c.category_name,
-        SUM(t.amount) AS total
-    FROM transaction_table t
-    LEFT JOIN category c ON t.category_id = c.category_id
-    WHERE t.type = 'expense'
-      AND DATE_FORMAT(t.txn_date_time, '%Y-%m') = ?
-    GROUP BY c.category_id, c.category_name
-    ORDER BY total DESC
-    LIMIT 5
+SELECT 
+    c.category_group,
+    SUM(t.amount) AS total
+FROM transaction_table t
+JOIN category c ON t.category_id = c.category_id
+WHERE t.type = 'expense'
+  AND DATE_FORMAT(t.txn_date_time, '%Y-%m') = ?
+GROUP BY c.category_group
+ORDER BY total DESC
+LIMIT 5
 ";
+
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("s", $current_month);
 $stmt->execute();
 $result = $stmt->get_result();
+
 $expense_categories = [];
 $expense_amounts = [];
+
 while ($row = $result->fetch_assoc()) {
-    $expense_categories[] = $row['category_name'] ?: 'Uncategorized';
+    $expense_categories[] = $row['category_group'] ?: 'Others';
     $expense_amounts[] = (float)$row['total'];
 }
+
 
 // ============================================
 // RECENT ACTIVITIES (LAST 5 TRANSACTIONS)
@@ -396,37 +400,53 @@ $recent_activities = $result->fetch_all(MYSQLI_ASSOC);
 // Task Status Chart
 const taskStatusCtx = document.getElementById('taskStatusChart');
 if (taskStatusCtx) {
-    new Chart(taskStatusCtx, {
-        type: 'doughnut',
-        data: {
-            labels: <?= json_encode($task_statuses) ?>,
-            datasets: [{
-    data: <?= json_encode($task_status_counts) ?>,
-    backgroundColor: [
-        '#3b8e48ff', // Completed
-        '#2196F3', // In Progress
-        '#E53935'  // Overdue
-    ],
-    borderColor: '#FFF',
-    borderWidth: 2
-}]
+   new Chart(taskStatusCtx, {
+    type: 'doughnut',
+    data: {
+        labels: <?= json_encode($task_statuses) ?>,
+        datasets: [{
+            data: <?= json_encode($task_status_counts) ?>,
+            backgroundColor: [
+                '#3b8e48ff', // Completed
+                '#2196F3',   // In Progress
+                '#E53935'    // Overdue
+            ],
+            borderColor: '#FFF',
+            borderWidth: 2
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
 
+        animation: {
+            duration: 900,
+            easing: 'easeOutQuart'
         },
-        options: {
-            responsive: true,
-            maintainAspectRatio: true,
-            plugins: {
-                legend: {
-                    position: 'bottom',
-                    labels: {
-                        font: { family: "'Inter', sans-serif", size: 12, weight: 500 },
-                        color: '#565D6D',
-                        padding: 15
-                    }
+
+        hover: {
+            animationDuration: 300
+        },
+
+        responsiveAnimationDuration: 0,
+
+        plugins: {
+            legend: {
+                position: 'bottom',
+                labels: {
+                    font: {
+                        family: "'Inter', sans-serif",
+                        size: 12,
+                        weight: 500
+                    },
+                    color: '#565D6D',
+                    padding: 15
                 }
             }
         }
-    });
+    }
+});
+
 }
 
 // Expense Category Chart

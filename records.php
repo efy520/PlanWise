@@ -604,24 +604,35 @@ function deleteTransaction() {
 <?php if (isset($_SESSION['budget_alert'])): ?>
 <div class="modal fade" id="budgetModal" tabindex="-1">
   <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content">
+    <div class="modal-content budget-modal 
+        <?= $_SESSION['budget_alert'] ['status']=== 'exceed' ? 'budget-danger' : 'budget-warning' ?>">
 
-      <div class="modal-header">
+      <div class="modal-header justify-content-center border-0">
         <h5 class="modal-title">
-            <?= $_SESSION['budget_alert'] == 'exceed'
+            <?= $_SESSION['budget_alert']['status'] === 'exceed'
                 ? '🚨 Budget Exceeded'
                 : '⚠️ Budget Warning' ?>
         </h5>
       </div>
 
-      <div class="modal-body">
-        <?= $_SESSION['budget_alert'] == 'exceed'
-            ? 'You have exceeded your budget for this category.'
-            : 'You have used more than 80% of your budget.' ?>
+      <div class="modal-body text-center">
+       
+
+        <p class="budget-text">
+<?php if ($_SESSION['budget_alert']['status'] === 'exceed'): ?>
+    🚨 <strong><?= htmlspecialchars($_SESSION['budget_alert']['category']) ?></strong>
+    has exceeded its budget.
+<?php else: ?>
+    ⚠️ <strong><?= htmlspecialchars($_SESSION['budget_alert']['category']) ?></strong>
+    has used <strong><?= $_SESSION['budget_alert']['used'] ?>%</strong>
+    of its budget.
+<?php endif; ?>
+</p>
+
       </div>
 
-      <div class="modal-footer">
-        <button class="btn btn-primary" data-bs-dismiss="modal">OK</button>
+      <div class="modal-footer justify-content-center border-0">
+        <button class="btn budget-btn" data-bs-dismiss="modal">OK</button>
       </div>
 
     </div>
@@ -635,6 +646,7 @@ document.addEventListener('DOMContentLoaded', () => {
 </script>
 
 <?php unset($_SESSION['budget_alert']); endif; ?>
+
 </body>
 
 

@@ -48,7 +48,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $datetime = $_POST['datetime'];
 
     $sql_ins = "INSERT INTO transaction_table 
-    (user_id, category_id, destination_account_id, txn_date_time, type, description, amount)
+    (user_id, category_id, source_account_id, txn_date_time, type, description, amount)
     VALUES (?, ?, ?, ?, 'income', ?, ?)";
 
 
@@ -57,7 +57,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     "iiissd",
     $user_id,
     $category_id,
-    $account_id,   // ✅ MASUK DESTINATION
+    $account_id,   // ✅ MASUK SOURCE
     $datetime,
     $description,
     $amount

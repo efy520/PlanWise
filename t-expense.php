@@ -85,13 +85,15 @@ if ($stmt->execute()) {
         $datetime
     );
 
-    if ($budgetInfo) {
-        if ($budgetInfo['percent'] >= 100) {
-            $_SESSION['budget_alert'] = 'exceed';
-        } elseif ($budgetInfo['percent'] >= 80) {
-            $_SESSION['budget_alert'] = 'warning';
-        }
-    }
+   if ($budgetInfo && $budgetInfo['percent'] >= 80) {
+
+    $_SESSION['budget_alert'] = [
+        'status'   => $budgetInfo['percent'] >= 100 ? 'exceed' : 'warning',
+        'category' => $budgetInfo['category_name'],
+        'used'     => round($budgetInfo['percent'])
+    ];
+}
+
 
     header("Location: records.php?added=1");
     exit();

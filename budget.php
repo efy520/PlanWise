@@ -73,6 +73,12 @@ $non_budgeted = $stmt_non->get_result();
 if ($_SERVER['REQUEST_METHOD'] == "POST" && isset($_POST['set_budget'])) {
     $cat_id = $_POST['category_id'];
     $limit = $_POST['limit_amount'];
+$limit = (float) $limit;
+
+if ($limit <= 0) {
+    header("Location: budget.php?month=$month&error=invalid_limit");
+    exit();
+}
 
     $sql_add = "INSERT INTO budget (user_id, category_id, month, limit_amount) VALUES (?, ?, ?, ?)";
     $stmt = $conn->prepare($sql_add);
@@ -89,14 +95,22 @@ if ($_SERVER['REQUEST_METHOD'] == "POST" && isset($_POST['set_budget'])) {
 if ($_SERVER['REQUEST_METHOD'] == "POST" && isset($_POST['update_budget'])) {
     $budget_id = $_POST['budget_id'];
     $limit = $_POST['limit_amount'];
+$limit = (float) $limit;
+
+if ($limit <= 0) {
+    header("Location: budget.php?month=$month&error=invalid_limit");
+    exit();
+}
 
     $sql_up = "UPDATE budget SET limit_amount = ? WHERE budget_id = ?";
     $stmt = $conn->prepare($sql_up);
     $stmt->bind_param("di", $limit, $budget_id);
     $stmt->execute();
 
+    
     header("Location: budget.php?month=$month");
     exit();
+    
 }
 
 /* ---------------------------------------------------------
@@ -142,6 +156,13 @@ if (isset($_GET['remove'])) {
         <button class="tab-button" onclick="window.location='finance-acc.php'">Finance Settings</button>
         <button class="tab-button active" onclick="window.location='budget.php'">Budgets</button>
     </div>
+    
+    <!-- ERROR MESSAGES -->
+<?php if (isset($_GET['error']) && $_GET['error'] === 'invalid_limit'): ?>
+    <div class="alert alert-danger">
+        Budget limit must be greater than 0.
+    </div>
+<?php endif; ?>
 
     <!-- MAIN CONTENT -->
     <div class="content-box">
@@ -282,8 +303,13 @@ if (isset($_GET['remove'])) {
                     
                     <div class="mb-4">
                         <label for="set_limit" class="form-label-budget">Limit</label>
-                        <input type="number" step="0.01" class="form-control-budget" name="limit_amount" id="set_limit" placeholder="Set your budget limit" required>
-                    </div>
+                        <input type="number"
+       step="0.01"
+       min="0.01"
+       class="form-control-budget"
+       name="limit_amount"
+       required>
+    </div>
                     
                     <button type="submit" class="btn-save-budget">Save</button>
                 </form>

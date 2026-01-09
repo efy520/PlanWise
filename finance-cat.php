@@ -13,36 +13,47 @@ $user_id = $_SESSION['user_id'];
 // CHECK AND CREATE DEFAULT CATEGORIES
 // ============================================
 function createDefaultCategories($conn, $user_id) {
-    // Default EXPENSE categories
-    $default_expense = ['Shopping', 'Health', 'Food', 'Bills', 'Petrol'];
-    
-    // Default INCOME categories
-    $default_income = ['Salary', 'PAMA'];
-    
-    // Check if user already has categories
+
+    $default_expense = [
+        ['name' => 'Shopping', 'group' => 'Shopping'],
+        ['name' => 'Health',   'group' => 'Health'],
+        ['name' => 'Food',     'group' => 'Food & Drink'],
+        ['name' => 'Bills',    'group' => 'Bills'],
+        ['name' => 'Petrol',   'group' => 'Transport'],
+    ];
+
+   $default_income = [
+    ['name' => 'Salary', 'group' => 'Primary Income'],
+    ['name' => 'Duit Poket',   'group' => 'Side Income']
+];
+
+
     $check_sql = "SELECT COUNT(*) as count FROM category WHERE user_id = ?";
     $stmt = $conn->prepare($check_sql);
     $stmt->bind_param("i", $user_id);
     $stmt->execute();
     $result = $stmt->get_result()->fetch_assoc();
-    
-    // Only create defaults if user has NO categories yet
+
     if ($result['count'] == 0) {
-        // Insert expense categories
-        foreach ($default_expense as $cat_name) {
-            $sql = "INSERT INTO category (user_id, category_name, category_type, is_active) VALUES (?, ?, 'expense', 1)";
+
+        foreach ($default_expense as $cat) {
+            $sql = "INSERT INTO category 
+                (user_id, category_name, category_type, category_group, is_active)
+                VALUES (?, ?, 'expense', ?, 1)";
             $stmt = $conn->prepare($sql);
-            $stmt->bind_param("is", $user_id, $cat_name);
+            $stmt->bind_param("iss", $user_id, $cat['name'], $cat['group']);
             $stmt->execute();
         }
-        
-        // Insert income categories
-        foreach ($default_income as $cat_name) {
-            $sql = "INSERT INTO category (user_id, category_name, category_type, is_active) VALUES (?, ?, 'income', 1)";
-            $stmt = $conn->prepare($sql);
-            $stmt->bind_param("is", $user_id, $cat_name);
-            $stmt->execute();
-        }
+
+       foreach ($default_income as $cat) {
+    $sql = "INSERT INTO category
+        (user_id, category_name, category_type, category_group, is_active)
+        VALUES (?, ?, 'income', ?, 1)";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("iss", $user_id, $cat['name'], $cat['group']);
+    $stmt->execute();
+}
+
     }
 }
 
@@ -63,14 +74,28 @@ if ($result_quote && $result_quote->num_rows > 0) {
 
 // Handle Add New Category
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_category'])) {
+    $category_name  = trim($_POST['category_name']);
+    $category_type  = $_POST['category_type'];
     $category_name = trim($_POST['category_name']);
-    $category_type = $_POST['category_type'];
+$category_type = $_POST['category_type'];
+
+if ($category_type === 'income') {
+    $category_group = $_POST['category_group_income'];
+} else {
+    $category_group = $_POST['category_group_expense'];
+}
+
+
     
     if (!empty($category_name)) {
-        $sql = "INSERT INTO category (user_id, category_name, category_type, is_active) VALUES (?, ?, ?, 1)";
-        $stmt = $conn->prepare($sql);
-        $stmt->bind_param("iss", $user_id, $category_name, $category_type);
-        $stmt->execute();
+       $sql = "INSERT INTO category 
+(user_id, category_name, category_type, category_group, is_active) 
+VALUES (?, ?, ?, ?, 1)";
+
+$stmt = $conn->prepare($sql);
+$stmt->bind_param("isss", $user_id, $category_name, $category_type, $category_group);
+$stmt->execute();
+
         header("Location: finance-cat.php?added=1");
         exit();
     }
@@ -309,28 +334,7 @@ $ignored_categories = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
     </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-<script>
-function showAddModal(type) {
-    document.getElementById('categoryType').value = type;
-    const modal = new bootstrap.Modal(document.getElementById('addCategoryModal'));
-    modal.show();
-}
 
-function showDeleteModal(categoryId, categoryName) {
-    document.getElementById('deleteCategoryId').value = categoryId;
-    document.getElementById('deleteCategoryName').textContent = categoryName;
-    const modal = new bootstrap.Modal(document.getElementById('deleteCategoryModal'));
-    modal.show();
-}
-
-function showEditModal(categoryId, categoryName) {
-    document.getElementById('editCategoryId').value = categoryId;
-    document.getElementById('edit_category_name').value = categoryName;
-    const modal = new bootstrap.Modal(document.getElementById('editCategoryModal'));
-    modal.show();
-}
-</script>
 
 <!-- ADD CATEGORY MODAL -->
 <div class="modal fade" id="addCategoryModal" tabindex="-1">
@@ -343,6 +347,31 @@ function showEditModal(categoryId, categoryName) {
             <form method="POST">
                 <div class="modal-body">
                     <input type="hidden" id="categoryType" name="category_type" value="income">
+                   
+                    <!-- Expense Group -->
+<div class="mb-3" id="expenseGroup">
+    <label class="form-label">Category Group</label>
+    <select name="category_group_expense" class="form-select">
+        <option value="Food & Drink">Food & Drink</option>
+        <option value="Shopping">Shopping</option>
+        <option value="Health">Health</option>
+        <option value="Transport">Transport</option>
+        <option value="Bills">Bills</option>
+        <option value="Others">Others</option>
+    </select>
+</div>
+
+<!-- Income Group -->
+<div class="mb-3 d-none" id="incomeGroup">
+    <label class="form-label">Category Group</label>
+    <select name="category_group_income" class="form-select">
+        <option value="Primary Income">Primary Income</option>
+        <option value="Side Income">Side Income</option>
+        <option value="Others">Others</option>
+    </select>
+</div>
+
+
                     <div class="mb-3">
                         <label for="category_name" class="form-label">Category Name</label>
                         <input type="text" class="form-control" id="category_name" name="category_name" required>
@@ -403,6 +432,44 @@ function showEditModal(categoryId, categoryName) {
         </div>
     </div>
 </div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    
+
+
+function showDeleteModal(categoryId, categoryName) {
+    document.getElementById('deleteCategoryId').value = categoryId;
+    document.getElementById('deleteCategoryName').textContent = categoryName;
+    const modal = new bootstrap.Modal(document.getElementById('deleteCategoryModal'));
+    modal.show();
+}
+
+function showEditModal(categoryId, categoryName) {
+    document.getElementById('editCategoryId').value = categoryId;
+    document.getElementById('edit_category_name').value = categoryName;
+    const modal = new bootstrap.Modal(document.getElementById('editCategoryModal'));
+    modal.show();
+}
+
+function showAddModal(type) {
+    document.getElementById('categoryType').value = type;
+
+    const expenseGroup = document.getElementById('expenseGroup');
+    const incomeGroup  = document.getElementById('incomeGroup');
+
+    if (type === 'income') {
+        expenseGroup.classList.add('d-none');
+        incomeGroup.classList.remove('d-none');
+    } else {
+        incomeGroup.classList.add('d-none');
+        expenseGroup.classList.remove('d-none');
+    }
+
+    const modal = new bootstrap.Modal(document.getElementById('addCategoryModal'));
+    modal.show();
+}
+</script>
 
 </body>
 </html>

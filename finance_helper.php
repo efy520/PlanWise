@@ -4,16 +4,16 @@ function getAccountBalance($conn, $user_id, $account_id) {
 
     $sql = "
         SELECT SUM(amount) AS balance FROM (
-            -- income masuk ke account
+            -- income masuk ke account (source_account_id)
             SELECT amount
             FROM transaction_table
             WHERE user_id = ?
               AND type = 'income'
-              AND destination_account_id = ?
+              AND source_account_id = ?
 
             UNION ALL
 
-            -- expense keluar dari account
+            -- expense keluar dari account (source_account_id)
             SELECT -amount
             FROM transaction_table
             WHERE user_id = ?
@@ -92,11 +92,19 @@ function checkBudgetUsage($conn, $user_id, $category_id, $date)
     if ($res->num_rows == 0) return null;
 
     $budget = $res->fetch_assoc()['limit_amount'];
+// get category name
+$sql_cat = "SELECT category_name FROM category WHERE category_id = ?";
+$stmt3 = $conn->prepare($sql_cat);
+$stmt3->bind_param("i", $category_id);
+$stmt3->execute();
+$category_name = $stmt3->get_result()->fetch_assoc()['category_name'];
 
     return [
-        'total'   => $total,
-        'budget' => $budget,
-        'percent'=> ($total / $budget) * 100
-    ];
+    'total'         => $total,
+    'budget'        => $budget,
+    'percent'       => ($total / $budget) * 100,
+    'category_name' => $category_name
+];
+
 }
 
