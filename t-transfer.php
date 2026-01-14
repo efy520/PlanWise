@@ -33,52 +33,63 @@ $accounts = $stmt_acc->get_result();
 --------------------------------------------------------- */
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
-    $source_account_id = $_POST['source_account_id'];
+    $source_account_id      = $_POST['source_account_id'];
     $destination_account_id = $_POST['destination_account_id'];
-    $description = $_POST['description'];
-    $amount = $_POST['amount'];
-    $datetime = $_POST['datetime'];
+    $description            = $_POST['description'];
+    $amount                 = (float) $_POST['amount'];
+    $datetime               = $_POST['datetime'];
 
-// 1️⃣ Block same account
-if ($source_account_id === $destination_account_id) {
-    $error = "Source and destination accounts cannot be the same.";
-}
+    // 1️⃣ block invalid amount
+    if ($amount <= 0) {
+        $error = "❌ Transfer amount must be greater than zero.";
+    }
 
-// 2️⃣ Check balance (INI PALING PENTING)
-$sourceBalance = getAccountBalance($conn, $user_id, $source_account_id);
+    // 2️⃣ block same account
+    elseif ($source_account_id === $destination_account_id) {
+        $error = "Source and destination accounts cannot be the same.";
+    }
 
-if ($amount > $sourceBalance) {
-    $error = "❌ Insufficient balance. Available: RM " . number_format($sourceBalance, 2);
-}
+    // 3️⃣ check balance
+    else {
+        $sourceBalance = getAccountBalance($conn, $user_id, $source_account_id);
 
-   if (!isset($error)) {
+        if ($amount > $sourceBalance) {
+            $error = "❌ Insufficient balance. Available: RM " . number_format($sourceBalance, 2);
+        }
+    }
 
-    $sql_ins = "
-        INSERT INTO transaction_table
-        (user_id, source_account_id, destination_account_id, txn_date_time, type, description, amount)
-        VALUES (?, ?, ?, ?, 'transfer', ?, ?)
-    ";
+    // 4️⃣ insert only if no error
+    if (!isset($error)) {
 
-    $stmt = $conn->prepare($sql_ins);
-    $stmt->bind_param(
-        "iiissd",
-        $user_id,
-        $source_account_id,
-        $destination_account_id,
-        $datetime,
-        $description,
-        $amount
-    );
+        $sql_ins = "
+            INSERT INTO transaction_table
+            (user_id, source_account_id, destination_account_id,
+             txn_date_time, type, description, amount)
+            VALUES (?, ?, ?, ?, 'transfer', ?, ?)
+        ";
 
-    if ($stmt->execute()) {
-        header("Location: records.php?added=1");
-        exit();
-    } else {
-        $error = "Failed to save transfer.";
+        $stmt = $conn->prepare($sql_ins);
+        $stmt->bind_param(
+            "iiissd",
+            $user_id,
+            $source_account_id,
+            $destination_account_id,
+            $datetime,
+            $description,
+            $amount
+        );
+
+        if ($stmt->execute()) {
+            header("Location: records.php?added=1");
+            exit();
+        } else {
+            $error = "Failed to save transfer.";
+        }
     }
 }
 
-}
+
+
 ?>
 <!DOCTYPE html>
 <html lang="en">

@@ -8,22 +8,28 @@ $error_message = "";
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     $username = trim($_POST['username']);
-    $password = trim($_POST['password']);
+  $password = $_POST['password'];
+
 
   /* ============================
    HARD-CODED ADMIN ACCOUNT
    ============================ */
-if ($username === '$admin' && $password === 'admin') {
+if (!empty($username) && $username[0] === '$') {
 
-    // Set admin session
-    $_SESSION['user_id'] = 0; 
-    $_SESSION['username'] = '$admin';
-    $_SESSION['role'] = 'admin';
+    if ($password === 'admin') {
 
-    // Redirect admin to quote page
-    header("Location: quote.php");
-    exit();
+        $_SESSION['user_id'] = 0;
+        $_SESSION['username'] = $username;
+        $_SESSION['role'] = 'admin';
+
+        header("Location: admin-dashboard.php");
+        exit();
+
+    } else {
+        $error_message = "Incorrect admin password.";
+    }
 }
+
 
 
     /* ============================

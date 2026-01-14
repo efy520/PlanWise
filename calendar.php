@@ -168,19 +168,7 @@ if ($result_quote && $result_quote->num_rows > 0) {
 </div>
 <?php unset($_SESSION['flash_success']); endif; ?>
 
-    <!-- calendar header: month & navigation -->
-    <div class="calendar-header d-flex justify-content-between align-items-center mb-2">
-        <div class="d-flex align-items-center gap-2">
-            <a href="calendar.php?m=<?= $prevM ?>&y=<?= $prevY ?>" class="btn btn-sm btn-light">&lt;</a>
-            <div class="month-name">
-                <strong><?= htmlspecialchars($monthName . ' ' . $year) ?></strong>
-            </div>
-            <a href="calendar.php?m=<?= $nextM ?>&y=<?= $nextY ?>" class="btn btn-sm btn-light">&gt;</a>
-        </div>
-<div>
-            <a href="createTask.php" id="btnNewTask" class="btn btn-new-task">+ New Task</a>
-        </div>
-    </div>
+    
 
  <!-- TABS -->
     <div class="row mb-3">
@@ -193,7 +181,20 @@ if ($result_quote && $result_quote->num_rows > 0) {
         </div>
     </div>
    
-
+<!-- calendar header: month & navigation -->
+    <div class="calendar-header d-flex justify-content-between align-items-center mb-2">
+        <div class="d-flex align-items-center gap-2">
+            <a href="calendar.php?m=<?= $prevM ?>&y=<?= $prevY ?>" class="btn btn-sm btn-light">&lt;</a>
+            <div class="month-name">
+                <strong><?= htmlspecialchars($monthName . ' ' . $year) ?></strong>
+            </div>
+            <a href="calendar.php?m=<?= $nextM ?>&y=<?= $nextY ?>" class="btn btn-sm btn-light">&gt;</a>
+        </div>
+<div>
+            <a href="createTask.php" id="btnNewTask" class="btn btn-new-task">+ New Task</a>
+        </div>
+    </div>
+    
     <!-- Calendar box -->
     <div class="calendar-wrap p-4">
         <!-- week day labels -->

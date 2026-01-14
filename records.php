@@ -17,23 +17,65 @@ $user_id = $_SESSION['user_id'];
 // HANDLE EDIT TRANSACTION
 // -------------------------------------------
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['edit_transaction'])) {
+
     $transaction_id = (int)$_POST['transaction_id'];
     $amount = (float)$_POST['amount'];
     $description = trim($_POST['description']);
     $txn_date_time = $_POST['txn_date_time'];
-    $category_id = (int)$_POST['category_id'];
+    $type = $_POST['type']; // WAJIB ADA
+
+    // ❌ Block negative amount
+    if ($amount < 0) {
+        $_SESSION['error'] = "Amount cannot be negative.";
+        header("Location: records.php");
+        exit();
+    }
+
+    // Category (income / expense only)
+    $category_id = null;
+    if (isset($_POST['category_id']) && $_POST['category_id'] !== '') {
+        $category_id = (int)$_POST['category_id'];
+    }
+
     $source_account_id = (int)$_POST['source_account_id'];
-    $destination_account_id = !empty($_POST['destination_account_id']) ? (int)$_POST['destination_account_id'] : null;
-    
-    $sql_update = "UPDATE transaction_table 
-                   SET amount = ?, description = ?, txn_date_time = ?, category_id = ?, 
+    $destination_account_id = !empty($_POST['destination_account_id'])
+        ? (int)$_POST['destination_account_id']
+        : null;
+
+    // 🔒 Check balance ONLY for expense
+    if ($type === 'expense') {
+        $sql_balance = "SELECT balance FROM account WHERE account_id = ? AND user_id = ?";
+        $stmt_bal = $conn->prepare($sql_balance);
+        $stmt_bal->bind_param("ii", $source_account_id, $user_id);
+        $stmt_bal->execute();
+        $balance = $stmt_bal->get_result()->fetch_assoc()['balance'];
+
+        if ($amount > $balance) {
+            $_SESSION['error'] = "Insufficient balance in selected account.";
+            header("Location: records.php");
+            exit();
+        }
+    }
+
+    // UPDATE
+    $sql_update = "UPDATE transaction_table
+                   SET amount = ?, description = ?, txn_date_time = ?, category_id = ?,
                        source_account_id = ?, destination_account_id = ?
                    WHERE transaction_id = ? AND user_id = ?";
-    
+
     $stmt = $conn->prepare($sql_update);
-    $stmt->bind_param("dssiiiii", $amount, $description, $txn_date_time, $category_id, 
-                      $source_account_id, $destination_account_id, $transaction_id, $user_id);
-    
+    $stmt->bind_param(
+        "dssiiiii",
+        $amount,
+        $description,
+        $txn_date_time,
+        $category_id,
+        $source_account_id,
+        $destination_account_id,
+        $transaction_id,
+        $user_id
+    );
+
     if ($stmt->execute()) {
         header("Location: records.php?updated=1");
         exit();
@@ -194,6 +236,12 @@ $months = $stmt_months->get_result()->fetch_all(MYSQLI_ASSOC);
 <div class="container-fluid px-4 py-3">
 <?php include 'nav-bar.php'; ?>
 
+<?php if (isset($_SESSION['error'])): ?>
+<div class="alert alert-danger">
+    <?= $_SESSION['error']; ?>
+</div>
+<?php unset($_SESSION['error']); endif; ?>
+
     <?php if (isset($_GET['updated'])): ?>
         <div class="alert alert-success alert-dismissible fade show" role="alert">
             Transaction updated successfully!
@@ -336,7 +384,7 @@ $months = $stmt_months->get_result()->fetch_all(MYSQLI_ASSOC);
                             <td><?= htmlspecialchars($r['description']) ?></td>
 
                             <td>
-                                <button class="btn btn-sm btn-primary" onclick="openEditModal(<?php echo htmlspecialchars(json_encode($r)); ?>)">Edit</button>
+                                <button class="btn btn-sm btn-success" onclick="openEditModal(<?php echo htmlspecialchars(json_encode($r)); ?>)">Edit</button>
                             </td>
                         </tr>
 
@@ -360,9 +408,10 @@ $months = $stmt_months->get_result()->fetch_all(MYSQLI_ASSOC);
             </div>
             <div class="modal-body">
                 <form method="POST" id="editTransactionForm">
-                    <input type="hidden" name="edit_transaction" value="1">
-                    <input type="hidden" name="transaction_id" id="editTransactionId" value="">
-                    
+    <input type="hidden" name="edit_transaction" value="1">
+    <input type="hidden" name="transaction_id" id="editTransactionId">
+    <input type="hidden" name="type" id="edit_type_hidden">
+
                     <div class="row mb-3">
                         <div class="col-md-6">
                             <label for="edit_type" class="form-label">Type</label>
@@ -370,7 +419,7 @@ $months = $stmt_months->get_result()->fetch_all(MYSQLI_ASSOC);
                         </div>
                         <div class="col-md-6">
                             <label for="edit_amount" class="form-label">Amount</label>
-                            <input type="number" step="0.01" class="form-control" id="edit_amount" name="amount" required>
+                            <input type="number" step="0.01" min="0.01" class="form-control" id="edit_amount" name="amount" required>
                         </div>
                     </div>
 
@@ -380,8 +429,11 @@ $months = $stmt_months->get_result()->fetch_all(MYSQLI_ASSOC);
                             <select class="form-control" id="edit_category" name="category_id" required>
                                 <option value="">Select Category</option>
                                 <?php foreach ($categories as $cat): ?>
-                                    <option value="<?= $cat['category_id'] ?>"><?= htmlspecialchars($cat['category_name']) ?></option>
-                                <?php endforeach; ?>
+                                    <option value="<?= $cat['category_id'] ?>" 
+        data-type="<?= $cat['category_type'] ?>">
+    <?= htmlspecialchars($cat['category_name']) ?>
+</option>
+  <?php endforeach; ?>
                             </select>
                         </div>
                         <div class="col-md-6">
@@ -411,7 +463,7 @@ $months = $stmt_months->get_result()->fetch_all(MYSQLI_ASSOC);
                     
                     <div class="d-flex gap-2">
                         <button type="button" class="btn btn-secondary flex-fill" data-bs-dismiss="modal">Cancel</button>
-                        <button type="submit" class="btn btn-primary flex-fill">Save Changes</button>
+                        <button type="submit" class="btn btn-success flex-fill">Save Changes</button>
                         <button type="button" class="btn btn-danger flex-fill" onclick="deleteTransaction()">Delete</button>
                     </div>
                 </form>
@@ -430,9 +482,10 @@ $months = $stmt_months->get_result()->fetch_all(MYSQLI_ASSOC);
             </div>
             <div class="modal-body">
                 <form method="POST" id="editTransferForm">
-                    <input type="hidden" name="edit_transaction" value="1">
-                    <input type="hidden" name="transaction_id" id="editTransferId" value="">
-                    
+    <input type="hidden" name="edit_transaction" value="1">
+    <input type="hidden" name="transaction_id" id="editTransferId">
+    <input type="hidden" name="type" value="transfer">
+
                     <div class="row mb-3">
                         <div class="col-md-6">
                             <label for="edit_transfer_type" class="form-label">Type</label>
@@ -440,14 +493,15 @@ $months = $stmt_months->get_result()->fetch_all(MYSQLI_ASSOC);
                         </div>
                         <div class="col-md-6">
                             <label for="edit_transfer_amount" class="form-label">Amount</label>
-                            <input type="number" step="0.01" class="form-control" id="edit_transfer_amount" name="amount" required>
+                            <input type="number" step="0.01" min="0.01" class="form-control" id="edit_transfer_amount" name="amount" required>
                         </div>
                     </div>
 
                     <div class="row mb-3">
                         <div class="col-md-6">
                             <label for="edit_transfer_from" class="form-label">From Account</label>
-                            <select class="form-control" id="edit_transfer_from" name="source_account_id" required>
+                            <select class="form-control" id="edit_transfer_from" disabled>
+
                                 <option value="">Select Account</option>
                                 <?php foreach ($accounts as $acc): ?>
                                     <option value="<?= $acc['account_id'] ?>"><?= htmlspecialchars($acc['account_name']) ?></option>
@@ -456,12 +510,17 @@ $months = $stmt_months->get_result()->fetch_all(MYSQLI_ASSOC);
                         </div>
                         <div class="col-md-6">
                             <label for="edit_transfer_to" class="form-label">To Account</label>
-                            <select class="form-control" id="edit_transfer_to" name="destination_account_id" required>
+                            <select class="form-control" id="edit_transfer_to" disabled>
+
                                 <option value="">Select Account</option>
                                 <?php foreach ($accounts as $acc): ?>
                                     <option value="<?= $acc['account_id'] ?>"><?= htmlspecialchars($acc['account_name']) ?></option>
                                 <?php endforeach; ?>
                             </select>
+                            
+                            <input type="hidden" name="source_account_id" id="hidden_transfer_from">
+<input type="hidden" name="destination_account_id" id="hidden_transfer_to">
+
                         </div>
                     </div>
 
@@ -479,7 +538,7 @@ $months = $stmt_months->get_result()->fetch_all(MYSQLI_ASSOC);
                     
                     <div class="d-flex gap-2">
                         <button type="button" class="btn btn-secondary flex-fill" data-bs-dismiss="modal">Cancel</button>
-                        <button type="submit" class="btn btn-primary flex-fill">Save Changes</button>
+                        <button type="submit" class="btn btn-success flex-fill">Save Changes</button>
                         <button type="button" class="btn btn-danger flex-fill" onclick="deleteTransaction()">Delete</button>
                     </div>
                 </form>
@@ -540,14 +599,36 @@ function clearFilters() {
 }
 
 function openEditModal(transaction) {
+  
+
+document.getElementById('hidden_transfer_from').value = transaction.source_account_id;
+document.getElementById('hidden_transfer_to').value = transaction.destination_account_id;
+
     console.log('Edit button clicked, transaction:', transaction);
-    
+    const categorySelect = document.getElementById('edit_category');
+categorySelect.value = "";
+
+Array.from(categorySelect.options).forEach(option => {
+    if (!option.value) return;
+
+    if (option.dataset.type === transaction.type) {
+        option.style.display = 'block';
+    } else {
+        option.style.display = 'none';
+    }
+});
+
+// Set correct category
+categorySelect.value = transaction.category_id;
+
     try {
         // Convert datetime format from 'YYYY-MM-DD HH:MM:SS' to 'YYYY-MM-DDTHH:MM'
         const datetime = transaction.txn_date_time.replace(' ', 'T').substring(0, 16);
         
         // Check if it's a transfer
         if (transaction.type === 'transfer') {
+              document.getElementById('edit_transfer_from').value = transaction.source_account_id;
+document.getElementById('edit_transfer_to').value = transaction.destination_account_id;
             console.log('Opening transfer modal');
             document.getElementById('editTransferId').value = transaction.transaction_id;
             document.getElementById('edit_transfer_amount').value = transaction.amount;
@@ -569,7 +650,8 @@ function openEditModal(transaction) {
             document.getElementById('edit_destination_account').value = transaction.destination_account_id || '';
             document.getElementById('edit_datetime').value = datetime;
             document.getElementById('edit_description').value = transaction.description;
-            
+            document.getElementById('edit_type_hidden').value = transaction.type;
+
             const modal = new bootstrap.Modal(document.getElementById('editTransactionModal'));
             modal.show();
         }

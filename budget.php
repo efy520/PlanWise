@@ -302,12 +302,14 @@ if (isset($_GET['remove'])) {
                     </div>
                     
                     <div class="mb-4">
-                        <label for="set_limit" class="form-label-budget">Limit</label>
+                        <label for="limit_amount" class="form-label-budget">Limit</label>
                         <input type="number"
        step="0.01"
        min="0.01"
        class="form-control-budget"
        name="limit_amount"
+        id="limit_amount"
+        placeholder="Set your budget limit"
        required>
     </div>
                     
@@ -381,7 +383,7 @@ document.addEventListener('click', function(e) {
 function openSetModal(categoryId, categoryName) {
     document.getElementById('set_cat_id').value = categoryId;
     document.getElementById('set_cat_name').value = categoryName;
-    document.getElementById('set_limit').value = '';
+    document.getElementById('limit_amount').value = '';
     
     const modal = new bootstrap.Modal(document.getElementById('setBudgetModal'));
     modal.show();

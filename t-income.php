@@ -41,36 +41,44 @@ $categories = $stmt_cat->get_result();
 --------------------------------------------------------- */
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
-    $account_id = $_POST['account_id'];
+    $account_id  = $_POST['account_id'];
     $category_id = $_POST['category_id'];
     $description = $_POST['description'];
-    $amount = $_POST['amount'];
-    $datetime = $_POST['datetime'];
+    $amount      = (float) $_POST['amount'];
+    $datetime    = $_POST['datetime'];
 
-    $sql_ins = "INSERT INTO transaction_table 
-    (user_id, category_id, source_account_id, txn_date_time, type, description, amount)
-    VALUES (?, ?, ?, ?, 'income', ?, ?)";
+    // ❌ BLOCK zero & negative
+    if ($amount <= 0) {
+        $error = "❌ Amount must be greater than zero.";
+    }
 
+    // ⛔ STOP kalau ada error
+    if (!isset($error)) {
 
-    $stmt = $conn->prepare($sql_ins);
-    $stmt->bind_param(
-    "iiissd",
-    $user_id,
-    $category_id,
-    $account_id,   // ✅ MASUK SOURCE
-    $datetime,
-    $description,
-    $amount
-);
+        $sql_ins = "INSERT INTO transaction_table 
+        (user_id, category_id, source_account_id, txn_date_time, type, description, amount)
+        VALUES (?, ?, ?, ?, 'income', ?, ?)";
 
+        $stmt = $conn->prepare($sql_ins);
+        $stmt->bind_param(
+            "iiissd",
+            $user_id,
+            $category_id,
+            $account_id,
+            $datetime,
+            $description,
+            $amount
+        );
 
-    if ($stmt->execute()) {
-        header("Location: records.php?added=1");
-        exit();
-    } else {
-        $error = "Failed to save transaction.";
+        if ($stmt->execute()) {
+            header("Location: records.php?added=1");
+            exit();
+        } else {
+            $error = "Failed to save transaction.";
+        }
     }
 }
+
 ?>
 <!DOCTYPE html>
 <html lang="en">

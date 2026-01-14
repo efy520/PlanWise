@@ -9,56 +9,6 @@ if (!isset($_SESSION['user_id'])) {
 
 $user_id = $_SESSION['user_id'];
 
-// ============================================
-// CHECK AND CREATE DEFAULT CATEGORIES
-// ============================================
-function createDefaultCategories($conn, $user_id) {
-
-    $default_expense = [
-        ['name' => 'Shopping', 'group' => 'Shopping'],
-        ['name' => 'Health',   'group' => 'Health'],
-        ['name' => 'Food',     'group' => 'Food & Drink'],
-        ['name' => 'Bills',    'group' => 'Bills'],
-        ['name' => 'Petrol',   'group' => 'Transport'],
-    ];
-
-   $default_income = [
-    ['name' => 'Salary', 'group' => 'Primary Income'],
-    ['name' => 'Duit Poket',   'group' => 'Side Income']
-];
-
-
-    $check_sql = "SELECT COUNT(*) as count FROM category WHERE user_id = ?";
-    $stmt = $conn->prepare($check_sql);
-    $stmt->bind_param("i", $user_id);
-    $stmt->execute();
-    $result = $stmt->get_result()->fetch_assoc();
-
-    if ($result['count'] == 0) {
-
-        foreach ($default_expense as $cat) {
-            $sql = "INSERT INTO category 
-                (user_id, category_name, category_type, category_group, is_active)
-                VALUES (?, ?, 'expense', ?, 1)";
-            $stmt = $conn->prepare($sql);
-            $stmt->bind_param("iss", $user_id, $cat['name'], $cat['group']);
-            $stmt->execute();
-        }
-
-       foreach ($default_income as $cat) {
-    $sql = "INSERT INTO category
-        (user_id, category_name, category_type, category_group, is_active)
-        VALUES (?, ?, 'income', ?, 1)";
-    $stmt = $conn->prepare($sql);
-    $stmt->bind_param("iss", $user_id, $cat['name'], $cat['group']);
-    $stmt->execute();
-}
-
-    }
-}
-
-// Create default categories on first access
-createDefaultCategories($conn, $user_id);
 
 // Fetch motivational quote
 $sql_quote = "SELECT quote_text FROM quote WHERE is_active = 1 ORDER BY RAND() LIMIT 1";
@@ -76,9 +26,7 @@ if ($result_quote && $result_quote->num_rows > 0) {
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_category'])) {
     $category_name  = trim($_POST['category_name']);
     $category_type  = $_POST['category_type'];
-    $category_name = trim($_POST['category_name']);
-$category_type = $_POST['category_type'];
-
+   
 if ($category_type === 'income') {
     $category_group = $_POST['category_group_income'];
 } else {
@@ -94,10 +42,25 @@ VALUES (?, ?, ?, ?, 1)";
 
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("isss", $user_id, $category_name, $category_type, $category_group);
-$stmt->execute();
 
-        header("Location: finance-cat.php?added=1");
+try {
+    $stmt->execute();
+    header("Location: finance-cat.php?added=1");
+    exit();
+
+} catch (mysqli_sql_exception $e) {
+
+    // 1062 = Duplicate entry (UNIQUE constraint)
+    if ($e->getCode() == 1062) {
+        $_SESSION['duplicate_error'] = "Category already exists. Please use a different name.";
+        header("Location: finance-cat.php");
         exit();
+    }
+
+    // kalau error lain (jarang)
+    throw $e;
+}
+
     }
 }
 
@@ -150,14 +113,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['restore_category_id']
 }
 
 // Fetch Income Categories
-$income_sql = "SELECT category_id, category_name FROM category WHERE user_id = ? AND category_type = 'income' AND is_active = 1";
+$income_sql = "
+    SELECT category_id, category_name, category_group
+    FROM category
+    WHERE user_id = ?
+    AND category_type = 'income'
+    AND is_active = 1
+";
 $stmt = $conn->prepare($income_sql);
 $stmt->bind_param("i", $user_id);
 $stmt->execute();
 $income_categories = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
 
 // Fetch Expense Categories
-$expense_sql = "SELECT category_id, category_name FROM category WHERE user_id = ? AND category_type = 'expense' AND is_active = 1";
+$expense_sql = "
+    SELECT category_id, category_name, category_group
+    FROM category
+    WHERE user_id = ?
+    AND category_type = 'expense'
+    AND is_active = 1
+";
 $stmt = $conn->prepare($expense_sql);
 $stmt->bind_param("i", $user_id);
 $stmt->execute();
@@ -432,6 +407,24 @@ $ignored_categories = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
         </div>
     </div>
 </div>
+<!-- DUPLICATE CATEGORY MODAL -->
+<div class="modal fade" id="duplicateModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header bg-danger text-white">
+        <h5 class="modal-title">Duplicate Category</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <p id="duplicateMessage"></p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">OK</button>
+      </div>
+    </div>
+  </div>
+</div>
+ 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
@@ -469,6 +462,21 @@ function showAddModal(type) {
     const modal = new bootstrap.Modal(document.getElementById('addCategoryModal'));
     modal.show();
 }
+<?php if (isset($_SESSION['duplicate_error'])): ?>
+
+document.addEventListener("DOMContentLoaded", function () {
+    document.getElementById("duplicateMessage").textContent =
+        "<?php echo addslashes($_SESSION['duplicate_error']); ?>";
+
+    const modal = new bootstrap.Modal(
+        document.getElementById('duplicateModal')
+    );
+    modal.show();
+});
+
+<?php unset($_SESSION['duplicate_error']); ?>
+<?php endif; ?>
+ 
 </script>
 
 </body>

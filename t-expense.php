@@ -48,6 +48,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $description = $_POST['description'];
     $amount      = (float)$_POST['amount'];
     $datetime    = $_POST['datetime'];
+    
+if ($amount <= 0) {
+    $error = "❌ Amount must be greater than zero.";
+}
 
     // 1️⃣ check balance
     $currentBalance = getAccountBalance($conn, $user_id, $account_id);

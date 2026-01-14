@@ -87,14 +87,20 @@ if (isset($_POST['reset_password'])) {
 
     $new_password_plain = trim($_POST['new_password']);
     $old_password_hash  = $_SESSION['fp_old_password_hash'];
-    $user_id = $_SESSION['fp_user_id'];
+    $user_id            = $_SESSION['fp_user_id'];
 
+    // ❌ minimum 4 characters
+    if (strlen($new_password_plain) < 4) {
+        $error = "Password must be at least 4 characters.";
+        $step = 3;
+    }
     // ❌ block password sama
-    if (password_verify($new_password_plain, $old_password_hash)) {
+    else if (password_verify($new_password_plain, $old_password_hash)) {
         $error = "New password cannot be the same as your old password.";
         $step = 3;
-    } else {
-
+    }
+    // ✅ update password
+    else {
         $new_password_hash = password_hash($new_password_plain, PASSWORD_DEFAULT);
 
         $sql = "UPDATE users SET password = ? WHERE user_id = ?";
@@ -117,8 +123,11 @@ if (isset($_POST['reset_password'])) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Forgot Password - PlanWise</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="CSS/forgot_password.css">
+
 </head>
 <body class="bg-light d-flex align-items-center min-vh-100">
 
@@ -202,9 +211,15 @@ if (isset($_POST['reset_password'])) {
                                 <span class="input-group-text bg-light border-end-0">
                                     <i class="bi bi-lock"></i>
                                 </span>
-                                <input type="password" class="form-control border-start-0" id="new_password" 
-                                       name="new_password" placeholder="Enter new password" required autofocus>
-                                <button class="btn btn-outline-secondary" type="button" id="togglePassword">
+                              <input type="password"
+       class="form-control border-start-0"
+       id="new_password"
+       name="new_password"
+       placeholder="Enter new password"
+       minlength="4"
+       required
+       title="Password must be at least 4 characters">
+   <button class="btn btn-outline-secondary" type="button" id="togglePassword">
                                     <i class="bi bi-eye"></i>
                                 </button>
                             </div>

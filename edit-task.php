@@ -130,6 +130,8 @@ if (isset($_POST['delete'])) {
                 <option value="completed" <?= $task['status']=='completed'?'selected':'' ?>>Completed</option>
             </select>
 
+<div id="statusWarningContainer"></div>
+
             <div class="button-row mt-4">
                 <a href="task.php" class="btn-cancel">Cancel</a>
 
@@ -149,36 +151,29 @@ document.addEventListener('DOMContentLoaded', function() {
     const dueDateInput = document.querySelector('input[name="due_date"]');
     const statusSelect = document.getElementById('statusSelect');
 
-    function checkOverdueWarning() {
-        const warningId = 'dateWarning';
-        const existing = document.getElementById(warningId);
+   function checkOverdueWarning() {
+    const container = document.getElementById('statusWarningContainer');
+    container.innerHTML = '';
 
-        if (!dueDateInput || !statusSelect) return;
+    const today = new Date();
+    today.setHours(0,0,0,0);
 
-        const today = new Date();
-        today.setHours(0,0,0,0);
+    const selectedDate = new Date(dueDateInput.value);
+    selectedDate.setHours(0,0,0,0);
 
-        const selectedDate = new Date(dueDateInput.value);
-        selectedDate.setHours(0,0,0,0);
-
-        const isInProgress = statusSelect.value === 'in progress';
-        const isPast = selectedDate < today;
-
-        if (isInProgress && isPast) {
-            if (!existing) {
-                const alertDiv = document.createElement('div');
-                alertDiv.id = warningId;
-                alertDiv.className = 'alert alert-warning mt-2';
-                alertDiv.innerHTML = '⚠ This task will remain overdue until the due date is updated.';
-                statusSelect.parentElement.appendChild(alertDiv);
-            }
-        } else {
-            if (existing) existing.remove();
-        }
+    if (statusSelect.value === 'in progress' && selectedDate < today) {
+        container.innerHTML = `
+            <div class="alert alert-warning mt-2">
+                ⚠ This task will remain overdue until the due date is updated.
+            </div>
+        `;
     }
+}
+
 
     dueDateInput.addEventListener('change', checkOverdueWarning);
-    statusSelect.addEventListener('change', checkOverdueWarning);
+document.getElementById('statusWarningContainer').appendChild(alertDiv);
+
 
     checkOverdueWarning(); // run once on load
 });

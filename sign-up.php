@@ -1,6 +1,40 @@
 <?php
 session_start();
 include 'db_connection.php';
+function createDefaultCategories($conn, $user_id) {
+
+    $default_expense = [
+        ['name' => 'Shopping', 'group' => 'Shopping'],
+        ['name' => 'Health',   'group' => 'Health'],
+        ['name' => 'Food',     'group' => 'Food & Drink'],
+        ['name' => 'Bills',    'group' => 'Bills'],
+        ['name' => 'Petrol',   'group' => 'Transport'],
+    ];
+
+    $default_income = [
+        ['name' => 'Salary', 'group' => 'Primary Income'],
+        ['name' => 'Duit Poket', 'group' => 'Side Income'],
+    ];
+
+    foreach ($default_expense as $cat) {
+        $sql = "INSERT INTO category
+            (user_id, category_name, category_type, category_group, is_active)
+            VALUES (?, ?, 'expense', ?, 1)";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("iss", $user_id, $cat['name'], $cat['group']);
+        $stmt->execute();
+    }
+
+    foreach ($default_income as $cat) {
+        $sql = "INSERT INTO category
+            (user_id, category_name, category_type, category_group, is_active)
+            VALUES (?, ?, 'income', ?, 1)";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("iss", $user_id, $cat['name'], $cat['group']);
+        $stmt->execute();
+    }
+}
+
 function getGenderFromIC($ic) {
     $lastDigit = (int) substr(str_replace('-', '', $ic), -1);
     return ($lastDigit % 2 === 0) ? 'female' : 'male';
@@ -29,67 +63,39 @@ function getAgeFromIC($ic) {
 
 $error_message = "";
 
-// Function to create default categories for new user
-function createDefaultCategories($conn, $user_id) {
-    // Default EXPENSE categories
-    $default_expense = ['Shopping', 'Health', 'Food', 'Bills', 'Petrol'];
-    
-    // Default INCOME categories
-    $default_income = ['Salary'];
-    
-    // Insert expense categories
-    foreach ($default_expense as $cat_name) {
-        $sql = "INSERT INTO category (user_id, category_name, category_type, is_active) VALUES (?, ?, 'expense', 1)";
-        $stmt = $conn->prepare($sql);
-        $stmt->bind_param("is", $user_id, $cat_name);
-        $stmt->execute();
-    }
-    
-    // Insert income categories
-    foreach ($default_income as $cat_name) {
-        $sql = "INSERT INTO category (user_id, category_name, category_type, is_active) VALUES (?, ?, 'income', 1)";
-        $stmt = $conn->prepare($sql);
-        $stmt->bind_param("is", $user_id, $cat_name);
-        $stmt->execute();
-    }
-}
 
 // When form is submitted
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
-    $username = trim($_POST['username']);
-    $phone = trim($_POST['phone']);
-    if (!preg_match('/^\d{10}$/', $phone)) {
+
+$username = trim($_POST['username']);
+$phone    = trim($_POST['phone']);
+$ic       = trim($_POST['ic']);
+$email    = trim($_POST['email']);
+$password = trim($_POST['password']);
+
+$security_question = trim($_POST['question']);
+$security_answer   = trim($_POST['answer']);
+
+//  Block username admin style
+if ($username !== "" && $username[0] === '$') {
+    $error_message = "Username cannot start with '$'. Please choose another username.";
+}
+
+//  Phone validation (only check if no previous error)
+if (empty($error_message) && !preg_match('/^\d{10}$/', $phone)) {
     $error_message = "Invalid Malaysian phone number. It should be 10 digits.";
 }
 
-    $ic = trim($_POST['ic']);
-    $email = trim($_POST['email']);
-    $password = trim($_POST['password']);
-    $security_question = trim($_POST['question']);
-$security_answer   = trim($_POST['answer']);
-
-if (empty($security_question) || empty($security_answer)) {
+//  Security Q/A
+if (empty($error_message) && (empty($security_question) || empty($security_answer))) {
     $error_message = "Security question and answer are required.";
 }
 
-    if (!preg_match('/^\d{6}-\d{2}-\d{4}$/', $ic)) {
+//  IC format
+if (empty($error_message) && !preg_match('/^\d{6}-\d{2}-\d{4}$/', $ic)) {
     $error_message = "Invalid IC format. Use XXXXXX-XX-XXXX.";
 }
-
-if (empty($error_message)) {
-    $gender  = getGenderFromIC($ic);
-    $age = getAgeFromIC($ic);
-
-if ($age === false) {
-    $error_message = "IC number contains invalid birth date.";
-}
-
-    $ic_hash = password_hash($ic, PASSWORD_DEFAULT);
-    // 🔥 SECURITY ANSWER HASH
-    $security_answer_hash = password_hash($security_answer, PASSWORD_DEFAULT);
-}
-
 
 
     // Validate simple required fields
@@ -237,7 +243,7 @@ VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())
                     <div class="mb-3">
                         <label for="password" class="form-label">Password</label>
                         <div class="input-group">
-                            <input type="password" class="form-control border-end-0" id="password" name="password" required>
+                            <input type="password" class="form-control border-end-0" id="password" name="password" minlength="4" required>
                             <span class="input-group-text bg-transparent border-start-0" onclick="togglePassword()">
                                 👁
                             </span>

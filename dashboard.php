@@ -14,34 +14,38 @@ $month = date('Y-m');
 // TASK COUNTS (NOT ONLY THIS MONTH)
 // -----------------------------
 $sql = "
-   SELECT
+  SELECT
     COUNT(*) AS total,
 
-    -- In Progress (NOT overdue)
-    SUM(
+    COALESCE(SUM(
         CASE 
             WHEN status = 'in progress'
              AND due_date >= CURDATE()
             THEN 1 
             ELSE 0 
         END
-    ) AS in_progress,
+    ), 0) AS in_progress,
 
-    -- Completed
-    SUM(status = 'completed') AS completed,
+    COALESCE(SUM(
+        CASE 
+            WHEN status = 'completed'
+            THEN 1 
+            ELSE 0 
+        END
+    ), 0) AS completed,
 
-    -- Overdue
-    SUM(
+    COALESCE(SUM(
         CASE 
             WHEN status = 'in progress'
              AND due_date < CURDATE()
             THEN 1 
             ELSE 0 
         END
-    ) AS overdue
+    ), 0) AS overdue
 
 FROM task
 WHERE user_id = ?
+
 ";
 
 $stmt = $conn->prepare($sql);
