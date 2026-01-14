@@ -2,6 +2,7 @@
 session_start();
 include 'db_connection.php';
 
+
 $error = "";
 $step = 1;
 

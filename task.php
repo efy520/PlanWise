@@ -2,6 +2,10 @@
 session_start(); 
 include 'db_connection.php';
 
+if (!isset($_SESSION['user_id'])) {
+    header("Location: login.php");
+    exit();
+}
 // -------------------------------------------
 // CHECK LOGIN SESSION
 // -------------------------------------------

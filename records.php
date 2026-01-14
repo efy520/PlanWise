@@ -3,6 +3,34 @@ session_start();
 
 include 'db_connection.php';
 
+if (!isset($_SESSION['user_id'])) {
+    header("Location: login.php");
+    exit();
+}
+function getLiveAccountBalance($conn, $user_id, $account_id) {
+
+    $sql = "
+        SELECT 
+            COALESCE(SUM(
+                CASE 
+                    WHEN type = 'income'   AND source_account_id = ? THEN amount
+                    WHEN type = 'expense'  AND source_account_id = ? THEN -amount
+                    WHEN type = 'transfer' AND destination_account_id = ? THEN amount
+                    WHEN type = 'transfer' AND source_account_id = ? THEN -amount
+                    ELSE 0
+                END
+            ), 0) AS balance
+        FROM transaction_table
+        WHERE user_id = ?
+    ";
+
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("iiiii", $account_id, $account_id, $account_id, $account_id, $user_id);
+    $stmt->execute();
+
+    return (float) $stmt->get_result()->fetch_assoc()['balance'];
+}
+
 // -------------------------------------------
 // CHECK LOGIN SESSION
 // -------------------------------------------
@@ -24,38 +52,87 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['edit_transaction'])) 
     $txn_date_time = $_POST['txn_date_time'];
     $type = $_POST['type']; // WAJIB ADA
 
-    // ❌ Block negative amount
-    if ($amount < 0) {
-        $_SESSION['error'] = "Amount cannot be negative.";
+// ✅ Get old transaction amount + old source account
+$sql_old = "SELECT amount, source_account_id 
+            FROM transaction_table 
+            WHERE transaction_id = ? AND user_id = ? 
+            LIMIT 1";
+$stmt_old = $conn->prepare($sql_old);
+$stmt_old->bind_param("ii", $transaction_id, $user_id);
+$stmt_old->execute();
+$oldTxn = $stmt_old->get_result()->fetch_assoc();
+
+if (!$oldTxn) {
+    $_SESSION['error'] = "Transaction not found.";
+    header("Location: records.php");
+    exit();
+}
+
+$old_amount = (float)$oldTxn['amount'];
+$old_source_account_id = (int)$oldTxn['source_account_id'];
+
+// ❌ Block negative / zero
+if ($amount < 0) {
+    $_SESSION['error'] = "Amount cannot be negative.";
+    header("Location: records.php");
+    exit();
+}
+
+if ($amount <= 0) {
+    $_SESSION['error'] = "Amount must be more than 0.";
+    header("Location: records.php");
+    exit();
+}
+
+$source_account_id = (int)$_POST['source_account_id'];
+$destination_account_id = !empty($_POST['destination_account_id'])
+    ? (int)$_POST['destination_account_id']
+    : null;
+
+// ✅ STOP TRANSFER IF SAME ACCOUNT
+if ($type === 'transfer' && $source_account_id == $destination_account_id) {
+    $_SESSION['error'] = "Transfer source and destination account cannot be the same.";
+    header("Location: records.php");
+    exit();
+}
+
+// ✅ CHECK TRANSFER BALANCE (EDIT MODE)
+if ($type === 'transfer') {
+
+    $balance = getLiveAccountBalance($conn, $user_id, $source_account_id);
+
+    $extra_needed = ($source_account_id == $old_source_account_id)
+        ? ($amount - $old_amount)
+        : $amount;
+
+    if ($extra_needed > 0 && $extra_needed > $balance) {
+        $_SESSION['error'] = "Insufficient balance for transfer.";
         header("Location: records.php");
         exit();
     }
+}
 
-    // Category (income / expense only)
-    $category_id = null;
-    if (isset($_POST['category_id']) && $_POST['category_id'] !== '') {
-        $category_id = (int)$_POST['category_id'];
+// ✅ CHECK EXPENSE BALANCE (EDIT MODE)
+if ($type === 'expense') {
+
+    $balance = getLiveAccountBalance($conn, $user_id, $source_account_id);
+
+    $extra_needed = ($source_account_id == $old_source_account_id)
+        ? ($amount - $old_amount)
+        : $amount;
+
+    if ($extra_needed > 0 && $extra_needed > $balance) {
+        $_SESSION['error'] = "Insufficient balance in selected account.";
+        header("Location: records.php");
+        exit();
     }
+}
 
-    $source_account_id = (int)$_POST['source_account_id'];
-    $destination_account_id = !empty($_POST['destination_account_id'])
-        ? (int)$_POST['destination_account_id']
-        : null;
 
-    // 🔒 Check balance ONLY for expense
-    if ($type === 'expense') {
-        $sql_balance = "SELECT balance FROM account WHERE account_id = ? AND user_id = ?";
-        $stmt_bal = $conn->prepare($sql_balance);
-        $stmt_bal->bind_param("ii", $source_account_id, $user_id);
-        $stmt_bal->execute();
-        $balance = $stmt_bal->get_result()->fetch_assoc()['balance'];
 
-        if ($amount > $balance) {
-            $_SESSION['error'] = "Insufficient balance in selected account.";
-            header("Location: records.php");
-            exit();
-        }
-    }
+
+
+
 
     // UPDATE
     $sql_update = "UPDATE transaction_table
@@ -80,8 +157,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['edit_transaction'])) 
         header("Location: records.php?updated=1");
         exit();
     }
-}
 
+}
 // -------------------------------------------
 // HANDLE DELETE TRANSACTION
 // -------------------------------------------
@@ -136,7 +213,9 @@ $sql = "
         c.category_type,
         
         a1.account_name AS source_account,
-        a2.account_name AS destination_account
+        a2.account_name AS destination_account,
+        a1.is_deleted AS source_deleted,
+        a2.is_deleted AS destination_deleted
 
     FROM transaction_table t
     LEFT JOIN category c 
@@ -147,6 +226,7 @@ $sql = "
         ON t.destination_account_id = a2.account_id
     WHERE t.user_id = ?
 ";
+
 
 // Add filters to SQL
 $params = [$user_id];
@@ -196,7 +276,12 @@ $records = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
 // -------------------------------------------
 // FETCH ACCOUNTS AND CATEGORIES FOR FILTERS AND MODALS
 // -------------------------------------------
-$sql_accounts = "SELECT account_id, account_name FROM account WHERE user_id = ? AND is_active = 1 ORDER BY account_name";
+$sql_accounts = "SELECT account_id, account_name 
+                 FROM account 
+                 WHERE user_id = ? 
+                   AND is_active = 1
+                   AND is_deleted = 0
+                 ORDER BY account_name";
 $stmt_accounts = $conn->prepare($sql_accounts);
 $stmt_accounts->bind_param("i", $user_id);
 $stmt_accounts->execute();
@@ -358,12 +443,22 @@ $months = $stmt_months->get_result()->fetch_all(MYSQLI_ASSOC);
                         $date = date('d/m/Y', strtotime($r['txn_date_time']));
                         $time = date('h:i A', strtotime($r['txn_date_time']));
 
-                        // Determine account display
-                        if ($r['type'] === 'transfer') {
-                            $account_display = $r['source_account'] . " → " . $r['destination_account'];
-                        } else {
-                            $account_display = $r['source_account'];
-                        }
+                       if ($r['type'] === 'transfer') {
+
+    $from = $r['source_account'] ?? '-';
+    $to   = $r['destination_account'] ?? '-';
+
+    if (!empty($r['source_deleted'])) $from .= " (Deleted)";
+    if (!empty($r['destination_deleted'])) $to .= " (Deleted)";
+
+    $account_display = $from . " → " . $to;
+
+} else {
+
+    $account_display = $r['source_account'] ?? '-';
+    if (!empty($r['source_deleted'])) $account_display .= " (Deleted)";
+}
+
                         ?>
 
                         <tr>

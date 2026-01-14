@@ -52,14 +52,13 @@ try {
 
     // 1062 = Duplicate entry (UNIQUE constraint)
     if ($e->getCode() == 1062) {
-        $_SESSION['duplicate_error'] = "Category already exists. Please use a different name.";
-        header("Location: finance-cat.php");
+        header("Location: finance-cat.php?exists=1");
         exit();
     }
 
-    // kalau error lain (jarang)
     throw $e;
 }
+
 
     }
 }
@@ -180,6 +179,13 @@ $ignored_categories = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
                 <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
             </div>
         <?php endif; ?>
+
+        <?php if (isset($_GET['exists'])): ?>
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        Category name already exists!
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+<?php endif; ?>
 
         <?php if (isset($_GET['deleted'])): ?>
             <div class="alert alert-success alert-dismissible fade show" role="alert">
@@ -407,23 +413,7 @@ $ignored_categories = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
         </div>
     </div>
 </div>
-<!-- DUPLICATE CATEGORY MODAL -->
-<div class="modal fade" id="duplicateModal" tabindex="-1">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-header bg-danger text-white">
-        <h5 class="modal-title">Duplicate Category</h5>
-        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-      </div>
-      <div class="modal-body">
-        <p id="duplicateMessage"></p>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">OK</button>
-      </div>
-    </div>
-  </div>
-</div>
+
  
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
@@ -462,20 +452,7 @@ function showAddModal(type) {
     const modal = new bootstrap.Modal(document.getElementById('addCategoryModal'));
     modal.show();
 }
-<?php if (isset($_SESSION['duplicate_error'])): ?>
 
-document.addEventListener("DOMContentLoaded", function () {
-    document.getElementById("duplicateMessage").textContent =
-        "<?php echo addslashes($_SESSION['duplicate_error']); ?>";
-
-    const modal = new bootstrap.Modal(
-        document.getElementById('duplicateModal')
-    );
-    modal.show();
-});
-
-<?php unset($_SESSION['duplicate_error']); ?>
-<?php endif; ?>
  
 </script>
 

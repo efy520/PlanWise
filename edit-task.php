@@ -2,6 +2,10 @@
 session_start();
 include 'db_connection.php';
 
+if (!isset($_SESSION['user_id'])) {
+    header("Location: login.php");
+    exit();
+}
 // Ensure task_id exists
 if (!isset($_GET['task_id'])) {
     header("Location: task.php");

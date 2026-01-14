@@ -2,6 +2,18 @@
 session_start();
 include 'db_connection.php';
 
+if (!isset($_SESSION['user_id'])) {
+    header("Location: login.php");
+    exit();
+}
+
+$due_date = isset($_GET['due_date']) ? $_GET['due_date'] : date('Y-m-d');
+
+// Optional: validate format YYYY-MM-DD
+if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $due_date)) {
+    $due_date = date('Y-m-d');
+}
+
 // Redirect if user not logged in
 if (!isset($_SESSION['user_id'])) {
     header("Location: login.php");

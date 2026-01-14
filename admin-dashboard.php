@@ -4,6 +4,10 @@ include 'db_connection.php';
 date_default_timezone_set('Asia/Kuala_Lumpur');
 
 
+if (!isset($_SESSION['user_id'])) {
+    header("Location: login.php");
+    exit();
+}
 // Check if user is admin (hardcoded for now)
 $is_admin = true;
 

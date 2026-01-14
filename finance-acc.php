@@ -22,36 +22,51 @@ if ($result_quote && $result_quote->num_rows > 0) {
 // Handle Add New Account
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_account'])) {
     $account_name = trim($_POST['account_name']);
-    
+
     if (!empty($account_name)) {
-        $sql = "INSERT INTO account (user_id, account_name, is_active) VALUES (?, ?, 1)";
+
+        // ✅ CHECK DUPLICATE ACCOUNT NAME (same user, not deleted)
+        $check_sql = "SELECT account_id FROM account 
+                      WHERE user_id = ? 
+                        AND LOWER(account_name) = LOWER(?) 
+                        AND is_deleted = 0
+                      LIMIT 1";
+        $check_stmt = $conn->prepare($check_sql);
+        $check_stmt->bind_param("is", $user_id, $account_name);
+        $check_stmt->execute();
+        $check_result = $check_stmt->get_result();
+
+        if ($check_result->num_rows > 0) {
+            // ❌ Duplicate found
+            header("Location: finance-acc.php?exists=1");
+            exit();
+        }
+
+        // ✅ Insert if no duplicate
+        $sql = "INSERT INTO account (user_id, account_name, is_active, is_deleted) 
+                VALUES (?, ?, 1, 0)";
         $stmt = $conn->prepare($sql);
         $stmt->bind_param("is", $user_id, $account_name);
         $stmt->execute();
+
         header("Location: finance-acc.php?added=1");
         exit();
     }
 }
 
-// Handle Delete Account
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_account_id'])) {
-    $account_id = (int)$_POST['delete_account_id'];
-    $sql = "DELETE FROM account WHERE account_id = ? AND user_id = ?";
-    $stmt = $conn->prepare($sql);
-    $stmt->bind_param("ii", $account_id, $user_id);
-    $stmt->execute();
-    header("Location: finance-acc.php?deleted=1");
-    exit();
-}
 
-// Handle Ignore Account (set is_active = 0)
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['ignore_account_id'])) {
-    $account_id = (int)$_POST['ignore_account_id'];
-    $sql = "UPDATE account SET is_active = 0 WHERE account_id = ? AND user_id = ?";
+// ✅ Delete Account (permanent)
+if (isset($_POST['delete_account'])) {
+    $account_id = (int)$_POST['account_id'];
+
+    $sql = "UPDATE account 
+            SET is_active = 0, is_deleted = 1
+            WHERE account_id = ? AND user_id = ?";
     $stmt = $conn->prepare($sql);
     $stmt->bind_param("ii", $account_id, $user_id);
     $stmt->execute();
-    header("Location: finance-acc.php?ignored=1");
+
+    header("Location: finance-acc.php?deleted=1");
     exit();
 }
 
@@ -59,40 +74,79 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['ignore_account_id']))
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['edit_account'])) {
     $account_id = (int)$_POST['account_id'];
     $account_name = trim($_POST['account_name']);
-    
+
     if (!empty($account_name)) {
-        $sql = "UPDATE account SET account_name = ? WHERE account_id = ? AND user_id = ?";
+        $sql = "UPDATE account 
+                SET account_name = ? 
+                WHERE account_id = ? AND user_id = ? AND is_deleted = 0";
         $stmt = $conn->prepare($sql);
         $stmt->bind_param("sii", $account_name, $account_id, $user_id);
         $stmt->execute();
+
         header("Location: finance-acc.php?edited=1");
         exit();
     }
 }
 
-// Handle Restore Account (set is_active = 1)
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['restore_account_id'])) {
-    $account_id = (int)$_POST['restore_account_id'];
-    $sql = "UPDATE account SET is_active = 1 WHERE account_id = ? AND user_id = ?";
+// ✅ Ignore Account (temporary)
+if (isset($_POST['ignore_account_id'])) {
+    $account_id = (int)$_POST['ignore_account_id'];
+
+    $sql = "UPDATE account 
+            SET is_active = 0
+            WHERE account_id = ? AND user_id = ? AND is_deleted = 0";
     $stmt = $conn->prepare($sql);
     $stmt->bind_param("ii", $account_id, $user_id);
     $stmt->execute();
-    header("Location: finance-acc.php?restored=1");
+
+    header("Location: finance-acc.php?ignored=1");
     exit();
 }
-// Fetch Active Accounts
-$sql = "SELECT account_id, account_name FROM account WHERE user_id = ? AND is_active = 1";
-$stmt = $conn->prepare($sql);
+
+// ✅ Restore Account (ignored only)
+if (isset($_POST['restore_account'])) {
+    $account_id = (int)$_POST['account_id'];
+
+    $sql = "UPDATE account 
+            SET is_active = 1
+            WHERE account_id = ? AND user_id = ? AND is_deleted = 0";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("ii", $account_id, $user_id);
+    $stmt->execute();
+
+    header("Location: finance-acc.php?restored=1");
+    exit();
+    
+}
+// POST handlers (add/edit/delete/ignore/restore) semua kat atas
+// jangan ada fetch kat sini
+
+// ✅ FETCH ACTIVE ACCOUNTS
+$sql_active_accounts = "SELECT account_id, account_name
+                        FROM account
+                        WHERE user_id = ?
+                          AND is_active = 1
+                          AND is_deleted = 0
+                        ORDER BY account_name";
+
+$stmt = $conn->prepare($sql_active_accounts);
 $stmt->bind_param("i", $user_id);
 $stmt->execute();
 $active_accounts = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
- 
-// Fetch Ignored Accounts (is_active = 0)
-$ignored_sql = "SELECT account_id, account_name FROM account WHERE user_id = ? AND is_active = 0";
-$stmt = $conn->prepare($ignored_sql);
+
+// ✅ FETCH IGNORED ACCOUNTS
+$sql_ignored_accounts = "SELECT account_id, account_name
+                         FROM account
+                         WHERE user_id = ?
+                           AND is_active = 0
+                           AND is_deleted = 0
+                         ORDER BY account_name";
+
+$stmt = $conn->prepare($sql_ignored_accounts);
 $stmt->bind_param("i", $user_id);
 $stmt->execute();
 $ignored_accounts = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+
 
 ?>
 <!DOCTYPE html>
@@ -122,6 +176,13 @@ $ignored_accounts = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
 
     <!-- MAIN CONTENT -->
     <div class="content-box">
+        
+<?php if (isset($_GET['exists'])): ?>
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        Account name already exists!
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+<?php endif; ?>
 
         <?php if (isset($_GET['added'])): ?>
             <div class="alert alert-success alert-dismissible fade show" role="alert">
@@ -222,10 +283,12 @@ $ignored_accounts = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
                         <?php foreach ($ignored_accounts as $account): ?>
                             <div class="category-item">
                                 <span class="category-name"><?php echo htmlspecialchars($account['account_name']); ?></span>
-                                <form method="POST" style="display: inline;">
-                                    <input type="hidden" name="restore_account_id" value="<?php echo $account['account_id']; ?>">
-                                    <button type="submit" class="btn btn-sm btn-success">Restore</button>
-                                </form>
+                               <form method="POST" style="display:inline;">
+    <input type="hidden" name="restore_account" value="1">
+    <input type="hidden" name="account_id" value="<?= $account['account_id']; ?>">
+    <button type="submit" class="btn btn-sm btn-success">Restore</button>
+</form>
+
                             </div>
                         <?php endforeach; ?>
                     <?php else: ?>
@@ -276,8 +339,8 @@ $ignored_accounts = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
             <div class="modal-body">
                 <p>Are you sure you want to delete "<span id="deleteAccountName"></span>"?</p>
                 <form method="POST">
-                    <input type="hidden" name="delete_account_id" id="deleteAccountId">
-                    <div class="d-flex gap-2">
+                     <input type="hidden" name="delete_account" value="1">
+    <input type="hidden" name="account_id" id="deleteAccountId"><div class="d-flex gap-2">
                         <button type="button" class="btn btn-secondary flex-fill" data-bs-dismiss="modal">Cancel</button>
                         <button type="submit" class="btn btn-danger flex-fill">Delete</button>
                     </div>
